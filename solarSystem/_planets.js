@@ -1,5 +1,7 @@
+//Why doesn't it work in strict?
+//Uncaught SyntaxError: Unexpected identifier (2 lines down)
+"use strict";
 (function(explore,undefined){
-
 	Date.prototype.getJulian = function() {
     return Math.floor((this / 86400000) - (this.getTimezoneOffset()/1440) + 2440587.5);
 	}
@@ -35,15 +37,15 @@
 	// Formulae and elements from Paul Schlyter's article "Computing planetary positions" available at 
 	// http://hem.passagen.se/pausch/comp/ppcomp.html
 
-	MERCURY = 0; VENUS = 1; EARTH = 2; MARS = 3; JUPITER = 4; SATURN = 5; 
-	URANUS = 6; NEPTUNE = 7; SUN = 9; MOON = 10; COMET = 15; USER = 20;
+	var MERCURY = 0, VENUS = 1, EARTH = 2, MARS = 3, JUPITER = 4, SATURN = 5, 
+	URANUS = 6, NEPTUNE = 7, SUN = 9, MOON = 10, COMET = 15, USER = 20;
 
 	// Planet diameters at 1 AU in arcsec (km for Moon)
 	var ndiam = [6.72, 16.68, 1, 9.36, 196.88, 165.46, 70.04, 67.0, 1, 1919.3, 716900000.0];
 
 	// The planet object
 
-	function planet(name,num,N,i,w,a,e,M) {
+	function planet(name,num,N,i,w,a,e,M,radius,oblique,dayLength,color) {
 		this.name=name;
 		this.num=num;
 		this.N=N; 	// longitude of ascending node
@@ -52,6 +54,14 @@
 		this.a=a;	// semimajor axis
 		this.e=e;		// eccentricity
 		this.M=M;	// mean anomaly
+
+		this.radius = radius;//km
+		this.oblique = oblique;//degrees rotation is off center
+		this.dayLength = dayLength;//length of day
+		this.texColor = color;//hex color to approximate surface
+		/*
+		this.webShader = webShader;
+		*/
 	}
 
 	explore.mercury = new planet("Mercury",0,
@@ -60,7 +70,12 @@
 	   new Array(29.1241, 1.01444E-5),
 	   new Array(0.387098, 0),
 	   new Array(0.205635, 5.59E-10),
-	   new Array(168.6562, 4.0923344368));
+	   new Array(168.6562, 4.0923344368),
+	   2439.5/2,
+	   0.01,
+	   4222.6,
+	   0xffffff
+	   );
 
 	explore.venus = new planet("Venus  ",1,
 	   new Array(76.6799, 2.46590E-5),
@@ -68,15 +83,25 @@
 	   new Array(54.8910, 1.38374E-5),
 	   new Array(0.723330, 0),
 	   new Array(0.006773, -1.302E-9),
-	   new Array(48.0052, 1.6021302244));
+	   new Array(48.0052, 1.6021302244),
+	   12104/2,
+	   177.4,
+	   2802,
+	   0xff9933
+	   );
 
 	explore.earth = new planet("Earth  ",2,
 	   new Array(0,0),
 	   new Array(0,0),
-	   new Array(0,0),
-	   new Array(0.0, 0.0),
-	   new Array(0.0, 0.0),
-	   new Array(0,0));
+	   new Array(282.9404,4.70935E-5),
+	   new Array(1.0, 0.0),
+	   new Array(0.016709, - 1.151E-9),
+	   new Array(356.0470, 0.9856002585),
+	   12756/2,
+	   23.4,
+	   24,
+	   0x00ff99 
+	   );
 
 	explore.mars = new planet("Mars   ",3,
 	   new Array(49.5574, 2.11081E-5),
@@ -84,7 +109,12 @@
 	   new Array(286.5016, 2.92961E-5),
 	   new Array(1.523688, 0),
 	   new Array(0.093405, 2.516E-9),
-	   new Array(18.6021, 0.5240207766));
+	   new Array(18.6021, 0.5240207766),
+	   6792/2,
+	   25.2,
+	   24.7,
+	   0xff0000
+	   );
 
 	explore.jupiter = new planet("Jupiter",4,
 	   new Array(100.4542, 2.76854E-5),
@@ -92,7 +122,12 @@
 	   new Array(273.8777, 1.64505E-5),
 	   new Array(5.20256, 0),
 	   new Array(0.048498, 4.469E-9),
-	   new Array(19.8950, 0.0830853001));
+	   new Array(19.8950, 0.0830853001),
+	   142984/2,
+	   3.1,
+	   9.9,
+	   0xff4d88
+	   );
 
 	explore.saturn = new planet("Saturn ",5,
 		new Array(113.6634, 2.38980E-5),
@@ -100,7 +135,12 @@
 		new Array(339.3939, 2.97661E-5),
 		new Array(9.55475, 0),
 		new Array(0.055546, -9.499E-9),
-		new Array(316.9670, 0.0334442282));
+		new Array(316.9670, 0.0334442282),
+		120536/2,
+		26.7,
+		10.7,
+		0x00ff00
+		);
 
 	explore.uranus = new planet("Uranus ",6,
 		new Array(74.0005, 1.3978E-5),
@@ -108,7 +148,12 @@
 		new Array(96.6612, 3.0565E-5),
 		new Array(19.18171, -1.55E-8),
 		new Array(0.047318, 7.45E-9),
-		new Array(142.5905, 0.011725806));
+		new Array(142.5905, 0.011725806),
+		51118/2,
+		97.8,
+		17.2,
+		0x0055ff
+		);
 
 	explore.neptune = new planet("Neptune",7,
 		new Array(131.7806, 3.0173E-5),
@@ -116,7 +161,12 @@
 		new Array(272.8461, -6.027E-6),
 		new Array(30.05826, 3.313E-8),
 		new Array(0.008606, 2.15E-9),
-		new Array(260.2471, 0.005995147));
+		new Array(260.2471, 0.005995147),
+		49528/2,
+		28.3,
+		16.1,
+		0x730099
+		);
 
 	// elements from Paul Schlyter
 	explore.planets=[explore.mercury,explore.venus,explore.earth,
@@ -147,7 +197,7 @@
 		this.elongupdate=updateElong;
 	}
 
-	bodies = new Array();
+	var bodies = new Array();
 	bodies[0] = new Body("Mercury",MERCURY,0,24,25);
 	bodies[1] = new Body("Venus  ",VENUS,1,24,25);
 	bodies[2] = new Body("Earth  ",2,3,24,25);
@@ -350,10 +400,3 @@
 			return new Array (altaz[0], altaz[1], altaz[2], ra, dec, lon, lat, k, r, dist, mag); 
 	}
 }(window.explore = window.explore || {}))
-
-
-//console.log(explore.SolarSystem(explore.mars,explore.now));
-
-for(p in explore.planets){
-	console.log(explore.SolarSystem(explore.planets[p],explore.now));
-}
