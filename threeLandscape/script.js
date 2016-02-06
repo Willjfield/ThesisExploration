@@ -8,23 +8,27 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
 var geometry = new THREE.PlaneGeometry( 50, 50, 50,50 );
-var material = new THREE.MeshBasicMaterial( { color: 0xdddddd, wireframe: true } );
+var wireFrameMaterial = new THREE.MeshBasicMaterial( { color: 0xdddddd, needsUpdate: true, wireframe: true,wireframeLinewidth: 2 } );
+var solidMaterial = new THREE.MeshBasicMaterial( { needsUpdate: true, color: 0x111111 } );
 
-for(var v=0;v<geometry.vertices.length;v++){
-	geometry.vertices[v].z = Math.random()*2
+for(var v=1;v<geometry.vertices.length-1;v++){
+	geometry.vertices[v].z = (Math.random()*2)*((geometry.vertices[v-1].z+geometry.vertices[v+1].z)/2)
 }
-var landscape = new THREE.Mesh( geometry, material );
-
-scene.add( landscape );
+var wireLandscape = new THREE.Mesh( geometry, wireFrameMaterial );
+var solidLandscape = new THREE.Mesh( geometry, solidMaterial)
+scene.add( wireLandscape )
+wireLandscape.add(solidLandscape)
+solidLandscape.position.z = -.01
 
 camera.position.z = 50;
-
+var fc = 0
 var render = function () {
-
 	requestAnimationFrame( render );
-	landscape.rotation.x = -45
-
+	for(var v = 0; v<geometry.vertices.length;v++){
+		wireLandscape.geometry.vertices[v].z += (Math.random()-.5)*.2
+		wireLandscape.geometry.verticesNeedUpdate = true	
+	}
 	renderer.render(scene, camera);
 };
 
-render();
+render()
