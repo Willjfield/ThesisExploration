@@ -7,6 +7,33 @@ document.body.appendChild( renderer.domElement );
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+var light = new THREE.PointLight( 0xffffff, 1, 0 );
+light.position.set( 10, 0, 0 );
+scene.add( light );
+
+var light = new THREE.PointLight( 0xffffff, 1, 0 );
+light.position.set( -10, 0, 0 );
+scene.add( light );
+
+var light = new THREE.PointLight( 0xffffff, 1, 0 );
+light.position.set( 0, 10, 0 );
+scene.add( light );
+
+var light = new THREE.PointLight( 0xffffff, 1, 0 );
+light.position.set( 0, -10, 0 );
+scene.add( light );
+
+var light = new THREE.PointLight( 0xffffff, 1, 0 );
+light.position.set( 0, 0, 10 );
+scene.add( light );
+
+var light = new THREE.PointLight( 0xffffff, 1, 0 );
+light.position.set( 0, 0, -10 );
+scene.add( light );
+
+var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( light );
+
 var t = 0;
 
 var planets = []
@@ -14,7 +41,7 @@ var solScale = 30;
 	
 //MERCURY - white
 var geometry = new THREE.SphereGeometry( 1,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 var sphere = new THREE.Mesh( geometry, material );
 var curPosition = explore.SolarSystem(explore.planets[0],explore.now);
 sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
@@ -24,7 +51,7 @@ console.log(curPosition)
 
 //VENUS - orange
 var geometry = new THREE.SphereGeometry( 2,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0xff9933 } );
+var material = new THREE.MeshLambertMaterial( { color: 0xff9933 } );
 var sphere = new THREE.Mesh( geometry, material );
 var curPosition = explore.SolarSystem(explore.planets[1],explore.now);
 sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
@@ -44,7 +71,7 @@ console.log(curPosition)
 
 //MARS - red
 var geometry = new THREE.SphereGeometry( 2,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+var material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
 var sphere = new THREE.Mesh( geometry, material );
 var curPosition = explore.SolarSystem(explore.planets[3],explore.now);
 sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
@@ -54,7 +81,7 @@ console.log(curPosition)
 
 //JUPITER - pink
 var geometry = new THREE.SphereGeometry( 5,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0xff4d88 } );
+var material = new THREE.MeshLambertMaterial( { color: 0xff4d88 } );
 var sphere = new THREE.Mesh( geometry, material );
 var curPosition = explore.SolarSystem(explore.planets[4],explore.now);
 sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
@@ -64,7 +91,7 @@ console.log(curPosition)
 
 //Saturn - green
 var geometry = new THREE.SphereGeometry( 5,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
 var sphere = new THREE.Mesh( geometry, material );
 var curPosition = explore.SolarSystem(explore.planets[5],explore.now);
 sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
@@ -74,7 +101,7 @@ console.log(curPosition)
 
 //Uranus - blue
 var geometry = new THREE.SphereGeometry( 5,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0x0055ff } );
+var material = new THREE.MeshLambertMaterial( { color: 0x0055ff } );
 var sphere = new THREE.Mesh( geometry, material );
 var curPosition = explore.SolarSystem(explore.planets[6],explore.now);
 sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
@@ -84,7 +111,7 @@ console.log(curPosition)
 
 //Neptune - purple
 var geometry = new THREE.SphereGeometry( 5,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0x730099 } );
+var material = new THREE.MeshLambertMaterial( { color: 0x730099 } );
 var sphere = new THREE.Mesh( geometry, material );
 var curPosition = explore.SolarSystem(explore.planets[7],explore.now);
 sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
@@ -97,7 +124,7 @@ console.log(curPosition)
 for(p in explore.planets){
 	
 	var geometry = new THREE.BoxGeometry( p/2, p/2, p/2 );
-	var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	var material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
 	var sphere = new THREE.Mesh( geometry, material );
 	planets.push(sphere);
 	scene.add( planets[p] );
