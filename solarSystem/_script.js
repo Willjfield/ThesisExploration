@@ -44,9 +44,13 @@ for(var p in explore.planets){
 var render = function () {
 	requestAnimationFrame( render );
 	controls.update();
-	t+=.1;
+	var step = .01;
+	t+=step;
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
+		var deltaRotation = (explore.planets[p].dayLength*360)*(Math.PI/180)
+		var curRotation = explore.planets[p].dayLength+(deltaRotation*t)
+		drawPlanets[p].rotation.set(0,0,curRotation)
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
 	}
 	renderer.render(scene, camera);
