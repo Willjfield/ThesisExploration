@@ -94,7 +94,7 @@
 	   new Array(0,0),
 	   new Array(0,0),
 	   new Array(282.9404,4.70935E-5),
-	   new Array(1.0, 0.0),
+	   new Array(-1.0, 0.0),
 	   new Array(0.016709, - 1.151E-9),
 	   new Array(356.0470, 0.9856002585),
 	   12756/2,

@@ -1,8 +1,10 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+camera.position.set(0,0,100)
 
-var renderer = new THREE.WebGLRenderer();
+var renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
+//renderer.setClearColor( 0xffffff, 0);
 document.body.appendChild( renderer.domElement );
 
 var controls = new THREE.OrbitControls(camera);
@@ -41,7 +43,7 @@ for(var p in explore.planets){
 	sphere.add(sphereW);
 	
 	var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
-	sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale);
+	sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
 	drawPlanets.push(sphere);
 	scene.add( sphere);
 }
@@ -49,18 +51,23 @@ for(var p in explore.planets){
 var render = function () {
 	requestAnimationFrame( render );
 	controls.update();
-	var step = .001;
+	var step = 0.01;
 	t+=step;
 	console.log(t)
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
-		var deltaRotation = (24/explore.planets[p].dayLength)*(2*Math.PI)
+		var deltaRotation = -(24/explore.planets[p].dayLength)*(2*Math.PI)
 
 		var curRotation = (deltaRotation*t)
-		drawPlanets[p].rotation.set(explore.planets[p].oblique*(Math.PI/180),0,curRotation)
-		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
+		drawPlanets[p].rotation.set(explore.planets[p].oblique*(Math.PI/180),curRotation,0)
+		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
 	renderer.render(scene, camera);
 };
+/*
+document.addEventListener("click", function(){ 
+	t+=365.25; 
+});
+*/
 
 render();
