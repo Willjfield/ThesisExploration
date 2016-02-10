@@ -3453,9 +3453,9 @@ explore.tle = function(line1, line2) {
         var satrec = explore.satellite.twoline2satrec (this.line1, this.line2);
 
         //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION
-        var deltaMinutes = deltaSeconds*60;
-        var deltaHours = deltaMinutes*60;
-        var deltaDays = deltaHours*24;
+        var deltaMinutes = this.deltaSeconds/60;
+        var deltaHours = deltaMinutes/60;
+        var deltaDays = deltaHours/24;
         // Propagate satellite using current time
         var now = new Date();
         // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
@@ -3465,7 +3465,7 @@ explore.tle = function(line1, line2) {
                                                         now.getUTCDate()+deltaDays,
                                                         now.getUTCHours()+deltaHours, 
                                                         now.getUTCMinutes()+deltaMinutes, 
-                                                        now.getUTCSeconds()+deltaSeconds);
+                                                        now.getUTCSeconds()+(this.deltaSeconds%60));
         // The position_velocity result is a key-value pair of ECI coordinates.
         // These are the base results from which all other coordinates are derived.
         var _position_eci = position_and_velocity["position"];
@@ -3479,11 +3479,11 @@ explore.tle = function(line1, line2) {
                                                         now.getUTCDate()+deltaDays,
                                                         now.getUTCHours()+deltaHours, 
                                                         now.getUTCMinutes()+deltaMinutes, 
-                                                        now.getUTCSeconds()+deltaSeconds
+                                                        now.getUTCSeconds()+this.deltaSeconds%60
 			));
         console.log("time: "+curgstime)
 
-        var _latlongalt = explore.satellite.eci_to_geodetic(position_eci, curgstime)
+        var _latlongalt = explore.satellite.eci_to_geodetic(_position_eci, curgstime)
         _latlongalt.longitude = _latlongalt.longitude*RAD2DEG
         _latlongalt.latitude = _latlongalt.latitude*RAD2DEG
 
