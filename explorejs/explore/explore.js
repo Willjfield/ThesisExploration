@@ -3443,14 +3443,19 @@ var satellite = (function () {
 explore.tle = function(line1, line2) {
     this.line1 = line1;
     this.line2 = line2;
+    this.latlongalt;
+    this.position_eci;
+    this.velocity_eci;
+    this.deltaSeconds = 0;
+
     this.update = function() {
         // Initialize a satellite record
         var satrec = explore.satellite.twoline2satrec (this.line1, this.line2);
 
-        var deltaSeconds = 0;
-        var deltaMinutes = 0;
-        var deltaHours = 0;
-        var deltaDays = 0;
+        //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION
+        var deltaMinutes = deltaSeconds*60;
+        var deltaHours = deltaMinutes*60;
+        var deltaDays = deltaHours*24;
         // Propagate satellite using current time
         var now = new Date();
         // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
@@ -3463,15 +3468,10 @@ explore.tle = function(line1, line2) {
                                                         now.getUTCSeconds()+deltaSeconds);
         // The position_velocity result is a key-value pair of ECI coordinates.
         // These are the base results from which all other coordinates are derived.
-        var position_eci = position_and_velocity["position"];
-        var velocity_eci = position_and_velocity["velocity"];
+        var _position_eci = position_and_velocity["position"];
+        var _velocity_eci = position_and_velocity["velocity"];
         // The coordinates are all stored in key-value pairs.
         // ECI and ECF are accessed by "x", "y", "z".
-        this.satellite_x = position_eci["x"];
-        this.satellite_y = position_eci["y"];
-        this.satellite_z = position_eci["z"];
-
-        //
 
 		var curgstime = explore.satellite.gstime_from_jday(explore.satellite.jday(
 														now.getUTCFullYear(), 
@@ -3483,13 +3483,16 @@ explore.tle = function(line1, line2) {
 			));
         console.log("time: "+curgstime)
 
-        //NEED TO CONVERT RADIANS TO DEGREES!!!!!!! ALSO, WORK THIS SHIT OUT SO ITS ACCESSIBLE OUTSIDE THE LIBRARY
-        console.log(explore.satellite.eci_to_geodetic(position_eci, curgstime))
-        return position_eci
+        var _latlongalt = explore.satellite.eci_to_geodetic(position_eci, curgstime)
+        _latlongalt.longitude = _latlongalt.longitude*RAD2DEG
+        _latlongalt.latitude = _latlongalt.latitude*RAD2DEG
 
-        this.velocity_x = velocity_eci["x"];
-        this.velocity_y = velocity_eci["y"];
-        this.velocity_z = velocity_eci["z"];
+        this.latlongalt = _latlongalt;
+    	this.position_eci = _position_eci;
+    	this.velocity_eci = _velocity_eci;
+
+    	//DOESN'T NEED TO RETURN ANYTHING. NEED TO CHANGE THREEJS SCENE
+    	return this.position_eci
     };
 }
 
