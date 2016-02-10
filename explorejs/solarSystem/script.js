@@ -51,7 +51,7 @@ for(var p in explore.planets){
 var render = function () {
 	requestAnimationFrame( render );
 	controls.update();
-	var step = 0.01;
+	var step = 0.001;
 	t+=step;
 	console.log(t)
 	for(p in drawPlanets){
