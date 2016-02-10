@@ -1,12 +1,12 @@
 //# sourceMappingURL=satellite.js.map
 //ISS:http://www.celestrak.com/NORAD/elements/stations.txt
-/*
+
 var tleLine1 = "1 25544U 98067A   16040.89929207  .00012681  00000-0  19534-3 0  9990"
-var tleLine2 = "2 25544  51.6455 337.7904 0007048  99.9517   6.8636 15.54554246985024"*/
+var tleLine2 = "2 25544  51.6455 337.7904 0007048  99.9517   6.8636 15.54554246985024"
 
 //canyon 1
-var tleLine1 = "1 03334U 68063A   15352.84992916 0.00000000  00000-0  00000-0 0    03"
-var tleLine2 = "2 03334  14.2712 328.9565 0937054 121.4864 248.0078  0.99241369"
+//var tleLine1 = "1 03334U 68063A   15352.84992916 0.00000000  00000-0  00000-0 0    03"
+//var tleLine2 = "2 03334  14.2712 328.9565 0937054 121.4864 248.0078  0.99241369"
 
 var tlObj = new explore.tle(tleLine1,tleLine2);
 var xyz = tlObj.update()

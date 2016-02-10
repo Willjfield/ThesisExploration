@@ -3481,7 +3481,7 @@ explore.tle = function(line1, line2) {
                                                         now.getUTCMinutes()+deltaMinutes, 
                                                         now.getUTCSeconds()+this.deltaSeconds%60
 			));
-        console.log("time: "+curgstime)
+        //console.log("time: "+curgstime)
 
         var _latlongalt = explore.satellite.eci_to_geodetic(_position_eci, curgstime)
         _latlongalt.longitude = _latlongalt.longitude*RAD2DEG
@@ -3490,6 +3490,8 @@ explore.tle = function(line1, line2) {
         this.latlongalt = _latlongalt;
     	this.position_eci = _position_eci;
     	this.velocity_eci = _velocity_eci;
+
+    	console.log(_latlongalt)
 
     	//DOESN'T NEED TO RETURN ANYTHING. NEED TO CHANGE THREEJS SCENE
     	return this.position_eci
