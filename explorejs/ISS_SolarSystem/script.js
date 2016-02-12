@@ -1,5 +1,5 @@
-var tleLine1 = "1 25544U 98067A   16040.89929207  .00012681  00000-0  19534-3 0  9990"
-var tleLine2 = "2 25544  51.6455 337.7904 0007048  99.9517   6.8636 15.54554246985024"
+var tleLine1 = "1 25544U 98067A   16043.59063867  .00017039  00000-0  25889-3 0  9993"
+var tleLine2 = "2 25544  51.6448 324.3640 0006823 108.4277 310.7755 15.54658286985448"
 var tlObj = new explore.tle(tleLine1,tleLine2);
 var xyz = tlObj.update();
 
@@ -36,7 +36,7 @@ scene.add( sphere );
 
 //PLANETS
 for(var p in explore.planets){
-	var geometry = new THREE.SphereGeometry( explore.planets[p].radius/planScale,8,8 );
+	var geometry = new THREE.SphereGeometry( explore.planets[p].radius/planScale,32,16 );
 	var material = new THREE.MeshLambertMaterial( { color: explore.planets[p].texColor } );
 	var sphere = new THREE.Mesh( geometry, material );
 
@@ -54,15 +54,15 @@ for(var p in explore.planets){
 	var ISSGeo = new THREE.SphereGeometry( .1,16,16 );
 	var ISSMat = new THREE.MeshLambertMaterial( { color: 0x000000 } );
 	var ISS = new THREE.Mesh(ISSGeo,ISSMat);
-	drawPlanets[2].add(ISS)
+	scene.add(ISS)
 
 var render = function () {
 	var earthPosition = explore.SolarSystem(explore.planets[2],explore.now);
 	xyz = tlObj.update();
-	//SET ISS AND EARTH REFERENCE FRAMES!! WILL REQUIRE USING ECF COORDINATES IF ATTACHED TO EARTH, ECI IF NOT
-	console.log(xyz)
+
+	var ISSPosition = explore.addArrays([xyz.x/150000,xyz.y/150000,xyz.z/150000],earthPosition)
 	//ISS.position.set((earthPosition[0]+(xyz.x/100000))*solScale,(earthPosition[2]+(xyz.y/100000))*solScale,(earthPosition[1]+(xyz.z/100000))*solScale);
-	ISS.position.set((xyz.x/150000)*solScale,(xyz.z/150000)*solScale,(xyz.y/150000)*solScale);
+	ISS.position.set(ISSPosition[0]*solScale,ISSPosition[2]*solScale,ISSPosition[1]*solScale);
 	
 
 	requestAnimationFrame( render );
@@ -70,12 +70,10 @@ var render = function () {
 
 	var step = .001;
 	t+=step;
-	//explore.updateTime(t);
-	//console.log(explore.now);
 
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
-		drawPlanets[p].rotation.set(explore.planets[p].oblique*(Math.PI/180),0,0);
+		drawPlanets[p].rotation.set(-explore.planets[p].oblique*(Math.PI/180),0,0);
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
 	renderer.render(scene, camera);

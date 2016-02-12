@@ -77,6 +77,18 @@
 
 	function SGN(x) 		{ return (x<0)?-1:+1; }
 
+	// SUM ARRAYS ///
+
+	explore.addArrays = function (arr1, arr2) {
+	    var sum = [];
+	    if (arr1 != null && arr2.length == arr1.length) {
+	        for (var i = 0; i < arr1.length; i++) {
+	            sum.push(arr2[i] + arr1[i]);
+	        }
+	    }
+	    return sum;
+	}
+
 	///////////////////////COMPUTE PLANET POSITIONS//////////////////////////////
 
 	// Functions for the planets from bkinsey808/simple_cal/astrotools/planets.js
@@ -3243,11 +3255,11 @@ function sgp4(satrec, tsince){
         r = { x : 0.0, y : 0.0, z : 0.0 };
         r["x"] = (mrt * ux)* radiusearthkm;
         r["y"] = (mrt * uy)* radiusearthkm;
-        r["z"] = (mrt * uz)* radiusearthkm;
+        r["z"] = -(mrt * uz)* radiusearthkm;
         v = { x : 0.0, y : 0.0, z : 0.0 };
         v["x"] = (mvt * ux + rvdot * vx) * vkmpersec;
         v["y"] = (mvt * uy + rvdot * vy) * vkmpersec;
-        v["z"] = (mvt * uz + rvdot * vz) * vkmpersec;
+        v["z"] = -(mvt * uz + rvdot * vz) * vkmpersec;
     }
     //  sgp4fix for decaying satellites
     if (mrt < 1.0) {
