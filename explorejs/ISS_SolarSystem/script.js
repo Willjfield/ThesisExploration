@@ -58,7 +58,9 @@ for(var p in explore.planets){
 
 var render = function () {
 	var earthPosition = explore.SolarSystem(explore.planets[2],explore.now);
-	xyz = tlObj.update();
+	tlObj.update();
+
+	xyz = tlObj.position_eci;
 
 	var ISSPosition = explore.addArrays([xyz.x/150000,xyz.y/150000,xyz.z/150000],earthPosition)
 	//ISS.position.set((earthPosition[0]+(xyz.x/100000))*solScale,(earthPosition[2]+(xyz.y/100000))*solScale,(earthPosition[1]+(xyz.z/100000))*solScale);

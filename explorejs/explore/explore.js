@@ -3255,11 +3255,13 @@ function sgp4(satrec, tsince){
         r = { x : 0.0, y : 0.0, z : 0.0 };
         r["x"] = (mrt * ux)* radiusearthkm;
         r["y"] = (mrt * uy)* radiusearthkm;
-        r["z"] = -(mrt * uz)* radiusearthkm;
+        //FLIP Z???
+        r["z"] = (mrt * uz)* radiusearthkm;
         v = { x : 0.0, y : 0.0, z : 0.0 };
         v["x"] = (mvt * ux + rvdot * vx) * vkmpersec;
         v["y"] = (mvt * uy + rvdot * vy) * vkmpersec;
-        v["z"] = -(mvt * uz + rvdot * vz) * vkmpersec;
+        //FLIP Z???
+        v["z"] = (mvt * uz + rvdot * vz) * vkmpersec;
     }
     //  sgp4fix for decaying satellites
     if (mrt < 1.0) {
@@ -3339,15 +3341,19 @@ function geodetic_to_ecf (geodetic_coords){
     var longitude   = geodetic_coords["longitude"];
     var latitude    = geodetic_coords["latitude"];
     var height      = geodetic_coords["height"];
+    
     var a           = 6378.137;
     var b           = 6356.7523142;
     var f           = (a - b)/a;
     var e2          = ((2*f) - (f*f));
     var normal      = a / Math.sqrt( 1 - (e2*(Math.sin(latitude)*Math.sin(latitude))));
 
+
     var X           = (normal + height) * Math.cos (latitude) * Math.cos (longitude);
     var Y           = (normal + height) * Math.cos (latitude) * Math.sin (longitude);
     var Z           = ((normal*(1-e2)) + height) * Math.sin (latitude);
+
+
     return { x : X, y : Y, z : Z };
 }
 
@@ -3356,6 +3362,7 @@ function topocentric (observer_coords, satellite_coords){
     // TS Kelso's method, except I'm using ECF frame
     // and he uses ECI.
     //
+    console.log(observer_coords)
     var longitude   = observer_coords["longitude"];
     var latitude    = observer_coords["latitude"];
     var height      = observer_coords["height"];
@@ -3411,13 +3418,21 @@ function degrees_lat (radians){
     return degrees;
 }
 
+function ecf_to_look_angles(observer_coords_ecf, satellite_coords_ecf) {
+    var topocentric_coords = topocentric (observer_coords_ecf, satellite_coords_ecf);
+    return topocentric_to_look_angles (topocentric_coords);
+}
+
+satellite.topocentric_to_look_angles = function (topocentric){
+	return topocentric_to_look_angles(topocentric);
+}
+
 satellite.eci_to_geodetic = function (eci_coords, gmst) {
     return eci_to_geodetic (eci_coords, gmst);
 }
 
 satellite.ecf_to_look_angles = function (observer_coords_ecf, satellite_coords_ecf) {
-    var topocentric_coords = topocentric (observer_coords_ecf, satellite_coords_ecf);
-    return topocentric_to_look_angles (topocentric_coords);
+	return ecf_to_look_angles(observer_coords_ecf, satellite_coords_ecf);
 }
 
 satellite.geodetic_to_ecf = function (geodetic_coords) {
@@ -3491,13 +3506,22 @@ var satellite = (function () {
 
 })();
 
+explore.createGeodetic = function(_longitude,_latitude,_height){
+	this.longitude = _longitude*DEG2RAD;
+	this.latitude = _latitude*DEG2RAD;
+	this.height = _height;
+}
+
 explore.tle = function(line1, line2) {
     this.line1 = line1;
     this.line2 = line2;
+
     this.latlongalt;
     this.position_eci;
     this.velocity_eci;
     this.deltaSeconds = 0;
+
+    	
 
     this.update = function() {
         // Initialize a satellite record
@@ -3532,17 +3556,32 @@ explore.tle = function(line1, line2) {
                                                         now.getUTCMinutes()+deltaMinutes, 
                                                         now.getUTCSeconds()+this.deltaSeconds%60
 			));
-        //console.log("time: "+curgstime)
-
+		//convert current satellite eci to lat/long in degrees and radians
         var _latlongalt = explore.satellite.eci_to_geodetic(_position_eci, curgstime)
-        _latlongalt.longitude = _latlongalt.longitude*RAD2DEG
-        _latlongalt.latitude = _latlongalt.latitude*RAD2DEG
+        _latlongalt.longitude = _latlongalt.longitude;
+        _latlongalt.latitude = _latlongalt.latitude;
+        _latlongalt.height = _latlongalt.height;
+        _latlongalt.longitudeDeg = _latlongalt.longitude*RAD2DEG
+        _latlongalt.latitudeDeg = _latlongalt.latitude*RAD2DEG
 
+
+        //make position velocity and lat/long available to the outside
         this.latlongalt = _latlongalt;
     	this.position_eci = _position_eci;
     	this.velocity_eci = _velocity_eci;
 
-    	//console.log(_latlongalt)
+    	//console.log(this.latlongalt)
+    	this.position_ecf = explore.satellite.geodetic_to_ecf(this.latlongalt);
+
+    	var TEST_geodetic = new explore.createGeodetic(-74,40.7,1);
+
+    	this.myLocation_ecf = explore.satellite.geodetic_to_ecf(TEST_geodetic);
+
+    	//this.lookAngles = explore.satellite.topocentric_to_look_angles(TEST_geodetic,this.position_ecf)
+    	
+    	//FIRST ARGUMENT TO explore.satellite.ecf_to_look_angles IS GEODETIC, NOT ECF COORDS!!!!!!!!!!
+    	this.lookAngles = explore.satellite.ecf_to_look_angles(TEST_geodetic,this.position_ecf)
+    	console.log(this.lookAngles.elevation*RAD2DEG);
 
     	//DOESN'T NEED TO RETURN ANYTHING. NEED TO CHANGE THREEJS SCENE
     	return this.position_eci
