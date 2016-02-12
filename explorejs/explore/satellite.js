@@ -5,7 +5,6 @@
  * License: MIT
  */
 
-
 satellite = (function () {
 
     var satellite = { version : "1.2" };

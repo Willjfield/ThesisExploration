@@ -1,12 +1,60 @@
 "use strict";
 (function(explore,undefined){
 	/////////TIME TOOLS////////////
-	Date.prototype.getJulian = function() {
-    	return Math.floor((this / 86400000) - (this.getTimezoneOffset()/1440) + 2440587.5);
-	}
-	var nowDate = new Date(); //set any date
-	explore.now = nowDate.getJulian(); //get Julian counterpart 
 
+	explore.daysToSeconds = function (days){
+		return days/0.00001157407
+	}
+
+	explore.hoursToSeconds = function (hours){
+		return hours*3600
+	}
+
+	explore.minutesToSeconds = function (minutes){
+		return minutes*60
+	}
+
+	explore.secondsToDays = function (seconds){
+		return seconds*0.00001157407
+	}
+
+	explore.secondsToHours = function (seconds){
+		return seconds/3600
+	}
+
+	explore.secondsToMinutes = function (seconds){
+		return seconds/60
+	}
+
+	function jday(year, mon, day, hr, minute, sec){
+	    return (367.0 * year -
+	          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
+	          Math.floor( 275 * mon / 9.0 ) +
+	          day + 1721013.5 +
+	          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
+	          //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
+	          );
+	}
+
+	var now = new Date(); //set any date
+
+	explore.now = jday(now.getUTCFullYear(), 
+	            now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+	            now.getUTCDate(),
+	            now.getUTCHours(), 
+	            now.getUTCMinutes(), 
+	            now.getUTCSeconds())
+
+	explore.updateTime = function (deltaSeconds){
+		var deltaSeconds = typeof deltaSeconds !== 'undefined' ?  deltaSeconds : 0;
+		var updatedDate = new Date(); //set any date
+		explore.now = jday(updatedDate.getUTCFullYear(), 
+		            updatedDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+		            updatedDate.getUTCDate(),
+		            updatedDate.getUTCHours(), 
+		            updatedDate.getUTCMinutes(), 
+		            updatedDate.getUTCSeconds()+deltaSeconds)
+	}
 	//////////DEGREES/RADIANS CONVERSION///////////
 	var DEG2RAD = Math.PI/180.0;
 	var RAD2DEG = 180.0/Math.PI;
@@ -1872,16 +1920,7 @@ function days2mdhms(year, days){
     return mdhms_result;
 }
 
-function jday(year, mon, day, hr, minute, sec){
 
-    return (367.0 * year -
-          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-          Math.floor( 275 * mon / 9.0 ) +
-          day + 1721013.5 +
-          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-          //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
-          );
-}
 
 satellite.jday = function (year, mon, day, hr, minute, sec){
 	return jday(year, mon, day, hr, minute, sec)
@@ -3491,7 +3530,7 @@ explore.tle = function(line1, line2) {
     	this.position_eci = _position_eci;
     	this.velocity_eci = _velocity_eci;
 
-    	console.log(_latlongalt)
+    	//console.log(_latlongalt)
 
     	//DOESN'T NEED TO RETURN ANYTHING. NEED TO CHANGE THREEJS SCENE
     	return this.position_eci
