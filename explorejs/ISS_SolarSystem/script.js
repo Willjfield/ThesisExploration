@@ -59,23 +59,23 @@ for(var p in explore.planets){
 var render = function () {
 	var earthPosition = explore.SolarSystem(explore.planets[2],explore.now);
 	xyz = tlObj.update();
-	//SET ISS AND EARTH REFERENCE FRAMES!!
+	//SET ISS AND EARTH REFERENCE FRAMES!! WILL REQUIRE USING ECF COORDINATES IF ATTACHED TO EARTH, ECI IF NOT
 	console.log(xyz)
 	//ISS.position.set((earthPosition[0]+(xyz.x/100000))*solScale,(earthPosition[2]+(xyz.y/100000))*solScale,(earthPosition[1]+(xyz.z/100000))*solScale);
-	ISS.position.set((xyz.x/100000)*solScale,(xyz.y/100000)*solScale,(xyz.z/100000)*solScale);
+	ISS.position.set((xyz.x/150000)*solScale,(xyz.z/150000)*solScale,(xyz.y/150000)*solScale);
 	
 
 	requestAnimationFrame( render );
 	controls.update();
 
-	var step = explore.minutesToSeconds(1);
+	var step = .001;
 	t+=step;
 	//explore.updateTime(t);
 	//console.log(explore.now);
 
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
-		
+		drawPlanets[p].rotation.set(explore.planets[p].oblique*(Math.PI/180),0,0);
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
 	renderer.render(scene, camera);
