@@ -3362,7 +3362,7 @@ function topocentric (observer_coords, satellite_coords){
     // TS Kelso's method, except I'm using ECF frame
     // and he uses ECI.
     //
-    console.log(observer_coords)
+    //console.log(observer_coords)
     var longitude   = observer_coords["longitude"];
     var latitude    = observer_coords["latitude"];
     var height      = observer_coords["height"];
@@ -3581,10 +3581,9 @@ explore.tle = function(line1, line2) {
     	
     	//FIRST ARGUMENT TO explore.satellite.ecf_to_look_angles IS GEODETIC, NOT ECF COORDS!!!!!!!!!!
     	this.lookAngles = explore.satellite.ecf_to_look_angles(TEST_geodetic,this.position_ecf)
-    	console.log(this.lookAngles.elevation*RAD2DEG);
 
     	//DOESN'T NEED TO RETURN ANYTHING. NEED TO CHANGE THREEJS SCENE
-    	return this.position_eci
+    	//return this.position_eci
     };
 }
 

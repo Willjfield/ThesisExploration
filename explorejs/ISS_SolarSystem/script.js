@@ -45,7 +45,7 @@ for(var p in explore.planets){
 	sphere.add(sphereW);
 	
 	var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
-	sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
+	sphere.position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale);
 	sphere.rotation.set(explore.planets[p].oblique*(Math.PI/180),0,0);
 	drawPlanets.push(sphere);
 	scene.add( sphere);
@@ -62,10 +62,9 @@ var render = function () {
 
 	xyz = tlObj.position_eci;
 
-	var ISSPosition = explore.addArrays([xyz.x/150000,xyz.y/150000,xyz.z/150000],earthPosition)
-	//ISS.position.set((earthPosition[0]+(xyz.x/100000))*solScale,(earthPosition[2]+(xyz.y/100000))*solScale,(earthPosition[1]+(xyz.z/100000))*solScale);
-	ISS.position.set(ISSPosition[0]*solScale,ISSPosition[2]*solScale,ISSPosition[1]*solScale);
-	
+	//z-axis is flipped between iss and solar system frames
+	var ISSPosition = explore.addArrays([xyz.x/150000,xyz.y/150000,-xyz.z/150000],earthPosition)
+	ISS.position.set(ISSPosition[0]*solScale,ISSPosition[1]*solScale,ISSPosition[2]*solScale);
 
 	requestAnimationFrame( render );
 	controls.update();
@@ -76,7 +75,7 @@ var render = function () {
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
 		drawPlanets[p].rotation.set(-explore.planets[p].oblique*(Math.PI/180),0,0);
-		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
+		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[1]*solScale,curPosition[2]*solScale)
 	}
 	renderer.render(scene, camera);
 };

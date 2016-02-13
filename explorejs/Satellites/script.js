@@ -9,7 +9,8 @@ var tleLine2 = "2 25544  51.6455 337.7904 0007048  99.9517   6.8636 15.545542469
 //var tleLine2 = "2 03334  14.2712 328.9565 0937054 121.4864 248.0078  0.99241369"
 
 var tlObj = new explore.tle(tleLine1,tleLine2);
-var xyz = tlObj.update()
+tlObj.update()
+var xyz = tlObj.position_eci
 console.log(xyz)
 
 var scene = new THREE.Scene();
