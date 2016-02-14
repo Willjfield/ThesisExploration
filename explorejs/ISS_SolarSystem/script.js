@@ -59,11 +59,12 @@ for(var p in explore.planets){
 var render = function () {
 	var earthPosition = explore.SolarSystem(explore.planets[2],explore.now);
 	tlObj.update();
+	console.log(tlObj.getLookAnglesFrom(-74,42, 1))
 
 	xyz = tlObj.position_eci;
 
-	//z-axis is flipped between iss and solar system frames
-	var ISSPosition = explore.addArrays([xyz.x/150000,xyz.y/150000,-xyz.z/150000],earthPosition)
+	//z-axis is flipped between iss and solar system frames? Also, 
+	var ISSPosition = explore.translatePositions([xyz.x/150000,xyz.y/150000,-xyz.z/150000],earthPosition)
 	ISS.position.set(ISSPosition[0]*solScale,ISSPosition[1]*solScale,ISSPosition[2]*solScale);
 
 	requestAnimationFrame( render );

@@ -49,22 +49,9 @@ var categories = {
 //http://blog.another-d-mention.ro/programming/read-load-files-from-zip-in-javascript/
 var classified = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
 
-function makeHttpObject() {
-  try {return new XMLHttpRequest();}
-  catch (error) {}
-  try {return new ActiveXObject("Msxml2.XMLHTTP");}
-  catch (error) {}
-  try {return new ActiveXObject("Microsoft.XMLHTTP");}
-  catch (error) {}
-
-  throw new Error("Could not create HTTP request object.");
-}
-
 var xmlhttp = new XMLHttpRequest();
 
-var satellites = []
-
-function getTLE(query){
+function getTLE(query, satellites, callback){
 	var url;
 	if(query in categories){
 		url = corsURL + celestrakTypeURL + categories[query]
@@ -72,9 +59,7 @@ function getTLE(query){
 		console.log("not a valid query")
 		return 0;
 	}
-
 	xmlhttp.open("GET", url, true);
-
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 		    var tleresponse = xmlhttp.responseText;
@@ -88,15 +73,15 @@ function getTLE(query){
 		    		})
 		        }
 	    }
+	    callback();
 	}
 	xmlhttp.send(null);
 }
+	/* EXAMPLE:
+	var stations = []
+	getTLE("stations", stations, function(){
+	console.log(stations)
+	*/
+})
 
-var request = makeHttpObject();
-request.open("GET", corsURL + celestrakTypeURL + "stations.txt", false);
-request.send(null);
-console.log(request.responseText);
-/*
-getTLE("stations")
-console.log(satellites)
-*/
+
