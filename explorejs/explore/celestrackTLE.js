@@ -49,50 +49,54 @@ var categories = {
 //http://blog.another-d-mention.ro/programming/read-load-files-from-zip-in-javascript/
 var classified = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
 
-var xmlhttp = new XMLHttpRequest();
+function makeHttpObject() {
+  try {return new XMLHttpRequest();}
+  catch (error) {}
+  try {return new ActiveXObject("Msxml2.XMLHTTP");}
+  catch (error) {}
+  try {return new ActiveXObject("Microsoft.XMLHTTP");}
+  catch (error) {}
 
-xmlhttp.onreadystatechange = function() {
-    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        var tleresponse = xmlhttp.responseText;
-        tleresponse = tleresponse.split('\n');
-        tleresponse.splice(tleresponse.length-1)
-
-        var ids = [];
-        var lines1 = [];
-        var lines2 = [];
-
-        for(var s in tleresponse){
-        	switch(s%3){
-        		case 0:
-        			var id = tleresponse[s].replace(/\s/g, '');
-        			ids.push(id);
-        			break;
-        		case 1:
-        			lines1.push(tleresponse[s]);
-    			case 2:
-    				lines2.push(tleresponse[s]);
-        	}
-        }
-        console.log(ids)
-    }
-};
-
-function getTLE(category){
-	if(category in categories){
-		console.log("found: "+categories[category]);
-	}else{
-		console.log("you probably meant an ID")
-		return 0;
-	}
-	/*
-	if(category == classified){
-		var url = corsURL + classified;
-	}else{
-		var url = corsURL + celestrakURL + category;
-	}
-	xmlhttp.open("GET", url, true);
-	xmlhttp.send();
-	*/
+  throw new Error("Could not create HTTP request object.");
 }
 
-getTLE("newTLE")
+var xmlhttp = new XMLHttpRequest();
+
+var satellites = []
+
+function getTLE(query){
+	var url;
+	if(query in categories){
+		url = corsURL + celestrakTypeURL + categories[query]
+	}else{
+		console.log("not a valid query")
+		return 0;
+	}
+
+	xmlhttp.open("GET", url, true);
+
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+		    var tleresponse = xmlhttp.responseText;
+		    tleresponse = tleresponse.split('\n');
+		    tleresponse.splice(tleresponse.length-1)
+		    for(var s = 0; s<tleresponse.length;s+=3){
+		    		satellites.push({
+		    			id: tleresponse[s].replace(/\s/g, ''),
+		    			line1 : tleresponse[s+1],
+		    			line2 : tleresponse[s+2]
+		    		})
+		        }
+	    }
+	}
+	xmlhttp.send(null);
+}
+
+var request = makeHttpObject();
+request.open("GET", corsURL + celestrakTypeURL + "stations.txt", false);
+request.send(null);
+console.log(request.responseText);
+/*
+getTLE("stations")
+console.log(satellites)
+*/
