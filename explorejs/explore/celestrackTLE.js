@@ -81,7 +81,6 @@ function getTLE(query, satellites, callback){
 	var stations = []
 	getTLE("stations", stations, function(){
 	console.log(stations)
-	*/
-})
-
+	})
+*/
 

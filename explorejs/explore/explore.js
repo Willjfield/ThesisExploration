@@ -3625,9 +3625,8 @@ explore.tle = function(line1, line2) {
 		 cubesats : "cubesat.txt",
 		 other : "other.txt"
 	}
-	//classified
-	//http://blog.another-d-mention.ro/programming/read-load-files-from-zip-in-javascript/
-	var classified = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
+	//classified:
+	//var classified = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
 
 	var xmlhttp = new XMLHttpRequest();
 
