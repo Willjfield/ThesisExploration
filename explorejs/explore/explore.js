@@ -229,9 +229,10 @@
 		);
 
 	// elements from Paul Schlyter
-	explore.planets=[explore.mercury,explore.venus,explore.earth,
+	var planets=[explore.mercury,explore.venus,explore.earth,
 					explore.mars,explore.jupiter,explore.saturn,
 					explore.uranus,explore.neptune];
+    explore.planets = planets
 
 	// Body holds current data of planet, Sun or Moon), method .update(jday,obs)
 	function Body(name,number,colour,colleft,colright) {
@@ -313,7 +314,58 @@
 	// account for pertuberations of Jupiter, Saturn, Uranus (Uranus and Neptune mutual pertubs are included in elements)
 	// returns heliocentric x, y, z, distance, longitude and latitude of object
 
-	explore.SolarSystem = function (p,jday) {
+	explore.SolarSystem = function(p,jday){
+        return planet_xyz(p,jday)
+    }
+    function planet_xyz(p,jday) {
+    var d = jday-2451543.5;
+	var w = p.w[0] + p.w[1]*d;		// argument of perihelion
+	var e = p.e[0] + p.e[1]*d; 
+	var a = p.a[0] + p.a[1]*d;
+	var i = p.i[0] + p.i[1]*d;
+	var N = p.N[0] + p.N[1]*d;
+	var M = rev( p.M[0] + p.M[1]*d ); 	// mean anomaly
+	var E0 = M + RAD2DEG*e*sind(M) * ( 1.0+e*cosd(M) );
+	var E1 = E0 - ( E0-RAD2DEG*e*sind(E0)-M ) / ( 1.0-e*cosd(E0) );
+	while (Math.abs(E0-E1) > 0.0005) {
+		E0 = E1;
+		E1 = E0 - ( E0 - RAD2DEG*e*sind(E0)-M ) / ( 1.0-e*cosd(E0) );
+	}
+	var xv = a*(cosd(E1) - e);
+	var yv = a*Math.sqrt(1.0 - e*e) * sind(E1);
+	var v = rev(atan2d( yv, xv ));		// true anomaly
+	var r = Math.sqrt( xv*xv + yv*yv );	// distance
+	var xh = r * ( cosd(N)*cosd(v+w) - sind(N)*sind(v+w)*cosd(i) );
+	var yh = r * ( sind(N)*cosd(v+w) + cosd(N)*sind(v+w)*cosd(i) );
+	var zh = r * ( sind(v+w)*sind(i) );
+	var lonecl = atan2d(yh, xh);
+	var latecl = atan2d(zh, Math.sqrt(xh*xh + yh*yh + zh*zh));
+	if (p.num==JUPITER) {		// Jupiter pertuberations by Saturn
+		var Ms = rev(planets[SATURN].M[0] + planets[SATURN].M[1]*d);
+		lonecl += (-0.332)*sind(2*M-5*Ms-67.6) - 0.056*sind(2*M-2*Ms+21) + 0.042*sind(3*M-5*Ms+21) -
+				0.036*sind(M-2*Ms) + 0.022*cosd(M-Ms) + 0.023*sind(2*M-3*Ms+52) - 0.016*sind(M-5*Ms-69);
+		xh=r*cosd(lonecl)*cosd(latecl);		// recalc xh, yh
+		yh=r*sind(lonecl)*cosd(latecl);
+	}
+	if (p.num==SATURN) {		// Saturn pertuberations
+		var Mj = rev(planets[JUPITER].M[0] + planets[JUPITER].M[1]*d);
+		lonecl += 0.812*sind(2*Mj-5*M-67.6) - 0.229*cosd(2*Mj-4*M-2) + 0.119*sind(Mj-2*M-3) + 
+				0.046*sind(2*Mj-6*M-69) + 0.014*sind(Mj-3*M+32);
+		latecl += -0.020*cosd(2*Mj-4*M-2) + 0.018*sind(2*Mj-6*M-49);
+		xh = r*cosd(lonecl)*cosd(latecl);		// recalc xh, yh, zh
+		yh = r*sind(lonecl)*cosd(latecl);
+    	zh = r*sind(latecl);
+	}
+	if (p.num==URANUS) {		// Uranus pertuberations
+		var Mj = rev(planets[JUPITER].M[0] + planets[JUPITER].M[1]*d);
+		var Ms = rev(planets[SATURN].M[0] + planets[SATURN].M[1]*d);
+		lonecl += 0.040*sind(Ms-2*M+6) + 0.035*sind(Ms-3*M+33) - 0.015*sind(Mj-M+20);
+		xh=r*cosd(lonecl)*cosd(latecl);		// recalc xh, yh
+		yh=r*sind(lonecl)*cosd(latecl);
+	}
+	return new Array(xh,yh,zh,r,lonecl,latecl);
+}
+  /*      function planet_xyz(p,jday) {
 		var d = jday-2451543.5;
 		var w = p.w[0] + p.w[1]*d;		// argument of perihelion
 		var e = p.e[0] + p.e[1]*d; 
@@ -359,12 +411,14 @@
 			xh=r*cosd(lonecl)*cosd(latecl);		// recalc xh, yh
 			yh=r*sind(lonecl)*cosd(latecl);
 		}
-		return new Array(xh,yh,zh);
-		//return new Array(xh,yh,zh,r,lonecl,latecl);
+		//return new Array(xh,yh,zh);
+		return new Array(xh,yh,zh,r,lonecl,latecl);
 	}	
-
-
-	function radecr(obj,sun,jday,obs) {
+*/
+     explore.radecr = function(obj,sun,jday,obs){
+        return radecr(obj,sun,jday,obs)
+     } 
+	 function radecr(obj,sun,jday,obs) {
 	// radecr returns ra, dec and earth distance
 	// obj and sun comprise Heliocentric Ecliptic Rectangular Coordinates
 	// (note Sun coords are really Earth heliocentric coordinates with reverse signs)
@@ -385,13 +439,17 @@
 			return new Array(ra,dec,dist);
 	} 
 
-
+    explore.radec2aa = function(ra,dec,jday,obs){
+        return radec2aa(ra,dec,jday,obs)
+    }
 	function radec2aa(ra,dec,jday,obs) {
 	// Convert ra/dec to alt/az, also return hour angle, azimut = 0 when north
 	// DOES NOT correct for parallax!
 	// TH0=Greenwich sid. time (eq. 12.4), H=hour angle (chapter 13)
-			var TH0 = 280.46061837 + 360.98564736629*(jday-2451545.0);
-			var H = rev(TH0-obs.longitude-ra);
+        // Changed from planets.js which was incorrect!
+			var gmst = rev(280.46061837 + 360.98564736629*(jday-2451545.0));
+            var LST = gmst+obs.longitude
+	    	var H = LST-ra
 			var alt = asind( sind(obs.latitude)*sind(dec) + cosd(obs.latitude)*cosd(dec)*cosd(H) );
 			var az = atan2d( sind(H), (cosd(H)*sind(obs.latitude) - tand(dec)*cosd(obs.latitude)) );
 			return new Array (alt, rev(az+180.0), H);
@@ -406,14 +464,45 @@
 		return new Array(d, rev(pa));
 	}	// end separation()
 
+    
+    // SUN and MOON
+    // Alternative version of Sun position based on Schlyter's method
 
-	function PlanetAlt(p,jday,obs) {
+    // Copyright Ole Nielsen 2002-2004
+    // Please read copyright notice in astrotools2.html source
+
+    // 'Meeus' means "Astronomical Algorithms", 2nd ed. by Jean Meeus
+
+    // ecliptic position of the Sun relative to Earth (basically simplified version of planetxyz calc)
+    function sunxyz(jday) {
+        // return x,y,z ecliptic coordinates, distance, true longitude
+        // days counted from 1999 Dec 31.0 UT
+        var d=jday-2451543.5;
+        var w = 282.9404 + 4.70935E-5 * d;		// argument of perihelion
+        var e = 0.016709 - 1.151E-9 * d; 
+        var M = rev(356.0470 + 0.9856002585 * d); // mean anomaly
+        var E = M + e*RAD2DEG * sind(M) * ( 1.0 + e * cosd(M) );
+        var xv = cosd(E) - e;
+        var yv = Math.sqrt(1.0 - e*e) * sind(E);
+        var v = atan2d( yv, xv );		// true anomaly
+        var r = Math.sqrt( xv*xv + yv*yv );	// distance
+        var lonsun = rev(v + w);	// true longitude
+        var xs = r * cosd(lonsun);		// rectangular coordinates, zs = 0 for sun 
+        var ys = r * sind(lonsun);
+        return new Array(xs,ys,0,r,lonsun,0);
+    }
+    
+	explore.PlanetAlt = function(p,jday,obs) {
+        return PlanetAlt(p,jday, obs)
+    }
+    function PlanetAlt(p,jday,obs) {
 	// Alt/Az, hour angle, ra/dec, ecliptic long. and lat, illuminated fraction, dist(Sun), dist(Earth), brightness of planet p
 			if (p==SUN) return SunAlt(jday,obs);
 			if (p==MOON) return MoonPos(jday,obs);
 			if (p==COMET) return CometAlt(jday,obs);
 			var sun_xyz = sunxyz(jday);
-			var planet_xyz = SolarSystem(planets[p],jday);
+            //console.log(sun_xyz)
+			var planet_xyz = explore.SolarSystem(explore.planets[p],jday);
 
 			var dx = planet_xyz[0]+sun_xyz[0];
 			var dy = planet_xyz[1]+sun_xyz[1];
