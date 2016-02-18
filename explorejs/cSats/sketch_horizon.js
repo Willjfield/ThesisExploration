@@ -1,12 +1,12 @@
 var satellites = []
-var visibleSats = []
+var visibileSatsLookAngles = []
 var img;
 function preload() {
   img = loadImage("sprite.png");
   imageMode(CENTER)
 }
 function setup(){
-    createCanvas(windowWidth,windowHeight)
+    createCanvas(1000,500)
     navigator.geolocation.getCurrentPosition(function(location){    
         parseTLE(satellites, function(){
             drawSky()
@@ -14,42 +14,45 @@ function setup(){
                 var satellite = new explore.tle(satellites[sat].line1,satellites[sat].line2)
                 satellite.update()
                 var lookAngles = satellite.getLookAnglesFrom(location.coords.longitude,location.coords.latitude,1)
+                lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
                 if(lookAngles.elevation>0){
-                    visibleSats.push(lookAngles)
+                    visibileSatsLookAngles.push(lookAngles)
                 } 
             }
-            //console.log(visibleSats)
             push()
-                translate(0,height)
-                for(var sat in visibleSats){
-                    push()
-                        var satPosition = map(visibleSats[sat].range_sat,0,50000,0,height)
-                        if(Math.random()>0){ 
-                            rotate(-visibleSats[sat].elevation*(Math.PI/180))
-                        }else{
-                            rotate(-Math.PI+visibleSats[sat].elevation*(Math.PI/180))
-                        }
-
-                        for(var i=0;i<satPosition;i++){
-                            stroke(255,0,0,255-map(i,0,satPosition,0,255))
-                            point(i,0)
-                        }
-                        noStroke()
-                        fill(255)
-                        image(img,satPosition,0)
-                        ellipse(satPosition,0,4,4)
-                    pop()
+                for(var sat=0; sat<visibileSatsLookAngles.length;sat++){
+                   var alt = map(visibileSatsLookAngles[sat].elevation,0,90,height,0)
+                   var az = map(visibileSatsLookAngles[sat].azimuth,0,360,0,width)
+                   var satScale = map(visibileSatsLookAngles[sat].range_sat,0,40000,7,2)
+                   noStroke()
+                   push()
+                   image(img,az,alt,satScale*2,satScale*2)
+                   ellipse(az,alt,satScale,satScale)
+                   pop()
+                   strokeWeight(.5)
+                   stroke(0,160,0,100)
+                   if(visibileSatsLookAngles[sat].name!='Unknown'){
+                       for(var otherSat = sat+1; otherSat<visibileSatsLookAngles.length-1;otherSat++){
+                            if(visibileSatsLookAngles[otherSat].name==visibileSatsLookAngles[sat].name){
+                                line(az,alt,map(visibileSatsLookAngles[otherSat].azimuth,0,360,0,width),map(visibileSatsLookAngles[otherSat].elevation,0,90,height,0))
+                            }
+                       }
+                   }
                 }
             pop()
-        var date = new Date();
-        textSize(32)
-        text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),width/1.5,height/4)
-        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),width/1.5,(height/4)+32)
+
+    fill(255)
+    noStroke()
+    textSize(16)
+    text("N",width-16,height-5)
+    text("N",0,height-5)
+    text("E",(width/4)-14,height-5)
+    text("S",(width/2)-14,height-5)
+    text("W",(width*.75)-14,height-5)
         })
     })
 }
-function draw(){
-}
+function draw(){}
 
 function drawSky(){
     for(var h=0;h<height;h++){
@@ -82,6 +85,4 @@ function parseTLE(satellites, callback){
     xmlhttp.send(null);
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
+

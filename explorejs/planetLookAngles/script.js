@@ -53,7 +53,6 @@ var render = function () {
 	controls.update();
 	var step = 0;
 	t+=step;
-
 	//console.log(t)
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
@@ -65,15 +64,12 @@ var render = function () {
 	}
 	renderer.render(scene, camera);
 };
-    var posMars = explore.SolarSystem(explore.planets[1],explore.now)
-    //console.log(posMars)
-    var obsPos = {latitude:40.67,longitude:-74}
+    var posMars = explore.SolarSystem(explore.planets[3],explore.now)
+    var obsPos = {latitude:42,longitude:-74}
     var earthPos = explore.SolarSystem(explore.planets[2],explore.now)
-    var sunPos = [earthPos[0]*-1,earthPos[1]*-1,earthPos[2]*-1]
-    var marsRaDec = explore.radecr(posMars,sunPos,explore.now,obsPos)
-    var lookAngles = explore.radec2aa(marsRaDec[0],marsRaDec[1],explore.now,obsPos)
-    console.log(lookAngles)
-   // console.log(explore.PlanetAlt(3,explore.now,obsPos)) 
+//    var sunPos = [earthPos[0]*-1,earthPos[1]*-1,earthPos[2]*-1]
+//    console.log(explore.radecr(posMars,sunPos,explore.now,obsPos))
+    console.log(explore.PlanetAlt(3,explore.now,obsPos)) 
 /*
 document.addEventListener("click", function(){ 
 	t+=365.25; 

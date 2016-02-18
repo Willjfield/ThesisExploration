@@ -6,7 +6,7 @@ function preload() {
   imageMode(CENTER)
 }
 function setup(){
-    createCanvas(1000,500)
+    createCanvas(600,600)
     navigator.geolocation.getCurrentPosition(function(location){    
         parseTLE(satellites, function(){
             drawSky()
@@ -20,24 +20,24 @@ function setup(){
                 } 
             }
             push()
+            translate(width/2,height/2)
                 for(var sat=0; sat<visibileSatsLookAngles.length;sat++){
-                   var alt = map(visibileSatsLookAngles[sat].elevation,0,90,height,0)
-                   var az = map(visibileSatsLookAngles[sat].azimuth,0,360,0,width)
+                   var alt = map(visibileSatsLookAngles[sat].elevation,0,90,height/2,0)
+//                   var az = map(visibileSatsLookAngles[sat].azimuth,0,360,0,width)
+                   var az = visibileSatsLookAngles[sat].azimuth
+                   var satScale = map(visibileSatsLookAngles[sat].range_sat,0,40000,7,2)
                    noStroke()
-                   image(img,az,alt)
-                   ellipse(az,alt,4,4)
+                   push()
+                   rotate((az-90)*Math.PI/180)
+                   image(img,alt,0,satScale*2,satScale*2)
+                   fill(255)
+                   ellipse(alt,0,satScale/2,satScale/2)
+                   pop()
                    strokeWeight(.5)
-                   stroke(255,0,0,100)
-                   if(visibileSatsLookAngles[sat].name!='Unknown'){
-                       for(var otherSat = sat+1; otherSat<visibileSatsLookAngles.length-1;otherSat++){
-                            if(visibileSatsLookAngles[otherSat].name==visibileSatsLookAngles[sat].name){
-                                line(az,alt,map(visibileSatsLookAngles[otherSat].azimuth,0,360,0,width),map(visibileSatsLookAngles[otherSat].elevation,0,90,height,0))
-                            }
-                       }
+                   stroke(0,160,0,100)
                    }
-                }
             pop()
-
+/*
     fill(255)
     noStroke()
     textSize(16)
@@ -46,6 +46,7 @@ function setup(){
     text("E",(width/4)-14,height-5)
     text("S",(width/2)-14,height-5)
     text("W",(width*.75)-14,height-5)
+   */
         })
     })
 }
@@ -53,10 +54,11 @@ function draw(){}
 
 function drawSky(){
     for(var h=0;h<height;h++){
-        var gradPart = map(h*h*h,0,height*height*height,0,100)
+        var gradPart = map(h*h*h*h,0,height*height*height*height,0,80)
         var skyColor = color(10,.2*gradPart,gradPart)
         stroke(skyColor)
-        line(0,h,width,h)
+        noFill()
+        ellipse(width/2,height/2,h,h)
     }
 }
 
