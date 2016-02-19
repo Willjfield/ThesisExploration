@@ -6,7 +6,7 @@ function preload() {
   imageMode(CENTER)
 }
 function setup(){
-    createCanvas(600,600)
+    createCanvas(windowWidth,windowHeight)
     navigator.geolocation.getCurrentPosition(function(location){    
         parseTLE(satellites, function(){
             drawSky()
@@ -37,6 +37,15 @@ function setup(){
                    stroke(0,160,0,100)
                    }
             pop()
+            /*
+        textAlign(LEFT)
+        fill(255,164)
+        var date = new Date();
+        textSize(20)
+        text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),5,16)
+        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),5,36)
+        */
+        document.getElementById("loading").style.visibility="hidden"
 /*
     fill(255)
     noStroke()

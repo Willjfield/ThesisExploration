@@ -41,10 +41,14 @@ function setup(){
                     pop()
                 }
             pop()
+        textAlign(RIGHT)
         var date = new Date();
-        textSize(32)
-        text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),width/1.5,height/4)
-        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),width/1.5,(height/4)+32)
+        textSize(20)
+        fill(255,64)
+        strokeWeight(0)
+        text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),width-10,height-32)
+        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),width-10,height-12)
+        document.getElementById("loading").style.visibility="hidden"
         })
     })
 }

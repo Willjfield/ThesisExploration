@@ -6,7 +6,9 @@ function preload() {
   imageMode(CENTER)
 }
 function setup(){
-    createCanvas(1000,500)
+    createCanvas(windowWidth,windowHeight-64)
+    document.getElementById("defaultCanvas0").style.position = "absolute"
+    document.getElementById("defaultCanvas0").style.bottom = "64px"
     navigator.geolocation.getCurrentPosition(function(location){    
         parseTLE(satellites, function(){
             drawSky()
@@ -40,15 +42,22 @@ function setup(){
                    }
                 }
             pop()
-
-    fill(255)
-    noStroke()
-    textSize(16)
-    text("N",width-16,height-5)
-    text("N",0,height-5)
-    text("E",(width/4)-14,height-5)
-    text("S",(width/2)-14,height-5)
-    text("W",(width*.75)-14,height-5)
+        textAlign(LEFT)
+        fill(255,164)
+        var date = new Date();
+        textSize(20)
+    /*    text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),5,16)
+        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),5,36)
+      */
+        document.getElementById("loading").style.visibility="hidden"
+        fill(255)
+        noStroke()
+        textSize(24)
+        text("N",width-24,24)
+        text("N",10,24)
+        text("E",(width/4)-8,24)
+        text("S",(width/2)-8,24)
+        text("W",(width*.75)-8,24)
         })
     })
 }
@@ -57,7 +66,7 @@ function draw(){}
 function drawSky(){
     for(var h=0;h<height;h++){
         var gradPart = map(h*h*h,0,height*height*height,0,100)
-        var skyColor = color(10,.2*gradPart,gradPart)
+        var skyColor = color(0,.2*gradPart,gradPart)
         stroke(skyColor)
         line(0,h,width,h)
     }
@@ -85,4 +94,6 @@ function parseTLE(satellites, callback){
     xmlhttp.send(null);
 }
 
-
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
