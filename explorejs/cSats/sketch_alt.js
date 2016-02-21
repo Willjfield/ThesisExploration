@@ -1,24 +1,53 @@
+$(document).ready(function(){
+    if(localStorage.introHide){
+        $("#intro").hide()
+    }
+   $("#close").click(function(){
+        $("#intro").hide()
+        localStorage.introHide = true
+   })
+   $("#next").click(function(){
+        $("#intro").css("visibility","hidden")
+   })
+})
 var satellites = []
 var visibleSats = []
 var img;
+var latLong = {}
+
 function preload() {
   img = loadImage("sprite.png");
   imageMode(CENTER)
 }
+
 function setup(){
-    createCanvas(windowWidth,windowHeight)
+    createCanvas(4000,windowHeight)
+    document.getElementById("defaultCanvas0").style.position = "absolute"
+    document.getElementById("defaultCanvas0").style.bottom = "0px"
     navigator.geolocation.getCurrentPosition(function(location){    
+        latLong.longitude =location.coords.longitude
+        latLong.latitude = location.coords.latitude
         parseTLE(satellites, function(){
+        drawSats()
+        document.getElementById("loading").style.visibility="hidden"
+        })
+    })
+}
+
+function draw(){}
+
+function drawSats(){
             drawSky()
+
             for(var sat in satellites){
                 var satellite = new explore.tle(satellites[sat].line1,satellites[sat].line2)
                 satellite.update()
-                var lookAngles = satellite.getLookAnglesFrom(location.coords.longitude,location.coords.latitude,1)
+                var lookAngles = satellite.getLookAnglesFrom( latLong.longitude, latLong.latitude,1)
                 if(lookAngles.elevation>0){
                     visibleSats.push(lookAngles)
                 } 
             }
-            //console.log(visibleSats)
+
             push()
                 translate(0,height)
                 for(var sat in visibleSats){
@@ -41,25 +70,21 @@ function setup(){
                     pop()
                 }
             pop()
+
         textAlign(RIGHT)
         var date = new Date();
         textSize(20)
         fill(255,64)
         strokeWeight(0)
         text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),width-10,height-32)
-        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),width-10,height-12)
-        document.getElementById("loading").style.visibility="hidden"
-        })
-    })
+        text(latLong.longitude.toFixed(4)+","+latLong.latitude.toFixed(4),width-10,height-12)
 }
-function draw(){
-}
-
 function drawSky(){
     for(var h=0;h<height;h++){
         var gradPart = map(h*h*h,0,height*height*height,0,100)
         var skyColor = color(10,.2*gradPart,gradPart)
         stroke(skyColor)
+        strokeWeight(1)
         line(0,h,width,h)
     }
 }
@@ -87,5 +112,6 @@ function parseTLE(satellites, callback){
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+    document.getElementById("defaultCanvas0").style.bottom = "0px"
 }
+

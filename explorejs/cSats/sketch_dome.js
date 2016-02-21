@@ -1,19 +1,30 @@
 var satellites = []
 var visibileSatsLookAngles = []
 var img;
+var latLong={};
 function preload() {
   img = loadImage("sprite.png");
   imageMode(CENTER)
 }
 function setup(){
     createCanvas(windowWidth,windowHeight)
-    navigator.geolocation.getCurrentPosition(function(location){    
+    navigator.geolocation.getCurrentPosition(function(location){
+        latLong.latitude = location.coords.latitude
+        latLong.longitude = location.coords.longitude
         parseTLE(satellites, function(){
+        drawSats()
+        document.getElementById("loading").style.visibility="hidden"
+        })
+    })
+}
+function draw(){}
+function drawSats(){
+
             drawSky()
             for(var sat in satellites){
                 var satellite = new explore.tle(satellites[sat].line1,satellites[sat].line2)
                 satellite.update()
-                var lookAngles = satellite.getLookAnglesFrom(location.coords.longitude,location.coords.latitude,1)
+                var lookAngles = satellite.getLookAnglesFrom(latLong.longitude,latLong.latitude,1)
                 lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
                 if(lookAngles.elevation>0){
                     visibileSatsLookAngles.push(lookAngles)
@@ -23,7 +34,6 @@ function setup(){
             translate(width/2,height/2)
                 for(var sat=0; sat<visibileSatsLookAngles.length;sat++){
                    var alt = map(visibileSatsLookAngles[sat].elevation,0,90,height/2,0)
-//                   var az = map(visibileSatsLookAngles[sat].azimuth,0,360,0,width)
                    var az = visibileSatsLookAngles[sat].azimuth
                    var satScale = map(visibileSatsLookAngles[sat].range_sat,0,40000,7,2)
                    noStroke()
@@ -37,30 +47,7 @@ function setup(){
                    stroke(0,160,0,100)
                    }
             pop()
-            /*
-        textAlign(LEFT)
-        fill(255,164)
-        var date = new Date();
-        textSize(20)
-        text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),5,16)
-        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),5,36)
-        */
-        document.getElementById("loading").style.visibility="hidden"
-/*
-    fill(255)
-    noStroke()
-    textSize(16)
-    text("N",width-16,height-5)
-    text("N",0,height-5)
-    text("E",(width/4)-14,height-5)
-    text("S",(width/2)-14,height-5)
-    text("W",(width*.75)-14,height-5)
-   */
-        })
-    })
 }
-function draw(){}
-
 function drawSky(){
     for(var h=0;h<height;h++){
         var gradPart = map(h*h*h*h,0,height*height*height*height,0,80)
@@ -93,4 +80,7 @@ function parseTLE(satellites, callback){
     xmlhttp.send(null);
 }
 
-
+function windowResized(){
+    resizeCanvas(windowWidth, windowHeight)
+    drawSats()
+}

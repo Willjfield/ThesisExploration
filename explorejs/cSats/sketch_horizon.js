@@ -1,21 +1,32 @@
 var satellites = []
 var visibileSatsLookAngles = []
 var img;
+var latLong={};
 function preload() {
   img = loadImage("sprite.png");
   imageMode(CENTER)
 }
 function setup(){
-    createCanvas(windowWidth,windowHeight-64)
+    createCanvas(windowWidth,windowHeight)
     document.getElementById("defaultCanvas0").style.position = "absolute"
     document.getElementById("defaultCanvas0").style.bottom = "64px"
     navigator.geolocation.getCurrentPosition(function(location){    
+        latLong.longitude = location.coords.longitude
+        latLong.latitude = location.coords.latitude
         parseTLE(satellites, function(){
+            drawSats()
+            document.getElementById("loading").style.visibility="hidden"
+        })
+    })
+}
+function draw(){
+}
+function drawSats(){
             drawSky()
             for(var sat in satellites){
                 var satellite = new explore.tle(satellites[sat].line1,satellites[sat].line2)
                 satellite.update()
-                var lookAngles = satellite.getLookAnglesFrom(location.coords.longitude,location.coords.latitude,1)
+                var lookAngles = satellite.getLookAnglesFrom(latLong.longitude,latLong.latitude,1)
                 lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
                 if(lookAngles.elevation>0){
                     visibileSatsLookAngles.push(lookAngles)
@@ -31,9 +42,9 @@ function setup(){
                    image(img,az,alt,satScale*2,satScale*2)
                    ellipse(az,alt,satScale,satScale)
                    pop()
-                   strokeWeight(.5)
-                   stroke(0,160,0,100)
                    if(visibileSatsLookAngles[sat].name!='Unknown'){
+                       strokeWeight(.75)
+                       stroke(0,160,0,100)
                        for(var otherSat = sat+1; otherSat<visibileSatsLookAngles.length-1;otherSat++){
                             if(visibileSatsLookAngles[otherSat].name==visibileSatsLookAngles[sat].name){
                                 line(az,alt,map(visibileSatsLookAngles[otherSat].azimuth,0,360,0,width),map(visibileSatsLookAngles[otherSat].elevation,0,90,height,0))
@@ -46,10 +57,6 @@ function setup(){
         fill(255,164)
         var date = new Date();
         textSize(20)
-    /*    text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),5,16)
-        text(location.coords.longitude.toFixed(4)+","+location.coords.latitude.toFixed(4),5,36)
-      */
-        document.getElementById("loading").style.visibility="hidden"
         fill(255)
         noStroke()
         textSize(24)
@@ -58,11 +65,7 @@ function setup(){
         text("E",(width/4)-8,24)
         text("S",(width/2)-8,24)
         text("W",(width*.75)-8,24)
-        })
-    })
 }
-function draw(){}
-
 function drawSky(){
     for(var h=0;h<height;h++){
         var gradPart = map(h*h*h,0,height*height*height,0,100)
@@ -95,5 +98,11 @@ function parseTLE(satellites, callback){
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+  // resizeCanvas(windowWidth, windowHeight);
+  // clear()
+  //document.getElementById("defaultCanvas0").style.position = "absolute"
+  document.getElementById("defaultCanvas0").style.width = windowWidth
+  document.getElementById("defaultCanvas0").style.height = windowHeight
+  document.getElementById("defaultCanvas0").style.bottom = "64px"
+  drawSats()
 }
