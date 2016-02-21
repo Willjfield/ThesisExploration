@@ -1,10 +1,10 @@
 $(document).ready(function(){
-    if(localStorage.introHide){
+    if(sessionStorage.introHide){
         $("#intro").hide()
     }
    $("#close").click(function(){
         $("#intro").hide()
-        localStorage.introHide = true
+        sessionStorage.introHide = true
    })
    $("#next").click(function(){
         $("#intro").css("visibility","hidden")
