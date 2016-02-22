@@ -1,5 +1,6 @@
 $(document).ready(function(){
     if(sessionStorage.introHide){
+        document.getElementById("loading").style.visibility="visible"
         $("#intro").hide()
     }
    $("#close").click(function(){
@@ -16,8 +17,9 @@ var img;
 var latLong = {}
 
 function preload() {
-  img = loadImage("sprite.png");
-  imageMode(CENTER)
+  img = loadImage("sprite.png")
+  angles = loadImage("angles.svg")
+  //imageMode(CENTER)
 }
 
 function setup(){
@@ -30,15 +32,22 @@ function setup(){
         parseTLE(satellites, function(){
         drawSats()
         document.getElementById("loading").style.visibility="hidden"
+        document.getElementById("close").style.visibility="visible"
         })
     })
 }
 
-function draw(){}
+function draw(){
+    /*
+    drawSats()
+    console.log(frameCount)
+    */
+}
 
 function drawSats(){
             drawSky()
-
+            imageMode(CENTER)
+            tint(255,255,255,255)
             for(var sat in satellites){
                 var satellite = new explore.tle(satellites[sat].line1,satellites[sat].line2)
                 satellite.update()
@@ -64,20 +73,30 @@ function drawSats(){
                             point(i,0)
                         }
                         noStroke()
+                        
                         fill(255)
-                        image(img,satPosition,0)
-                        ellipse(satPosition,0,4,4)
+                        translate(satPosition,0)
+                        scale(map(visibleSats[sat].range_sat,0,40000,3,.25))
+                        image(img,0,0)
+                        ellipse(0,0,4,4)
                     pop()
                 }
             pop()
+        imageMode(CORNERS)
 
-        textAlign(RIGHT)
+        tint(0, 255, 10, 100);
+        image(angles,0,0,angles.width,angles.height,0,height-400,400,height)
+        tint(0,0,0,0)
+        //imageMode(CENTER)
+        
+        /*textAlign(RIGHT)
         var date = new Date();
         textSize(20)
         fill(255,64)
         strokeWeight(0)
         text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),width-10,height-32)
         text(latLong.longitude.toFixed(4)+","+latLong.latitude.toFixed(4),width-10,height-12)
+        */
 }
 function drawSky(){
     for(var h=0;h<height;h++){

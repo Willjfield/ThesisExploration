@@ -5,6 +5,7 @@ var latLong={};
 function preload() {
   img = loadImage("sprite.png");
   imageMode(CENTER)
+  document.getElementById("loading").style.visibility="visible"
 }
 function setup(){
     createCanvas(windowWidth,windowHeight)
@@ -35,17 +36,18 @@ function drawSats(){
             push()
                 for(var sat=0; sat<visibileSatsLookAngles.length;sat++){
                    var alt = map(visibileSatsLookAngles[sat].elevation,0,90,height,0)
+                   if(visibileSatsLookAngles[sat].elevation>90){console.log(visibileSatsLookAngles[sat].elevation)}
                    var az = map(visibileSatsLookAngles[sat].azimuth,0,360,0,width)
-                   var satScale = map(visibileSatsLookAngles[sat].range_sat,0,40000,7,2)
+                   var satScale = map(visibileSatsLookAngles[sat].range_sat,0,50000,5,2)
                    noStroke()
                    push()
-                   image(img,az,alt,satScale*2,satScale*2)
+                   image(img,az,alt,satScale*2.5,satScale*2.5)
                    ellipse(az,alt,satScale,satScale)
                    pop()
                    if(visibileSatsLookAngles[sat].name!='Unknown'){
                        strokeWeight(.75)
                        stroke(0,160,0,100)
-                       for(var otherSat = sat+1; otherSat<visibileSatsLookAngles.length-1;otherSat++){
+                       for(var otherSat = sat+1; otherSat<visibileSatsLookAngles.length;otherSat++){
                             if(visibileSatsLookAngles[otherSat].name==visibileSatsLookAngles[sat].name){
                                 line(az,alt,map(visibileSatsLookAngles[otherSat].azimuth,0,360,0,width),map(visibileSatsLookAngles[otherSat].elevation,0,90,height,0))
                             }
@@ -55,16 +57,16 @@ function drawSats(){
             pop()
         textAlign(LEFT)
         fill(255,164)
-        var date = new Date();
+        //var date = new Date();
         textSize(20)
         fill(255)
         noStroke()
         textSize(24)
-        text("N",width-24,24)
-        text("N",10,24)
-        text("E",(width/4)-8,24)
-        text("S",(width/2)-8,24)
-        text("W",(width*.75)-8,24)
+        text("N",width-24,100)
+        text("N",10,100)
+        text("E",(width/4)-8,100)
+        text("S",(width/2)-8,100)
+        text("W",(width*.75)-8,100)
 }
 function drawSky(){
     for(var h=0;h<height;h++){

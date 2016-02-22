@@ -8,6 +8,7 @@ function preload() {
 }
 function setup(){
     createCanvas(windowWidth,windowHeight)
+    document.getElementById("loading").style.visibility="visible"
     navigator.geolocation.getCurrentPosition(function(location){
         latLong.latitude = location.coords.latitude
         latLong.longitude = location.coords.longitude
@@ -19,7 +20,6 @@ function setup(){
 }
 function draw(){}
 function drawSats(){
-
             drawSky()
             for(var sat in satellites){
                 var satellite = new explore.tle(satellites[sat].line1,satellites[sat].line2)
@@ -33,7 +33,7 @@ function drawSats(){
             push()
             translate(width/2,height/2)
                 for(var sat=0; sat<visibileSatsLookAngles.length;sat++){
-                   var alt = map(visibileSatsLookAngles[sat].elevation,0,90,height/2,0)
+                   var alt = map(visibileSatsLookAngles[sat].elevation,0,90,(height/2)-50,0)
                    var az = visibileSatsLookAngles[sat].azimuth
                    var satScale = map(visibileSatsLookAngles[sat].range_sat,0,40000,7,2)
                    noStroke()
@@ -47,14 +47,21 @@ function drawSats(){
                    stroke(0,160,0,100)
                    }
             pop()
-}
+                    fill(255)
+                    noStroke()
+                    textSize(14)
+                    text("N",width/2,16)
+                    text("E",(width/2)+(height/2),height/2)
+                    text("S",width/2,height-8)
+                    text("W",(width/2)-(height/2),height/2)
+                  }
 function drawSky(){
     for(var h=0;h<height;h++){
         var gradPart = map(h*h*h*h,0,height*height*height*height,0,80)
         var skyColor = color(10,.2*gradPart,gradPart)
         stroke(skyColor)
         noFill()
-        ellipse(width/2,height/2,h,h)
+        ellipse(width/2,height/2,h-50,h-50)
     }
 }
 
