@@ -1,3 +1,12 @@
+/*
+myAudio = new Audio('satSounds.mp3'); 
+myAudio.volume = .35
+myAudio.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
+myAudio.play();
+*/
 var satellites = []
 var visibileSatsLookAngles = []
 var img;
@@ -9,6 +18,7 @@ function preload() {
 }
 function setup(){
     createCanvas(windowWidth,windowHeight)
+    frameRate(.2)
     document.getElementById("defaultCanvas0").style.position = "absolute"
     document.getElementById("defaultCanvas0").style.bottom = "64px"
     navigator.geolocation.getCurrentPosition(function(location){    
@@ -21,6 +31,7 @@ function setup(){
     })
 }
 function draw(){
+  drawSats()
 }
 function drawSats(){
             drawSky()
@@ -67,6 +78,7 @@ function drawSats(){
         text("E",(width/4)-8,100)
         text("S",(width/2)-8,100)
         text("W",(width*.75)-8,100)
+        visibileSatsLookAngles = []
 }
 function drawSky(){
     for(var h=0;h<height;h++){
@@ -100,11 +112,6 @@ function parseTLE(satellites, callback){
 }
 
 function windowResized() {
-  // resizeCanvas(windowWidth, windowHeight);
-  // clear()
-  //document.getElementById("defaultCanvas0").style.position = "absolute"
-  document.getElementById("defaultCanvas0").style.width = windowWidth
-  document.getElementById("defaultCanvas0").style.height = windowHeight
-  document.getElementById("defaultCanvas0").style.bottom = "64px"
+  resizeCanvas(windowWidth, windowHeight);
   drawSats()
 }

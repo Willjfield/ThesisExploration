@@ -1,3 +1,12 @@
+/*
+myAudio = new Audio('satSounds.mp3'); 
+myAudio.volume = .35
+myAudio.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
+myAudio.play();
+*/
 $(document).ready(function(){
     if(sessionStorage.introHide){
         document.getElementById("loading").style.visibility="visible"
@@ -19,29 +28,26 @@ var latLong = {}
 function preload() {
   img = loadImage("sprite.png")
   angles = loadImage("angles.svg")
-  //imageMode(CENTER)
 }
 
 function setup(){
     createCanvas(4000,windowHeight)
+    frameRate(.2)
     document.getElementById("defaultCanvas0").style.position = "absolute"
     document.getElementById("defaultCanvas0").style.bottom = "0px"
     navigator.geolocation.getCurrentPosition(function(location){    
         latLong.longitude =location.coords.longitude
         latLong.latitude = location.coords.latitude
         parseTLE(satellites, function(){
-        drawSats()
-        document.getElementById("loading").style.visibility="hidden"
-        document.getElementById("close").style.visibility="visible"
+            drawSats()
+            document.getElementById("loading").style.visibility="hidden"
+            document.getElementById("close").style.visibility="visible"
         })
     })
 }
 
 function draw(){
-    /*
     drawSats()
-    console.log(frameCount)
-    */
 }
 
 function drawSats(){
@@ -97,6 +103,7 @@ function drawSats(){
         text(date.getDay()+"/"+date.getMonth()+"/"+date.getFullYear()+" at "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(),width-10,height-32)
         text(latLong.longitude.toFixed(4)+","+latLong.latitude.toFixed(4),width-10,height-12)
         */
+        visibleSats = []
 }
 function drawSky(){
     for(var h=0;h<height;h++){
