@@ -57,8 +57,20 @@ function drawPlanets(){
 				var distance = Math.sqrt(((curPosition[0]*25)*(curPosition[0]*25))+((curPosition[1]*25)*(curPosition[1]*25)))
 				ellipse(0,0,distance*2,distance*2)
 				translate(-curPosition[0]*25,curPosition[1]*25)
-				scale(explore.planets[p].radius*.000002)
-				image(planets[p],0,0)
+				
+				push()
+					scale(explore.planets[p].radius*.000002)
+					image(planets[p],0,0)
+				pop()
+
+				if(abs(mouseX-(width/2)+(curPosition[0]*25*zoom))<15){
+					if(abs(mouseY-(height/2)-(curPosition[1]*25*zoom))<15){
+						fill(255)
+						noStroke()
+						textSize(16/zoom)
+						text(explore.planets[p].name,explore.planets[p].radius*.0005/zoom,explore.planets[p].radius*.0005/zoom)
+					}
+				}
 			pop()
 		}
 		image(spaceMatte,0,0,spaceMatte.width,spaceMatte.height,0,0,width*3,height*3)	
