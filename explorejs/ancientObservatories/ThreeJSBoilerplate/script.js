@@ -24,6 +24,31 @@ var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 var cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
+var loader = new THREE.OBJLoader( manager );
+			loader.load( 'models/chichenitza.obj', function ( object ) {
+
+					object.traverse( function ( child ) {
+
+							if ( child instanceof THREE.Mesh ) {
+
+									var textureLoader = new THREE.TextureLoader();
+											textureLoader.load('El_Caracol.1Surface_Color.jpg', function(t){
+													child.material.map = texture;
+									});
+									//	child.material.map = texture;
+
+							}
+
+					} );
+
+					xScale = 3;
+					object.scale.x = object.scale.y = object.scale.z = xScale;
+
+					object.position.y = 0;
+					scene.add( object );
+
+			} );
+
 function render(){
 	requestAnimationFrame( render );
 
