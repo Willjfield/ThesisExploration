@@ -30,24 +30,19 @@ function preload(){
 	for(var p in planetYears){
 		loadPlanetTex(planetYears[p], thisYear, p)
 	}
-	// planets[0] = loadImage("mercury"/mercury.png")
-	// planets[1] = loadImage("img/venus.png")
-	// planets[2] = loadImage("img/earth.png")
-	// planets[3] = loadImage("img/mars.png")
-	// planets[4] = loadImage("img/jupiter.png")
-	// planets[5] = loadImage("img/saturn.png")
 }
 
 function loadPlanetTex(pYears, curYear, planetNum){
-					for(var y = pYears.length; y>0; y--){
-						for(var i = curYear;i>1500;i--){
+					for(var y = pYears.length; y>=0; y--){
+						for(var i = curYear;i>1700;i--){
 							if(pYears[y]==i){
 								var loadString = "img"+"/"+planetNum+"/"+i+".png"
 								planets[planetNum] = loadImage(loadString)
-								console.log(loadString)
+								//console.log(curYear)
+								//console.log(loadString)
 								return 0
 						}
-					}
+				}
 		}
 }
 
@@ -72,6 +67,7 @@ function draw(){
 		tOffset+=speed*speed*speed
 	}
 	date = explore.dateFromJday(explore.now+tOffset)
+
 	noStroke()
 	fill(255)
 	textSize(30)
@@ -134,10 +130,14 @@ function mousePressed(){
 
 function mouseReleased(){
 	document.getElementById("speedSlider").value = 0
+	for(var p in planetYears){
+		loadPlanetTex(planetYears[p], date.year, p)
+	}
 }
 
 function mouseDragged() {
 	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
+
 	centerX = mouseX-initX
 	centerY = mouseY-initY
 
