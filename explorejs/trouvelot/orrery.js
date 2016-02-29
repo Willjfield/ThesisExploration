@@ -8,23 +8,51 @@ var initY = 0
 var speed = 0
 var tOffset = 0
 var date
+
+var mercuryYears = [1934,2014]
+var venusYears = [1761,2009]
+var earthYears = [1816,2016]
+var marsYears = [1874,2003]
+var jupiterYears = [1874,1991,2009]
+var saturnYears = [1874,2004]
+
+var planetYears = [mercuryYears,venusYears,earthYears,marsYears,jupiterYears,saturnYears]
+
 function preload(){
+	var thisYear = explore.dateFromJday(explore.now).year
 	document.getElementById("speedSlider").min = -5
 	document.getElementById("speedSlider").max = 5
 	document.getElementById("speedSlider").step = .01
 	spaceBackground = loadImage("fludd_infinity2.jpg")
 	spaceMatte = loadImage("infinity.png")
 	sun = loadImage("img/sun.png")
-	planets[0] = loadImage("img/mercury.png")
-	planets[1] = loadImage("img/venus.png")
-	planets[2] = loadImage("img/earth.png")
-	planets[3] = loadImage("img/mars.png")
-	planets[4] = loadImage("img/jupiter.png")
-	planets[5] = loadImage("img/saturn.png")
+	console.log(thisYear)
+	for(var p in planetYears){
+		loadPlanetTex(planetYears[p], thisYear, p)
+	}
+	// planets[0] = loadImage("mercury"/mercury.png")
+	// planets[1] = loadImage("img/venus.png")
+	// planets[2] = loadImage("img/earth.png")
+	// planets[3] = loadImage("img/mars.png")
+	// planets[4] = loadImage("img/jupiter.png")
+	// planets[5] = loadImage("img/saturn.png")
+}
+
+function loadPlanetTex(pYears, curYear, planetNum){
+					for(var y = pYears.length; y>0; y--){
+						for(var i = curYear;i>1500;i--){
+							if(pYears[y]==i){
+								var loadString = "img"+"/"+planetNum+"/"+i+".png"
+								planets[planetNum] = loadImage(loadString)
+								console.log(loadString)
+								return 0
+						}
+					}
+		}
 }
 
 function setup(){
-	createCanvas(windowHeight, windowHeight)
+	createCanvas(windowWidth, windowHeight)
 	imageMode(CENTER)
 	drawPlanets()
 	zoom = 1
@@ -47,8 +75,9 @@ function draw(){
 	noStroke()
 	fill(255)
 	textSize(30)
-	text(date.month,50,70)
-	text(date.day,100,70)
+	textAlign(CENTER)
+	text(date.month + "/",50,70)
+	text(date.day + "/",90,70)
 	text(date.year,150,70)
 }
 
@@ -64,7 +93,7 @@ function drawPlanets(){
 		scale(zoom)
 		push()
 		scale(1+(zoom*.1))
-		image(spaceBackground,0,0,spaceBackground.width,spaceBackground.height,0,0,width,height)	
+		image(spaceBackground,0,0,spaceBackground.width,spaceBackground.height,0,0,height-100,height-100)
 		pop()
 		strokeWeight(1/zoom)
 		push()
@@ -77,7 +106,7 @@ function drawPlanets(){
 				var distance = Math.sqrt(((curPosition[0]*25)*(curPosition[0]*25))+((curPosition[1]*25)*(curPosition[1]*25)))
 				ellipse(0,0,distance*2,distance*2)
 				translate(-curPosition[0]*25,curPosition[1]*25)
-				
+
 				push()
 					scale(explore.planets[p].radius*.000002)
 					image(planets[p],0,0)
@@ -93,7 +122,7 @@ function drawPlanets(){
 				}
 			pop()
 		}
-		image(spaceMatte,0,0,spaceMatte.width,spaceMatte.height,0,0,width*3,height*3)	
+		image(spaceMatte,0,0,spaceMatte.width,spaceMatte.height,0,0,(height-100)*3,(height-100)*3)
 	pop()
 }
 
