@@ -41,7 +41,7 @@ for(var p in explore.planets){
 	var materialW = new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: .5 } );
 	var sphereW = new THREE.Mesh( geometry, materialW );
 	sphere.add(sphereW);
-	
+
 	var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
 	sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
 	drawPlanets.push(sphere);
@@ -51,9 +51,9 @@ for(var p in explore.planets){
 var render = function () {
 	requestAnimationFrame( render );
 	controls.update();
-	var step = 0.001;
+	var step = 0;
 	t+=step;
-	console.log(t)
+	//console.log(t)
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
 		var deltaRotation = -(24/explore.planets[p].dayLength)*(2*Math.PI)
@@ -65,8 +65,8 @@ var render = function () {
 	renderer.render(scene, camera);
 };
 /*
-document.addEventListener("click", function(){ 
-	t+=365.25; 
+document.addEventListener("click", function(){
+	t+=365.25;
 });
 */
 

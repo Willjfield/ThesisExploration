@@ -8,6 +8,7 @@ var initY = 0
 var speed = 0
 var tOffset = 0
 var date
+var trailLength = 300
 
 var mercuryYears = [1934,2014]
 var venusYears = [1761,2009]
@@ -19,7 +20,7 @@ var saturnYears = [1874,2004]
 var planetYears = [mercuryYears,venusYears,earthYears,marsYears,jupiterYears,saturnYears]
 
 function preload(){
-	var thisYear = explore.dateFromJday(explore.now).year
+	var thisYear = explore.dateFromJday(explore.now,-5).year
 	document.getElementById("speedSlider").min = -5
 	document.getElementById("speedSlider").max = 5
 	document.getElementById("speedSlider").step = .01
@@ -66,7 +67,7 @@ function draw(){
 	}else{
 		tOffset+=speed*speed*speed
 	}
-	date = explore.dateFromJday(explore.now+tOffset)
+	date = explore.dateFromJday(explore.now+tOffset,-5)
 
 	noStroke()
 	fill(255)
@@ -99,8 +100,14 @@ function drawPlanets(){
 		for(var p in planets){
 			push()
 				var curPosition = explore.SolarSystem(explore.planets[p],explore.now+tOffset)
-				var distance = Math.sqrt(((curPosition[0]*25)*(curPosition[0]*25))+((curPosition[1]*25)*(curPosition[1]*25)))
-				ellipse(0,0,distance*2,distance*2)
+				var distanceSq = ((curPosition[0]*25)*(curPosition[0]*25))+((curPosition[1]*25)*(curPosition[1]*25))
+				//ellipse(0,0,distance*2,distance*2)
+				for(var trail = 0;trail<distanceSq/7;trail+=5){
+					var t1 = explore.SolarSystem(explore.planets[p],explore.now+tOffset-trail)
+					var t2 = explore.SolarSystem(explore.planets[p],explore.now+tOffset-trail-5)
+					line(-t1[0]*25,t1[1]*25,-t2[0]*25,t2[1]*25)
+				}
+
 				translate(-curPosition[0]*25,curPosition[1]*25)
 
 				push()

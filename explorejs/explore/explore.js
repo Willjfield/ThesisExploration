@@ -36,14 +36,16 @@
 	          );
 	}
 
-	explore.dateFromJday = function(jday){
-		return dateFromJday(jday)
+	explore.dateFromJday = function(jday, timezoneOffset){
+		return dateFromJday(jday, timezoneOffset)
 	}
 
 	//From http://www.onlineconversion.com/julian_date.htm
-	function dateFromJday(jd){
+	function dateFromJday(jd, timezoneOffset){
 			var	j1, j2, j3, j4, j5;			//scratch
-
+			if(timezoneOffset!=0){
+				jd+=timezoneOffset/24
+			}
 			//
 			// get the date from the Julian day number
 			//
@@ -97,21 +99,21 @@
 
 	var now = new Date(); //set any date
 
-	explore.now = jday(now.getUTCFullYear(), 
-	            now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+	explore.now = jday(now.getUTCFullYear(),
+	            now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
 	            now.getUTCDate(),
-	            now.getUTCHours(), 
-	            now.getUTCMinutes(), 
+	            now.getUTCHours(),
+	            now.getUTCMinutes(),
 	            now.getUTCSeconds())
 
 	explore.updateTime = function (deltaSeconds){
 		var deltaSeconds = typeof deltaSeconds !== 'undefined' ?  deltaSeconds : 0;
 		var updatedDate = new Date(); //set any date
-		explore.now = jday(updatedDate.getUTCFullYear(), 
-		            updatedDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+		explore.now = jday(updatedDate.getUTCFullYear(),
+		            updatedDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
 		            updatedDate.getUTCDate(),
-		            updatedDate.getUTCHours(), 
-		            updatedDate.getUTCMinutes(), 
+		            updatedDate.getUTCHours(),
+		            updatedDate.getUTCMinutes(),
 		            updatedDate.getUTCSeconds()+deltaSeconds)
 	}
 	//////////DEGREES/RADIANS CONVERSION///////////
@@ -153,10 +155,10 @@
 	// Functions for the planets from bkinsey808/simple_cal/astrotools/planets.js
 	// Copyright Ole Nielsen 2002-2004
 	// Please read copyright notice in astrotools2.html source
-	// Formulae and elements from Paul Schlyter's article "Computing planetary positions" available at 
+	// Formulae and elements from Paul Schlyter's article "Computing planetary positions" available at
 	// http://hem.passagen.se/pausch/comp/ppcomp.html
 
-	var MERCURY = 0, VENUS = 1, EARTH = 2, MARS = 3, JUPITER = 4, SATURN = 5, 
+	var MERCURY = 0, VENUS = 1, EARTH = 2, MARS = 3, JUPITER = 4, SATURN = 5,
 	URANUS = 6, NEPTUNE = 7, SUN = 9, MOON = 10, COMET = 15, USER = 20;
 
 	// Planet diameters at 1 AU in arcsec (km for Moon)
@@ -219,7 +221,7 @@
 	   12756/2,
 	   23.4,
 	   24,
-	   0x00ff99 
+	   0x00ff99
 	   );
 
 	explore.mars = new planet("Mars   ",3,
@@ -313,7 +315,7 @@
 		this.mag=-1.0;
 		this.elong=0;
 		this.pa=0;	// position angle (elongation)
-		this.update=updatePosition;	
+		this.update=updatePosition;
 		this.elongupdate=updateElong;
 	}
 
@@ -360,7 +362,7 @@
 	function updateElong(jday,obs) {
 		// calculate elongation for object
 		if (this.number==SUN) return;
-		bodies[SUN].update(jday,obs); 
+		bodies[SUN].update(jday,obs);
 		var ra2=bodies[SUN].ra; var dec2=bodies[SUN].dec;
 		this.update(jday,obs);
 		var dat = separation(this.ra, ra2, this.dec, dec2);
@@ -379,7 +381,7 @@
     function planet_xyz(p,jday) {
     var d = jday-2451543.5;
 	var w = p.w[0] + p.w[1]*d;		// argument of perihelion
-	var e = p.e[0] + p.e[1]*d; 
+	var e = p.e[0] + p.e[1]*d;
 	var a = p.a[0] + p.a[1]*d;
 	var i = p.i[0] + p.i[1]*d;
 	var N = p.N[0] + p.N[1]*d;
@@ -408,7 +410,7 @@
 	}
 	if (p.num==SATURN) {		// Saturn pertuberations
 		var Mj = rev(planets[JUPITER].M[0] + planets[JUPITER].M[1]*d);
-		lonecl += 0.812*sind(2*Mj-5*M-67.6) - 0.229*cosd(2*Mj-4*M-2) + 0.119*sind(Mj-2*M-3) + 
+		lonecl += 0.812*sind(2*Mj-5*M-67.6) - 0.229*cosd(2*Mj-4*M-2) + 0.119*sind(Mj-2*M-3) +
 				0.046*sind(2*Mj-6*M-69) + 0.014*sind(Mj-3*M+32);
 		latecl += -0.020*cosd(2*Mj-4*M-2) + 0.018*sind(2*Mj-6*M-49);
 		xh = r*cosd(lonecl)*cosd(latecl);		// recalc xh, yh, zh
@@ -427,7 +429,7 @@
   /*      function planet_xyz(p,jday) {
 		var d = jday-2451543.5;
 		var w = p.w[0] + p.w[1]*d;		// argument of perihelion
-		var e = p.e[0] + p.e[1]*d; 
+		var e = p.e[0] + p.e[1]*d;
 		var a = p.a[0] + p.a[1]*d;
 		var i = p.i[0] + p.i[1]*d;
 		var N = p.N[0] + p.N[1]*d;
@@ -456,7 +458,7 @@
 		}
 		if (p.num==SATURN) {		// Saturn pertuberations
 			var Mj = rev(explore.planets[JUPITER].M[0] + explore.planets[JUPITER].M[1]*d);
-			lonecl += 0.812*sind(2*Mj-5*M-67.6) - 0.229*cosd(2*Mj-4*M-2) + 0.119*sind(Mj-2*M-3) + 
+			lonecl += 0.812*sind(2*Mj-5*M-67.6) - 0.229*cosd(2*Mj-4*M-2) + 0.119*sind(Mj-2*M-3) +
 					0.046*sind(2*Mj-6*M-69) + 0.014*sind(Mj-3*M+32);
 			latecl += -0.020*cosd(2*Mj-4*M-2) + 0.018*sind(2*Mj-6*M-49);
 			xh = r*cosd(lonecl)*cosd(latecl);		// recalc xh, yh, zh
@@ -472,11 +474,11 @@
 		}
 		//return new Array(xh,yh,zh);
 		return new Array(xh,yh,zh,r,lonecl,latecl);
-	}	
+	}
 */
      explore.radecr = function(obj,sun,jday,obs){
         return radecr(obj,sun,jday,obs)
-     } 
+     }
 	 function radecr(obj,sun,jday,obs) {
 	// radecr returns ra, dec and earth distance
 	// obj and sun comprise Heliocentric Ecliptic Rectangular Coordinates
@@ -496,7 +498,7 @@
 			var dec=atan2d(z1, Math.sqrt(x1*x1+y1*y1));
 			var dist=Math.sqrt(x1*x1+y1*y1+z1*z1);
 			return new Array(ra,dec,dist);
-	} 
+	}
 
     explore.radec2aa = function(ra,dec,jday,obs){
         return radec2aa(ra,dec,jday,obs)
@@ -515,7 +517,7 @@
 	}
 
 
-	function separation(ra1, ra2, dec1, dec2) {		
+	function separation(ra1, ra2, dec1, dec2) {
 	// ra, dec may also be long, lat, but PA is relative to the chosen coordinate system
 		var d = acosd(sind(dec1)*sind(dec2) + cosd(dec1)*cosd(dec2)*cosd(ra1-ra2));		// (Meeus 17.1)
 		if (d < 0.1) d = Math.sqrt(sqr( rev2(ra1-ra2)*cosd((dec1+dec2)/2) ) + sqr(dec1-dec2));	// (17.2)
@@ -523,7 +525,7 @@
 		return new Array(d, rev(pa));
 	}	// end separation()
 
-    
+
     // SUN and MOON
     // Alternative version of Sun position based on Schlyter's method
 
@@ -538,7 +540,7 @@
         // days counted from 1999 Dec 31.0 UT
         var d=jday-2451543.5;
         var w = 282.9404 + 4.70935E-5 * d;		// argument of perihelion
-        var e = 0.016709 - 1.151E-9 * d; 
+        var e = 0.016709 - 1.151E-9 * d;
         var M = rev(356.0470 + 0.9856002585 * d); // mean anomaly
         var E = M + e*RAD2DEG * sind(M) * ( 1.0 + e * cosd(M) );
         var xv = cosd(E) - e;
@@ -546,17 +548,129 @@
         var v = atan2d( yv, xv );		// true anomaly
         var r = Math.sqrt( xv*xv + yv*yv );	// distance
         var lonsun = rev(v + w);	// true longitude
-        var xs = r * cosd(lonsun);		// rectangular coordinates, zs = 0 for sun 
+        var xs = r * cosd(lonsun);		// rectangular coordinates, zs = 0 for sun
         var ys = r * sind(lonsun);
         return new Array(xs,ys,0,r,lonsun,0);
     }
-    
+
+		function SunAlt(jday, obs) {
+		// return alt, az, time angle, ra, dec, ecl. long. and lat=0, illum=1, 0,
+		// dist, brightness
+		var sdat = sunxyz(jday);
+		var ecl = 23.4393 - 3.563E-7 * (jday - 2451543.5);
+		var xe = sdat[0];
+		var ye = sdat[1] * cosd(ecl);
+		var ze = sdat[1] * sind(ecl);
+		var ra = rev(atan2d(ye, xe));
+		var dec = atan2d(ze, Math.sqrt(xe * xe + ye * ye));
+		var topo = radec2aa(ra, dec, jday, obs);
+		return new Array(topo[0], topo[1], topo[2], ra, dec, sdat[4], 0, 1, 0,
+				sdat[3], -26.74);
+	}
+	///WHERE DOES THE MOON FIT INTO ALL THIS?
+	function MoonPos(jday, obs) {
+		// MoonPos calculates the Moon position and distance, based on Meeus chapter
+		// 47
+		// and the illuminated percentage from Meeus equations 48.4 and 48.1
+		// OPN: This version of MoonPos calculates the position to a precision of
+		// about 2' or so
+		// All T^2, T^3 and T^4 terms skipped. NB: Time is not taken from obs but
+		// from jday (julian day)
+		// Returns alt, az, hour angle, ra, dec (geocentr!), eclip. long and lat
+		// (geocentr!),
+		// illumination, distance, brightness and phase angle
+		var T = (jday - 2451545.0) / 36525;
+		// Moons mean longitude L'
+		var LP = rev(218.3164477 + 481267.88123421 * T);
+		// Moons mean elongation
+		var D = rev(297.8501921 + 445267.1114034 * T);
+		// Suns mean anomaly
+		var M = rev(357.5291092 + 35999.0502909 * T);
+		// Moons mean anomaly M'
+		var MP = rev(134.9633964 + 477198.8675055 * T);
+		// Moons argument of latitude
+		var F = rev(93.2720950 + 483202.0175233 * T);
+		// The "further arguments" A1, A2 and A3 and the term E have been ignored
+		// Sum of most significant terms from table 45.A and 45.B (terms less than
+		// 0.004 deg / 40 km dropped)
+		var Sl = 6288774 * sind(MP) + 1274027 * sind(2 * D - MP) + 658314
+				* sind(2 * D) + 213618 * sind(2 * MP) - 185116 * sind(M) - 114332
+				* sind(2 * F) + 58793 * sind(2 * D - 2 * MP) + 57066
+				* sind(2 * D - M - MP) + 53322 * sind(2 * D + MP) + 45758
+				* sind(2 * D - M) - 40923 * sind(M - MP) - 34720 * sind(D) - 30383
+				* sind(M + MP) + 15327 * sind(2 * D - 2 * F) - 12528
+				* sind(MP + 2 * F) + 10980 * sind(MP - 2 * F) + 10675
+				* sind(4 * D - MP) + 10034 * sind(3 * MP) + 8548
+				* sind(4 * D - 2 * MP) - 7888 * sind(2 * D + M - MP) - 6766
+				* sind(2 * D + M) - 5163 * sind(D - MP) + 4987 * sind(D + M) + 4036
+				* sind(2 * D - M + MP);
+		var Sb = 5128122 * sind(F) + 280602 * sind(MP + F) + 277602 * sind(MP - F)
+				+ 173237 * sind(2 * D - F) + 55413 * sind(2 * D - MP + F) + 46271
+				* sind(2 * D - MP - F) + 32573 * sind(2 * D + F) + 17198
+				* sind(2 * MP + F) + 9266 * sind(2 * D + MP - F) + 8822
+				* sind(2 * MP - F) + 8216 * sind(2 * D - M - F) + 4324
+				* sind(2 * D - 2 * MP - F) + 4200 * sind(2 * D + MP + F);
+		var Sr = (-20905355) * cosd(MP) - 3699111 * cosd(2 * D - MP) - 2955968
+				* cosd(2 * D) - 569925 * cosd(2 * MP) + 246158
+				* cosd(2 * D - 2 * MP) - 152138 * cosd(2 * D - M - MP) - 170733
+				* cosd(2 * D + MP) - 204586 * cosd(2 * D - M) - 129620
+				* cosd(M - MP) + 108743 * cosd(D) + 104755 * cosd(M + MP) + 79661
+				* cosd(MP - 2 * F) + 48888 * cosd(M);
+		// geocentric longitude, latitude
+		var mglong = rev(LP + Sl / 1000000.0);
+		var mglat = Sb / 1000000.0;
+		// Obliquity of Ecliptic
+		var obl = 23.4393 - 3.563E-7 * (jday - 2451543.5);
+		var ra = rev(atan2d(sind(mglong) * cosd(obl) - tand(mglat) * sind(obl),
+				cosd(mglong)));
+		var dec = asind(sind(mglat) * cosd(obl) + cosd(mglat) * sind(obl)
+				* sind(mglong));
+		var moondat = radec2aa(ra, dec, jday, obs);
+		// phase angle (48.4)
+		var pa = Math.abs(180.0 - D - 6.289 * sind(MP) + 2.100 * sind(M) - 1.274
+				* sind(2 * D - MP) - 0.658 * sind(2 * D) - 0.214 * sind(2 * MP)
+				- 0.11 * sind(D));
+		var k = (1 + cosd(pa)) / 2;
+		var mr = Math.round(385000.56 + Sr / 1000.0);
+		var h = moondat[0];
+		// correct for parallax, equatorial horizontal parallax, see Meeus p. 337
+		h -= asind(6378.14 / mr) * cosd(h);
+		// brightness, use Paul Schlyter's formula (based on common phase law for
+		// Moon)
+		var sdat = sunxyz(jday);
+		var r = sdat[3];
+		// Earth (= Moon) distance to Sun in AU
+		var R = mr / 149598000;
+		// Moon distance to Earth in AU
+		var mag = 0.23 + 5 * log10(r * R) + 0.026 * pa + 4.0E-9 * pa * pa * pa * pa;
+
+
+
+        var j;
+        var ip, ag;
+        ip = (jday + 4.867) / 29.53059;
+        ip = ip - Math.floor(ip);
+        if(ip < 0.5)
+        {
+            ag = ip * 29.53059 + 29.53059 / 2;
+        }
+        else
+        {
+            ag = ip * 29.53059 - 29.53059 / 2;
+        }
+        ag = Math.floor(ag) + 1;
+
+
+		return new Array(h, moondat[1], moondat[2], ra, dec, mglong, mglat, k, r,
+				mr, mag, ag);
+	}
+
 	explore.PlanetAlt = function(p,jday,obs) {
         return PlanetAlt(p,jday, obs)
     }
     function PlanetAlt(p,jday,obs) {
 	// Alt/Az, hour angle, ra/dec, ecliptic long. and lat, illuminated fraction, dist(Sun), dist(Earth), brightness of planet p
-			if (p==SUN) return SunAlt(jday,obs);
+			if (p==2) return SunAlt(jday,obs);
 			if (p==MOON) return MoonPos(jday,obs);
 			if (p==COMET) return CometAlt(jday,obs);
 			var sun_xyz = sunxyz(jday);
@@ -570,14 +684,14 @@
 			var lat = atan2d(dz, Math.sqrt(dx*dx+dy*dy));
 
 			var radec = radecr(planet_xyz, sun_xyz, jday, obs);
-			var ra = radec[0]; 
+			var ra = radec[0];
 			var dec = radec[1];
 			var altaz = radec2aa(ra, dec, jday, obs);
 
 			var dist = radec[2];
 			var R = sun_xyz[3];	// Sun-Earth distance
 			var r = planet_xyz[3];	// heliocentric distance
-			var k = ((r+dist)*(r+dist)-R*R) / (4*r*dist);		// illuminated fraction (41.2) 
+			var k = ((r+dist)*(r+dist)-R*R) / (4*r*dist);		// illuminated fraction (41.2)
 			// brightness calc according to Meeus p. 285-86 using Astronomical Almanac expressions
 			var absbr = new Array(-0.42, -4.40, 0, -1.52, -9.40, -8.88, -7.19, -6.87);
 			var i = acosd( (r*r+dist*dist-R*R) / (2*r*dist) );	// phase angle
@@ -605,7 +719,7 @@
 				mag += 0.044*dU - 2.60*sind(Math.abs(B)) + 1.25*sind(B)*sind(B);
 				break;
 			}
-			return new Array (altaz[0], altaz[1], altaz[2], ra, dec, lon, lat, k, r, dist, mag); 
+			return new Array (altaz[0], altaz[1], altaz[2], ra, dec, lon, lat, k, r, dist, mag);
 	}
 
 	////////////////  EARTH satellite-js   //////////////////
@@ -3489,7 +3603,7 @@ function geodetic_to_ecf (geodetic_coords){
     var longitude   = geodetic_coords["longitude"];
     var latitude    = geodetic_coords["latitude"];
     var height      = geodetic_coords["height"];
-    
+
     var a           = 6378.137;
     var b           = 6356.7523142;
     var f           = (a - b)/a;
@@ -3682,11 +3796,11 @@ explore.tle = function(line1, line2) {
         var now = new Date();
         // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
         var position_and_velocity = explore.satellite.propagate (satrec,
-                                                        now.getUTCFullYear(), 
-                                                        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+                                                        now.getUTCFullYear(),
+                                                        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                                                         now.getUTCDate()+deltaDays,
-                                                        now.getUTCHours()+deltaHours, 
-                                                        now.getUTCMinutes()+deltaMinutes, 
+                                                        now.getUTCHours()+deltaHours,
+                                                        now.getUTCMinutes()+deltaMinutes,
                                                         now.getUTCSeconds()+(this.deltaSeconds%60));
         // The position_velocity result is a key-value pair of ECI coordinates.
         // These are the base results from which all other coordinates are derived.
@@ -3696,11 +3810,11 @@ explore.tle = function(line1, line2) {
         // ECI and ECF are accessed by "x", "y", "z".
 
 		var curgstime = explore.satellite.gstime_from_jday(explore.satellite.jday(
-														now.getUTCFullYear(), 
-                                                        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+														now.getUTCFullYear(),
+                                                        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                                                         now.getUTCDate()+deltaDays,
-                                                        now.getUTCHours()+deltaHours, 
-                                                        now.getUTCMinutes()+deltaMinutes, 
+                                                        now.getUTCHours()+deltaHours,
+                                                        now.getUTCMinutes()+deltaMinutes,
                                                         now.getUTCSeconds()+this.deltaSeconds%60
 			));
 		//convert current satellite eci to lat/long in degrees and radians

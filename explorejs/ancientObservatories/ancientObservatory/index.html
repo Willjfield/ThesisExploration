@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - OBJ loader</title>
+		<title>Ancient Observatories</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -23,13 +23,16 @@
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
-
+		<link rel="stylesheet" type="text/css" href="style.css">
 		<script src="three.js"></script>
 		<script src="OrbitControls.js"></script>
 		<script src="OBJLoader.js"></script>
+		<script src="../../explore/explore.js"></script>
 	</head>
 
 	<body>
+		<input id="speedSlider" onmouseup="mouseUp()" type="range"></input><br>
+		<p id="#date"></p>
 		<script src="scene.js"></script>
 
 	</body>
