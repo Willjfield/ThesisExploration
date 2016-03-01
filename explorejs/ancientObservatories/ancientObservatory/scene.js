@@ -47,31 +47,35 @@
 				controls.minPolarAngle = 0; // radians
 				controls.maxPolarAngle = Math.PI*2
 
-				 var ambient = new THREE.AmbientLight( 0xffffff );
+				 var ambient = new THREE.AmbientLight( 0x222233 );
 				 scene.add( ambient );
 
-				var light = new THREE.PointLight( 0xffffff, 10, 1000 );
-				light.position.set( 50, 100, 50 );
-				scene.add( light );
+				 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+ 			 	directionalLight.position.set( 0, 0, -500 );
+				directionalLight.castShadow	= true
+				directionalLight.shadowCameraVisible = true
 
 				for(var p in explore.planets){
+					if(p<6){
 					var nullObj = new THREE.Object3D();
 					if(p!=2){
 						var geometry = new THREE.SphereGeometry( 10,8,8 );
-						var material = new THREE.MeshLambertMaterial( { color: explore.planets[p].texColor } );
+						var material = new THREE.MeshBasicMaterial( { color: explore.planets[p].texColor } );
 					}else{
 						var geometry = new THREE.SphereGeometry( 15,8,8 );
-						var material = new THREE.MeshLambertMaterial( { color: 0xffff00 } );
+						var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 					}
 					var sphere = new THREE.Mesh( geometry, material );
 					sphere.position.set(0,0,-900)
 
 					nullObj.add(sphere)
+					p==2 ? nullObj.add( directionalLight ) : {}
 
 					var pAltAz = explore.PlanetAlt(p,explore.now+tOffset,obsPos)
 					nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
 					planetArray.push(nullObj)
 					scene.add( nullObj )
+				}
 				}
 
 				//when done, add the venusNull to the scene
@@ -107,6 +111,7 @@
 					object.traverse( function ( child ) {
 						if ( child instanceof THREE.Mesh ) {
 							child.material = new THREE.MeshLambertMaterial( {color: 0xffffff, map: texture, needsUpdate: true} );//.map = texture;
+							child.geometry.computeVertexNormals();
 						}
 					} );
 
