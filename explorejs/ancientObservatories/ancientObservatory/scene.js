@@ -51,8 +51,8 @@
 				 scene.add( ambient );
 
 				var light = new THREE.PointLight( 0xffffff, 10, 1000 );
-light.position.set( 50, 100, 50 );
-scene.add( light );
+				light.position.set( 50, 100, 50 );
+				scene.add( light );
 
 				for(var p in explore.planets){
 					var nullObj = new THREE.Object3D();
