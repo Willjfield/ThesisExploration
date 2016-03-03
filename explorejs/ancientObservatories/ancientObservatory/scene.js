@@ -1,3 +1,4 @@
+			//http://www.ancient-astronomy.org/webapplications/gordon/SundialNavigatorProject/CurrentVersion/index.html
 			var obsPos = {latitude:20.6792,longitude:-88.5707}
 			var modelPath = 'models/chichenitza.obj'
 			var texturePath = 'models/El_Caracol.1Surface_Color.jpg'
@@ -36,6 +37,10 @@
 				camera.position.set(0,0,0);
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMapType = THREE.PCFSoftShadowMap;
+				//renderer.shadowMapSoft = true;
+
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -50,10 +55,21 @@
 				 var ambient = new THREE.AmbientLight( 0x222233 );
 				 scene.add( ambient );
 
-				 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
  			 	directionalLight.position.set( 0, 0, -500 );
 				directionalLight.castShadow	= true
+
+				directionalLight.shadowCameraRight     =  100;
+				directionalLight.shadowCameraLeft     = -100;
+				directionalLight.shadowCameraTop      =  100;
+				directionalLight.shadowCameraBottom   = -100;
+				directionalLight.shadowCameraNear   = 1;
+				directionalLight.shadowCameraFar   = 800;
 				directionalLight.shadowCameraVisible = true
+
+				directionalLight.shadowDarkness = .1;
+				directionalLight.shadowMapWidth = 2048;
+				directionalLight.shadowMapHeight = 2048;
 
 				for(var p in explore.planets){
 					if(p<6){
@@ -103,6 +119,8 @@
 
 					texture.image = image;
 					texture.needsUpdate = true;
+					texture.receiveShadow = true;
+					texture.castShadow = true;
 
 				} );
 
@@ -110,12 +128,16 @@
 				loader.load( modelPath, function ( object ) {
 					object.traverse( function ( child ) {
 						if ( child instanceof THREE.Mesh ) {
-							child.material = new THREE.MeshLambertMaterial( {color: 0xffffff, map: texture, needsUpdate: true} );//.map = texture;
+							child.material = new THREE.MeshLambertMaterial( {map: texture, needsUpdate: true} );
 							child.geometry.computeVertexNormals();
+
+							child.castShadow = true
+							child.receiveShadow = true
 						}
 					} );
-
 					object.scale.set(.01,.01,.01)
+
+
 					scene.add( object );
 
 				}, onProgress, onError );
