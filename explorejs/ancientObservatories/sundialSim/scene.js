@@ -1,6 +1,6 @@
 			//http://www.ancient-astronomy.org/webapplications/gordon/SundialNavigatorProject/CurrentVersion/index.html
 			var obsPos = {latitude:42.85,longitude:13.583333, elevation: .154}
-			var modelPath = 'models/Sundials/Ascoli/ObjID574_r2.obj'
+			var modelPath = 'models/Sundials/Ascoli/ObjID574_r1.obj'
 			var texturePath = 'models/Sundials/Ascoli/ss_tex.jpg'
 			var timeZone = 1
 
