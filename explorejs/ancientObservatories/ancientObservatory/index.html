@@ -4,25 +4,6 @@
 		<title>Ancient Observatories</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<!-- <script src="three.js"></script> -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r74/three.min.js"></script>
@@ -32,8 +13,21 @@
 	</head>
 
 	<body>
+		<div id="sliderTitle"> Time Speed </div>
 		<input id="speedSlider" onmouseup="mouseUp()" type="range"></input><br>
-		<p id="#date"></p>
+		<h1 id="loading"> LOADING </h1>
+		<!--FOR PLACING GNOMON ONLY-->
+		<!-- <input id="zGnomon" onchange="gzMouseDown()" type="range"></input>
+		<input id="yGnomon" onchange="gyMouseDown()" type="range"></input> -->
+
+		<div id="rt">Real-Time</div>
+		<div id="wrapper">
+			<div id="rewind">Rewind</div>
+			<div id="forward">Fast Forward</div>
+		</div>
+
+		<p id="date"></p>
+		<p id="latlong"></p>
 		<script src="scene.js"></script>
 
 	</body>

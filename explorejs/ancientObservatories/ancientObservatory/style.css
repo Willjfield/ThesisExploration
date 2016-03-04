@@ -3,14 +3,91 @@
   height:50px;
 }
 
-*{
+#wrapper{
+  width: 100%;
   background: black;
-  overflow: hidden;
-}
-canvas{
-    margin: 0 auto;
+  margin: 0 auto;
+  margin-top: -10px;
+  padding-bottom: 10px;
 }
 
+#rewind{
+  display: inline;
+  font-family:sans-serif;
+  font-size: 12px;
+}
+
+#zGnomon{
+  position: absolute;
+  bottom:0px;
+  left: 0px;
+  width:100%;
+  }
+
+  #yGnomon{
+    position: absolute;
+    display:inline;
+    transform: rotate(90deg);
+    bottom:33%;
+    right:72%;
+    width: 50%;
+    }
+
+#loading{
+    position:absolute;
+    bottom:50%;
+    width: 100%;
+    text-align: center;
+}
+
+#rt{
+  font-family:sans-serif;
+  font-size: 12px;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: -16px;
+  margin-top: -3px;
+  left:50%;
+  text-align: center;
+}
+#latlong{
+  display: inline;
+  position: absolute;
+  right: 0px;
+  text-align: right;
+}
+
+#sliderTitle{
+  margin: 0 auto;
+  text-align: center;
+  font-size: 20px;
+  background: black;
+}
+
+#forward{
+  display:inline-block;
+  position: absolute;
+  right:0px;
+  font-family:sans-serif;
+  font-size: 12px;
+}
+h1{font-size: 40px}
+*{
+  /*background: black;*/
+  color: white;
+  font-family : monospace;
+  overflow: hidden;
+  margin: 0 auto;
+}
+canvas{
+    position: absolute;
+    top: 0px;
+    margin: 0 auto;
+    z-index: -999;
+}
+input{
+  background: black;
+}
 input[type=range] {
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
   width: 100%; /* Specific width is required for Firefox. */
@@ -27,8 +104,8 @@ input[type=range]:focus {
 input[type=range]::-ms-track {
   width: 100%;
   cursor: pointer;
-  background: transparent; /* Hides the slider so custom styles can be added */
-  border-color: transparent;
+  background: black; /* Hides the slider so custom styles can be added */
+  border-color: black;
   color: transparent;
 }
 
@@ -117,4 +194,9 @@ input[type=range]::-ms-fill-upper {
 }
 input[type=range]:focus::-ms-fill-upper {
   background: #367ebd;
+}
+#date{
+  display: inline;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.33);
 }
