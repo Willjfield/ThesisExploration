@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Sundial Simulator</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<!-- <script src="three.js"></script> -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r74/three.min.js"></script>
+		<script src="OrbitControls.js"></script>
+		<script src="OBJLoader.js"></script>
+		<script src="../../explore/explore.js"></script>
+	</head>
+
+	<body>
+		<div id="sliderTitle"> Time Speed </div>
+		<input id="speedSlider" onmouseup="mouseUp()" type="range"></input><br>
+		<h1 id="loading"> LOADING </h1>
+		<!--FOR PLACING GNOMON ONLY-->
+		<!-- <input id="zGnomon" onchange="gzMouseDown()" type="range"></input>
+		<input id="yGnomon" onchange="gyMouseDown()" type="range"></input> -->
+
+		<div id="rt">Real-Time</div>
+		<div id="wrapper">
+			<div id="rewind"> Rewind</div>
+			<div id="forward">Fast Forward </div>
+		</div>
+
+		<p id="date"></p>
+		<p id="latlong"></p>
+		<script src="scene.js"></script>
+		<p id="credit"> Sundial Simulator<br> <a href="willjfield.com">Will Field</a>, 2016<br>Computational Photography and<br>3D Modeling for the Ancient World<br>
+		with Sebastian Heath, NYU
+
+	</body>
+</html>
