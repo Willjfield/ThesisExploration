@@ -26,6 +26,10 @@
 		return seconds/60
 	}
 
+	explore.jday = function (year, mon, day, hr, minute, sec){
+		return jday(year, mon, day, hr, minute, sec)
+	}
+
 	function jday(year, mon, day, hr, minute, sec){
 	    return (367.0 * year -
 	          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +

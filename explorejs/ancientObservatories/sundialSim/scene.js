@@ -1,6 +1,5 @@
-			//http://www.ancient-astronomy.org/webapplications/gordon/SundialNavigatorProject/CurrentVersion/index.html
-			var obsPos = {latitude:42.85,longitude:13.583333, elevation: .154}
-			var modelPath = 'models/Sundials/Ascoli/ObjID574_r1.obj'
+			var obsPos = {latitude:41.895556,longitude:12.496667, elevation: .038}
+			var modelPath = 'models/Sundials/Ascoli/ObjID73_r2.obj'
 			var texturePath = 'models/Sundials/Ascoli/ss_tex.jpg'
 			var timeZone = 1
 
@@ -30,10 +29,15 @@
 			function init() {
 				speed = 0
 				tOffset = 0
-				document.getElementById("speedSlider").min = -1
-				document.getElementById("speedSlider").max = 1
+				document.getElementById("speedSlider").min = -.01
+				document.getElementById("speedSlider").max = .01
 				document.getElementById("speedSlider").step = .0001
 
+
+				var date = explore.dateFromJday(explore.now,timeZone)
+				document.getElementById('inday').value = date.day
+				document.getElementById('inmonth').value = date.month
+				document.getElementById('inyear').value = date.year
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -67,10 +71,10 @@
  			 	directionalLight.position.set( 0, 0, -500 );
 				directionalLight.castShadow	= true
 
-				directionalLight.shadowCameraRight     =  10;
-				directionalLight.shadowCameraLeft     = -10;
-				directionalLight.shadowCameraTop      =  10;
-				directionalLight.shadowCameraBottom   = -10;
+				directionalLight.shadowCameraRight     =  5;
+				directionalLight.shadowCameraLeft     = -5;
+				directionalLight.shadowCameraTop      =  5;
+				directionalLight.shadowCameraBottom   = -5;
 				directionalLight.shadowCameraNear   = 1;
 				directionalLight.shadowCameraFar   = 800;
 				directionalLight.shadowCameraVisible = true
@@ -84,8 +88,6 @@
 						var groundTex = new THREE.Texture();
 						groundTex.image = image
 						groundTex.needsUpdate = true;
-						//groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
-						//groundTex.repeat.set( 10, 10 );
 						var groundGeo = new THREE.BoxGeometry(25,.5,25)
 						var groundMat = new THREE.MeshLambertMaterial({map: groundTex, /*color:0x307030,*/ side:THREE.DoubleSide})
 						var groundMesh = new THREE.Mesh(groundGeo,groundMat)
@@ -95,11 +97,10 @@
 				})
 
 
-				var gnomonGeo = new THREE.CylinderGeometry( .05, .05, 1.5, 16 );
+				var gnomonGeo = new THREE.CylinderGeometry( .025, .025, 3, 16 );
 				var gnomonMat = new THREE.MeshBasicMaterial( {color: 0x111111} );
 				gnomonMesh = new THREE.Mesh( gnomonGeo, gnomonMat );
-				gnomonMesh.rotation.set(Math.PI/2,0,0)
-				gnomonMesh.position.set(0,4.85,-.55+zGnomon)
+				gnomonMesh.position.set(0,1.44,-.05+zGnomon)
 				gnomonMesh.castShadow = true
 				scene.add( gnomonMesh );
 
@@ -132,20 +133,19 @@
 				var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
 					document.getElementById("loading").remove()
+					document.getElementById("loadAmount").remove()
 					console.log( item, loaded, total );
 				};
 
 				var onProgress = function ( xhr ) {
 					if ( xhr.lengthComputable ) {
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						document.getElementById("loadAmount").innerHTML = (Math.round(percentComplete, 2) + '%')
 					}
 				};
 
 				var onError = function ( xhr ) {
 				};
-
-
 
 				/*For image texture
 				var texture = new THREE.Texture();
@@ -168,7 +168,8 @@
 						}
 					} );
 					object.scale.set(.01,.01,.01)
-
+					object.rotateX(-Math.PI/2)
+					object.position.y=3
 
 					scene.add( object );
 
@@ -191,39 +192,27 @@
 			function animate() {
 				speed = parseFloat(document.getElementById("speedSlider").value)
 
-				if(Math.abs(speed) < .2){
-					speed *= .01
-				}
-				if(Math.abs(speed)>.2 && Math.abs(speed)<.5) {
-					speed *= .1 
-				}else{
-					if(Math.abs(speed)>.7 && Math.abs(speed)<.9){
-					speed *= 1.1
-				}else{
-					if(Math.abs(speed)>.9 && Math.abs(speed)<.99){
-					speed *= 10
-				}else{
-					if(Math.abs(speed)==1){
-						speed *= 200
-					}
-				}
-				}
-				}
-
-
 				tOffset+=speed
 				date = explore.dateFromJday(explore.now+tOffset,timeZone)
 				var dmin = date.minute.toString()
 				if(dmin.length<2) dmin = "0"+dmin
 
-				document.getElementById('date').innerHTML = "Date: " + date.month+ "/"+date.day+"/"+date.year+
-																										"<br> Time: "+date.hour+":"+dmin;
+				var inDay = parseFloat(document.getElementById('inday').value)>0 ? parseFloat(document.getElementById('inday').value) : 0
+				var inMonth = parseFloat(document.getElementById('inmonth').value)>0 ? parseFloat(document.getElementById('inmonth').value) : 0
+				var inYear = parseFloat(document.getElementById('inyear').value)>0 ? parseFloat(document.getElementById('inyear').value) : 0
+
+				var tset = explore.jday(inYear, inMonth, inDay, date.hour, date.minute, date.sec)
+				var difTime = explore.now+tOffset-tset+0.04166666651144624
+				console.log(difTime)
+
+				document.getElementById('date').innerHTML = "Time: "+date.hour+":"+dmin;
 				document.getElementById('latlong').innerHTML ="Latitude: "+obsPos.latitude+
-																										"<br> Longitude: "+obsPos.longitude+
-																										"<br> Elevation(m): "+obsPos.elevation*1000
+																							"<br> Longitude: "+obsPos.longitude+
+																							"<br> Elevation(m): "+obsPos.elevation*1000+
+																							"<br>Sundial from Villa Palombara Massimi, Rome"
 
 				for(var p in planetArray){
-						var pAltAz = explore.PlanetAlt(p,explore.now+tOffset,obsPos)
+						var pAltAz = explore.PlanetAlt(p,explore.now+tOffset-difTime,obsPos)
 						planetArray[p].rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
 				}
 				requestAnimationFrame( animate );
