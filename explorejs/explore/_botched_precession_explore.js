@@ -29,6 +29,7 @@
 	explore.jday = function (year, mon, day, hr, minute, sec){
 		return jday(year, mon, day, hr, minute, sec)
 	}
+
 	function jday(year, mon, day, hr, minute, sec){
 	    return (367.0 * year -
 	          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
@@ -39,16 +40,16 @@
 	          );
 	}
 
-	explore.dateFromJday = function(jday){
-		return dateFromJday(jday)
+	explore.dateFromJday = function(jday, timezoneOffset){
+		return dateFromJday(jday, timezoneOffset)
 	}
 
 	//From http://www.onlineconversion.com/julian_date.htm
-	function dateFromJday(jd){
+	function dateFromJday(jd, timezoneOffset){
 			var	j1, j2, j3, j4, j5;			//scratch
-			// if(timezoneOffset!=0){
-			// 	jd+=timezoneOffset/24
-			// }
+			if(timezoneOffset!=0){
+				jd+=timezoneOffset/24
+			}
 			//
 			// get the date from the Julian day number
 			//
@@ -76,10 +77,7 @@
 			var d = Math.floor(j2 - j4 - Math.floor(j5*30.6001));
 			var m = Math.floor(j5 - 1);
 			if( m > 12 ) m -= 12;
-			var y = Math.floor(j3 - 4715)
-			var centuryDayLost = (2000-y)/100
-			centuryDayLost<0 ? centuryDayLost=Math.ceil(centuryDayLost) : centuryDayLost=Math.floor(centuryDayLost)
-			d+=centuryDayLost
+			var y = Math.floor(j3 - 4715);
 			if( m > 2 )   --y;
 			if( y <= 0 )  --y;
 
@@ -384,6 +382,7 @@
 	explore.SolarSystem = function(p,jday){
         return planet_xyz(p,jday)
     }
+
     function planet_xyz(p,jday) {
     var d = jday-2451543.5;
 	var w = p.w[0] + p.w[1]*d;		// argument of perihelion
@@ -406,6 +405,8 @@
 	var yh = r * ( sind(N)*cosd(v+w) + cosd(N)*sind(v+w)*cosd(i) );
 	var zh = r * ( sind(v+w)*sind(i) );
 	var lonecl = atan2d(yh, xh);
+	var precession = 0.00003824552 * (365.2422 * 0 - ( jday-2451543.5 ))
+	// lonecl+=precession
 	var latecl = atan2d(zh, Math.sqrt(xh*xh + yh*yh + zh*zh));
 	if (p.num==JUPITER) {		// Jupiter pertuberations by Saturn
 		var Ms = rev(planets[SATURN].M[0] + planets[SATURN].M[1]*d);
@@ -495,6 +496,38 @@
 			var zg=obj[2];
 			// Obliquity of Ecliptic (exponent corrected, was E-9!)
 			var obl = 23.4393 - 3.563E-7 * (jday-2451543.5);
+			//var precession = 0.00003824552 * (365.2422 * 0 - ( jday-2451543.5 ))
+			
+			// var t = (jday-2451543.5)*2.73972603E-7
+			// var obl = 23.43929-
+			// (1.300258*t)-
+			// (0.0004305556*Math.pow(t,2))+
+			// (0.5553472*Math.pow(t,3))-
+			// (0.01427222*Math.pow(t,4))-
+			// (0.06935278*Math.pow(t,5))-
+			// (0.01084722*Math.pow(t,6))+
+			// (0.001977778*Math.pow(t,7))+
+			// (0.007741667*Math.pow(t,8))+
+			// (0.001608333*Math.pow(t,9))+
+			// (0.0006805556*Math.pow(t,10))
+
+			//var t = (jday-2451543.5)*0.00002739726
+			// var obl = 23.43928-
+			//  (0.01301021*t)-
+			//  (5.086111E-8*Math.pow(t,2))+
+			// 	(5.565E-7*Math.pow(t,3))-
+			//  	(1.6E-8*Math.pow(t,4))-
+			//  	(1.205556E-11*Math.pow(t,5))
+
+			// obl-=precession
+			// console.log("mO "+(23.43929-precession))
+
+			//console.log("obl "+obl)
+			//console.log("pre "+precession)
+
+			// var obl = 84381.448-(46.84024*t)-((59 * 10E-5)*Math.pow(t,2)) + ((1.813 * 10E-3)*Math.pow(t,3))
+			// console.log("obl "+(obl/3600))
+
 			// Convert to eq. co-ordinates
 			var x1=xg;
 			var y1=yg*cosd(obl) - zg*sind(obl);
@@ -509,6 +542,7 @@
     explore.radec2aa = function(ra,dec,jday,obs){
         return radec2aa(ra,dec,jday,obs)
     }
+    
 	function radec2aa(ra,dec,jday,obs) {
 	// Convert ra/dec to alt/az, also return hour angle, azimut = 0 when north
 	// DOES NOT correct for parallax!
@@ -554,16 +588,34 @@
         var v = atan2d( yv, xv );		// true anomaly
         var r = Math.sqrt( xv*xv + yv*yv );	// distance
         var lonsun = rev(v + w);	// true longitude
+        //var precession = 0.00003824552 * (365.2422 * 0 - ( jday-2451543.5 ))
+        //console.log("p "+precession)
+        //lonsun += precession
         var xs = r * cosd(lonsun);		// rectangular coordinates, zs = 0 for sun
         var ys = r * sind(lonsun);
         return new Array(xs,ys,0,r,lonsun,0);
     }
 
-		function SunAlt(jday, obs) {
+	function SunAlt(jday, obs) {
 		// return alt, az, time angle, ra, dec, ecl. long. and lat=0, illum=1, 0,
 		// dist, brightness
 		var sdat = sunxyz(jday);
-		var ecl = 23.4393 - 3.563E-7 * (jday - 2451543.5);
+		//var ecl = 23.4393 - 3.563E-7 * (jday - 2451543.5);
+		var t = (jday-2451543.5)*2.73972603E-7
+			var ecl = 23.43929-
+			(1.300258*t)-
+			(0.0004305556*Math.pow(t,2))+
+			(0.5553472*Math.pow(t,3))-
+			(0.01427222*Math.pow(t,4))-
+			(0.06935278*Math.pow(t,5))-
+			(0.01084722*Math.pow(t,6))+
+			(0.001977778*Math.pow(t,7))+
+			(0.007741667*Math.pow(t,8))+
+			(0.001608333*Math.pow(t,9))+
+			(0.0006805556*Math.pow(t,10))
+
+		var precession = 0.00003824552 * (365.2422 * 0 - ( jday-2451543.5 ))
+		//ecl+=precession
 		var xe = sdat[0];
 		var ye = sdat[1] * cosd(ecl);
 		var ze = sdat[1] * sind(ecl);
@@ -627,6 +679,18 @@
 		var mglat = Sb / 1000000.0;
 		// Obliquity of Ecliptic
 		var obl = 23.4393 - 3.563E-7 * (jday - 2451543.5);
+		// var t = (jday-2451543.5)*2.73972603E-7
+		// 	var obl = 23.43929-
+		// 	(1.300258*t)-
+		// 	(0.0004305556*Math.pow(t,2))+
+		// 	(0.5553472*Math.pow(t,3))-
+		// 	(0.01427222*Math.pow(t,4))-
+		// 	(0.06935278*Math.pow(t,5))-
+		// 	(0.01084722*Math.pow(t,6))+
+		// 	(0.001977778*Math.pow(t,7))+
+		// 	(0.007741667*Math.pow(t,8))+
+		// 	(0.001608333*Math.pow(t,9))+
+			(0.0006805556*Math.pow(t,10))
 		var ra = rev(atan2d(sind(mglong) * cosd(obl) - tand(mglat) * sind(obl),
 				cosd(mglong)));
 		var dec = asind(sind(mglat) * cosd(obl) + cosd(mglat) * sind(obl)
@@ -676,7 +740,6 @@
     }
     function PlanetAlt(p,jday,obs) {
 	// Alt/Az, hour angle, ra/dec, ecliptic long. and lat, illuminated fraction, dist(Sun), dist(Earth), brightness of planet p
-			//(typeof epoch == undefined) ? epoch = 2000 : newEpoch = epoch
 			if (p==2) return SunAlt(jday,obs);
 			if (p==MOON) return MoonPos(jday,obs);
 			if (p==COMET) return CometAlt(jday,obs);
@@ -688,8 +751,10 @@
 			var dy = planet_xyz[1]+sun_xyz[1];
 			var dz = planet_xyz[2]+sun_xyz[2];
 			var lon = rev( atan2d(dy, dx) );
-			lon+= 3.82394E-5 * (jday-2451545.0)
-
+			//lon+= 3.824552E-5 * (jday-2451545.0)
+			var precession = 0.00003824552 * (365.2422 * 0 - ( jday-2451543.5 ))
+			// lon+=precession
+			//console.log("update l")
 			var lat = atan2d(dz, Math.sqrt(dx*dx+dy*dy));
 
 			var radec = radecr(planet_xyz, sun_xyz, jday, obs);
@@ -705,6 +770,7 @@
 			var absbr = new Array(-0.42, -4.40, 0, -1.52, -9.40, -8.88, -7.19, -6.87);
 			var i = acosd( (r*r+dist*dist-R*R) / (2*r*dist) );	// phase angle
 			var mag = absbr[p] + 5 * log10(r*dist);	// common for all planets
+
 			switch(p) {
 			case MERCURY:
 				mag += i*(0.0380 + i*(-0.000273 + i*0.000002)); break;
@@ -728,6 +794,7 @@
 				mag += 0.044*dU - 2.60*sind(Math.abs(B)) + 1.25*sind(B)*sind(B);
 				break;
 			}
+
 			return new Array (altaz[0], altaz[1], altaz[2], ra, dec, lon, lat, k, r, dist, mag);
 	}
 

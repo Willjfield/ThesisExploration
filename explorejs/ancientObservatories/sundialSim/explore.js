@@ -673,6 +673,7 @@
     }
     function PlanetAlt(p,jday,obs) {
 	// Alt/Az, hour angle, ra/dec, ecliptic long. and lat, illuminated fraction, dist(Sun), dist(Earth), brightness of planet p
+			//(typeof epoch == undefined) ? epoch = 2000 : newEpoch = epoch
 			if (p==2) return SunAlt(jday,obs);
 			if (p==MOON) return MoonPos(jday,obs);
 			if (p==COMET) return CometAlt(jday,obs);
@@ -684,6 +685,8 @@
 			var dy = planet_xyz[1]+sun_xyz[1];
 			var dz = planet_xyz[2]+sun_xyz[2];
 			var lon = rev( atan2d(dy, dx) );
+			lon+= 3.82394E-5 * (jday-2451545.0)
+
 			var lat = atan2d(dz, Math.sqrt(dx*dx+dy*dy));
 
 			var radec = radecr(planet_xyz, sun_xyz, jday, obs);

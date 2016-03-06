@@ -1,5 +1,5 @@
-			//var obsPos = {latitude:41.895556,longitude:12.496667, elevation: .038}
-			var obsPos = {latitude:40.6928,longitude:-73.9903, elevation: 0}
+			//Rome var obsPos = {latitude:41.895556,longitude:12.496667, elevation: .038}
+			var obsPos = {latitude:40.692778,longitude:-73.990278, elevation: .038}
 			var modelPath = 'models/Sundials/Ascoli/ObjID73_r2.obj'
 			var texturePath = 'models/Sundials/Ascoli/ss_tex.jpg'
 			var timeZone = -5
@@ -30,15 +30,15 @@
 			function init() {
 				speed = 0
 				tOffset = 0
-				document.getElementById("speedSlider").min = -1.1
-				document.getElementById("speedSlider").max = 1.1
+				document.getElementById("speedSlider").min = -.01
+				document.getElementById("speedSlider").max = .01
 				document.getElementById("speedSlider").step = .0001
 
 
 				var date = explore.dateFromJday(explore.now,timeZone)
-				// document.getElementById('inday').value = date.day
-				// document.getElementById('inmonth').value = date.month
-				// document.getElementById('inyear').value = date.year
+				document.getElementById('inday').value = date.day
+				document.getElementById('inmonth').value = date.month
+				document.getElementById('inyear').value = date.year
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -119,9 +119,9 @@
 					sphere.position.set(0,0,-900)
 
 					nullObj.add(sphere)
-					p==2 ? nullObj.add( directionalLight ) : {}
 
 					var pAltAz = explore.PlanetAlt(p,explore.now+tOffset,obsPos)
+					p==2 ? nullObj.add( directionalLight ) : {}
 					nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
 					planetArray.push(nullObj)
 					scene.add( nullObj )
@@ -190,40 +190,40 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 			}
 
-			function animate() {
+			function animate() {				
+				
+				explore.updateTime()
+
 				speed = parseFloat(document.getElementById("speedSlider").value)
 
+				tOffset+=speed
 				
-				speed>0 ? tOffset+=Math.pow(speed,4)*100 : tOffset-=Math.pow(speed,4)*100
+				date = explore.dateFromJday(explore.now+tOffset,timeZone)
 
-				date = explore.dateFromJday(explore.now+tOffset)
 				var dmin = date.minute.toString()
 				if(dmin.length<2) dmin = "0"+dmin
 
-				var curJday = explore.jday(date.year,date.month,date.day,date.hour,date.minute,date.sec)
+				var inDay = parseFloat(document.getElementById('inday').value)>0 ? parseFloat(document.getElementById('inday').value) : 0
+				var inMonth = parseFloat(document.getElementById('inmonth').value)>0 ? parseFloat(document.getElementById('inmonth').value) : 0
+				var inYear = parseFloat(document.getElementById('inyear').value)>0 ? parseFloat(document.getElementById('inyear').value) : 0
 
-				console.log("actual "+(explore.now+tOffset))
-				console.log("measured "+curJday)
-				//var inDay = parseFloat(document.getElementById('inday').value)>0 ? parseFloat(document.getElementById('inday').value) : 0
-				//var inMonth = parseFloat(document.getElementById('inmonth').value)>0 ? parseFloat(document.getElementById('inmonth').value) : 0
-				//var inYear = parseFloat(document.getElementById('inyear').value)>0 ? parseFloat(document.getElementById('inyear').value) : 0
-
-				//var tset = explore.jday(inYear, inMonth, inDay, date.hour, date.minute, date.sec)
-				//var difTime = explore.now+tOffset-tset+0.04166666651144624
+				var tset = explore.jday(inYear, inMonth, inDay, date.hour-timeZone, date.minute, date.sec)
+				var difTime = explore.now-tset//+0.04166666651144624
 				//console.log(difTime)
 
-				document.getElementById('date').innerHTML = "Date: " + date.month + "/" + date.day + "/" +date.year+
-															"<br>Time: "+(date.hour+timeZone)+":"+dmin;
+				document.getElementById('date').innerHTML = "Time: "+date.hour+":"+dmin;
 				document.getElementById('latlong').innerHTML ="Latitude: "+obsPos.latitude+
 																							"<br> Longitude: "+obsPos.longitude+
 																							"<br> Elevation(m): "+obsPos.elevation*1000+
 																							"<br>Sundial from Villa Palombara Massimi, Rome"
 
 				for(var p in planetArray){
-						var pAltAz = explore.PlanetAlt(p,explore.now+tOffset,obsPos)
+						var pAltAz = explore.PlanetAlt(p,explore.now+tOffset-difTime,obsPos)
 						planetArray[p].rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
 				}
+				//console.log(explore.PlanetAlt(2,explore.now+tOffset-difTime,obsPos)[5],explore.PlanetAlt(2,explore.now+tOffset-difTime,obsPos)[6])
 				
+				console.log(explore.PlanetAlt(2,explore.now-difTime,obsPos)[0],explore.PlanetAlt(2,explore.now+tOffset-difTime,obsPos)[1])
 				requestAnimationFrame( animate );
 				render();
 			}

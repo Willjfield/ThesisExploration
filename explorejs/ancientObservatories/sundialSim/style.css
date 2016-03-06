@@ -237,7 +237,7 @@ input[type=range]:focus::-ms-fill-upper {
 #date{
   display: inline;
   position: absolute;
-  margin-top:25px;
+  margin-top:0px;
   left: 0px;
   background-color: rgba(0, 0, 0, 0);
 }
