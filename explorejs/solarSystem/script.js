@@ -1,3 +1,8 @@
+var tleLine1 = "1 25544U 98067A   16068.60811216  .00006572  00000-0  10711-3 0  9999"
+var tleLine2 = "2 25544  51.6425 199.6230 0001553 265.2287 192.4960 15.53947737989335"
+var tlObj = new explore.tle(tleLine1,tleLine2);
+var xyz = tlObj.update();
+
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.001, 1000 );
 camera.position.set(0,0,100)
@@ -13,9 +18,9 @@ var controls = new THREE.OrbitControls(camera);
 				controls.minDistance = 0;
 				controls.minPolarAngle = 0; // radians
 				controls.maxPolarAngle = Infinity;
-				controls.zoomSpeed = .01
-				controls.rotateSpeed = .1
-				controls.panSpeed = .1
+				controls.zoomSpeed = .001
+				controls.rotateSpeed = .01
+				controls.panSpeed = .01
 
 var light = new THREE.PointLight( 0xffffff, 1, 0 );
 light.position.set( 0, 0, 0 );
@@ -26,18 +31,14 @@ scene.add( light );
 
 var t = 0;
 var drawPlanets = []
-var solScale = 10;
+var solScale = 100;
 var planScale = 25000;
-
-				
-
 
 //SUN
 var geometry = new THREE.SphereGeometry( explore.kmtoau(explore.sol.radius)*solScale,16,16 );
 var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 var sphere = new THREE.Mesh( geometry, material );
 scene.add( sphere );
-
 
 //PLANETS
 var manager = new THREE.LoadingManager();
@@ -61,7 +62,8 @@ var loader = new THREE.ImageLoader( manager );
 
 function makePlanets(){
 	for(var p in explore.planets){	
-			var geometry = new THREE.SphereGeometry( explore.kmtoau(explore.planets[p].radius)*solScale*100,16,16 );
+			var geometry = new THREE.SphereGeometry( explore.kmtoau(explore.planets[p].radius)*solScale,32,32 );
+			console.log(explore.kmtoau(explore.planets[2].radius)*solScale)
 			var material = new THREE.MeshLambertMaterial( { color:0xffffff} );
 			var sphere = new THREE.Mesh( geometry, material );
 			
@@ -72,6 +74,7 @@ function makePlanets(){
 
 			var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
+			sphere.rotateY(Math.PI/2)
 			sphere.name = explore.planets[p].name
 			drawPlanets.push(sphere);
 		}
@@ -87,28 +90,44 @@ drawPlanets.forEach(function(planet, index){
 				ptexture = new THREE.Texture();
 				ptexture.image = image;
 				ptexture.needsUpdate = true;
-				planet.material.map = ptexture
-				scene.add(planet)
+				drawPlanets[index].material.map = ptexture
+				scene.add(drawPlanets[index])
 				})		
 });
 
+var ISSGeo = new THREE.SphereGeometry( .0001,16,16 );
+	var ISSMat = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+	var ISS = new THREE.Mesh(ISSGeo,ISSMat);
+	scene.add(ISS)
+
+camera.position.set(drawPlanets[2].position.x+.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
+//camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
+camera.rotateY(Math.PI/2)
+
 var render = function () {
+	//KEEP CAMERA LOOKING AT EARTH
+	//camera.position.set(drawPlanets[2].position.x+.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
+	explore.updateTime()
+	var step = .0001
+	t+=step;
+	console.log(explore.now+t)
+	//THIS XYZ THING NEEDS TO UPDATE WITH EXPLORE.NOW + T
+	var xyz = tlObj.update(t);
+	var earthPosition = [drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z]
+	xyz = tlObj.position_eci;
+
+	var ISSPosition = explore.translatePositions([explore.kmtoau(xyz.x)*solScale,explore.kmtoau(xyz.y)*solScale,explore.kmtoau(xyz.z)*solScale],earthPosition)
+	ISS.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 
 	requestAnimationFrame( render );
-	controls.update();
-	var step = 0
-	t+=step;
-	/*set target to planet
-	var jtar = explore.SolarSystem(explore.planets[4],explore.now+t)
-	var target = new THREE.Vector3(jtar[0]*solScale,jtar[1]*solScale,jtar[2]*solScale)
-	controls.target = target
-	*/
+	//controls.update();
+	
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
 		var deltaRotation = -(24/explore.planets[p].dayLength)*(2*Math.PI)
 
-		var curRotation = (deltaRotation*t)
-		drawPlanets[p].rotation.set(explore.planets[p].oblique*(Math.PI/180),curRotation,0)
+		var curRotation = (deltaRotation*t)+(Math.PI/2)
+		drawPlanets[p].rotation.set(0,curRotation,explore.planets[p].oblique*(Math.PI/180))
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
 	renderer.render(scene, camera);
@@ -123,9 +142,9 @@ document.addEventListener("keydown",function(event){
 })
 
 document.addEventListener("keyup",function(){
-	controls.zoomSpeed = .01
-	controls.rotateSpeed = .1
-		controls.panSpeed = .1
+	controls.zoomSpeed = .001
+	controls.rotateSpeed = .01
+		controls.panSpeed = .01
 	})
 
 render();

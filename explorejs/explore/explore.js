@@ -3805,11 +3805,16 @@ explore.tle = function(line1, line2) {
     this.position_ecf;
     this.deltaSeconds = 0;
 
-    this.update = function() {
+    this.update = function(t) {
+    	typeof t == undefined ? t = 0 : {}
         // Initialize a satellite record
         var satrec = explore.satellite.twoline2satrec (this.line1, this.line2);
 
-        //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION
+        //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION, RIGHT NOW, UPDATE ONLY UPDATES IN REAL TIME B/C now = new DATE
+        //NEED TO MAKE NEW DATE() at CONSTRUCTION AND ADD T IN THIS FUNCTION
+        //PROPAGATE NEEDS TO USE JDAY NOT CAL DATE
+
+        //this.deltaSeconds += t
         var deltaMinutes = this.deltaSeconds/60;
         var deltaHours = deltaMinutes/60;
         var deltaDays = deltaHours/24;
@@ -3822,7 +3827,7 @@ explore.tle = function(line1, line2) {
                                                         now.getUTCDate()+deltaDays,
                                                         now.getUTCHours()+deltaHours,
                                                         now.getUTCMinutes()+deltaMinutes,
-                                                        now.getUTCSeconds()+(this.deltaSeconds%60));
+                                                        now.getUTCSeconds()+(this.deltaSeconds));
         // The position_velocity result is a key-value pair of ECI coordinates.
         // These are the base results from which all other coordinates are derived.
         var _position_eci = position_and_velocity["position"];
@@ -3836,7 +3841,7 @@ explore.tle = function(line1, line2) {
                                                         now.getUTCDate()+deltaDays,
                                                         now.getUTCHours()+deltaHours,
                                                         now.getUTCMinutes()+deltaMinutes,
-                                                        now.getUTCSeconds()+this.deltaSeconds%60
+                                                        now.getUTCSeconds()+this.deltaSeconds
 			));
 		//convert current satellite eci to lat/long in degrees and radians
         var _latlongalt = explore.satellite.eci_to_geodetic(_position_eci, curgstime)

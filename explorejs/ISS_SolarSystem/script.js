@@ -59,7 +59,7 @@ for(var p in explore.planets){
 var render = function () {
 	var earthPosition = explore.SolarSystem(explore.planets[2],explore.now);
 	tlObj.update();
-	console.log(tlObj.getLookAnglesFrom(-74,42, 1))
+	//console.log(tlObj.getLookAnglesFrom(-74,42, 1))
 
 	xyz = tlObj.position_eci;
 
