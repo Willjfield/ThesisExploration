@@ -34,21 +34,21 @@
 	          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
 	          Math.floor( 275 * mon / 9.0 ) +
 	          day + 1721013.5 +
-	          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-	          //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
+	          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0-  //  ut in days
+	          0.5*sgn(100.0*year+mon-190002.5)+0.5
 	          );
 	}
 
-	explore.dateFromJday = function(jday, timezoneOffset){
-		return dateFromJday(jday, timezoneOffset)
+	explore.dateFromJday = function(jday){
+		return dateFromJday(jday)
 	}
 
 	//From http://www.onlineconversion.com/julian_date.htm
-	function dateFromJday(jd, timezoneOffset){
+	function dateFromJday(jd){
 			var	j1, j2, j3, j4, j5;			//scratch
-			if(timezoneOffset!=0){
-				jd+=timezoneOffset/24
-			}
+			// if(timezoneOffset!=0){
+			// 	jd+=timezoneOffset/24
+			// }
 			//
 			// get the date from the Julian day number
 			//
@@ -76,7 +76,10 @@
 			var d = Math.floor(j2 - j4 - Math.floor(j5*30.6001));
 			var m = Math.floor(j5 - 1);
 			if( m > 12 ) m -= 12;
-			var y = Math.floor(j3 - 4715);
+			var y = Math.floor(j3 - 4715)
+			var centuryDayLost = (2000-y)/100
+			centuryDayLost<0 ? centuryDayLost=Math.ceil(centuryDayLost) : centuryDayLost=Math.floor(centuryDayLost)
+			d+=centuryDayLost
 			if( m > 2 )   --y;
 			if( y <= 0 )  --y;
 

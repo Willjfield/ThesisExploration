@@ -1,9 +1,8 @@
-			//Precession means it doesn't work forever. It goes off.
-			var obsPos = {latitude:41.895556,longitude:12.496667, elevation: .038} //rome
-			//var obsPos = {latitude:40.6928,longitude:-73.9903, elevation: 0}//brooklyn
+			//var obsPos = {latitude:41.895556,longitude:12.496667, elevation: .038}
+			var obsPos = {latitude:40.6928,longitude:-73.9903, elevation: 0}
 			var modelPath = 'models/Sundials/Ascoli/ObjID73_r2.obj'
 			var texturePath = 'models/Sundials/Ascoli/ss_tex.jpg'
-			var timeZone = 1
+			var timeZone = -5
 
 			var groundTexPath = 'models/Sundials/Ascoli/groundtext.jpg'
 			var container;
@@ -17,7 +16,7 @@
 
 			var controls;
 
-			var speed, tOffset, date
+			var speed, tOffset, date, diffDay
 
 			var planetArray = []
 
@@ -31,14 +30,13 @@
 			function init() {
 				speed = 0
 				tOffset = 0
+				diffDay = 0
 				//min hr day month year decade century
 				document.getElementById("speedSlider").min = -7
 				document.getElementById("speedSlider").max = 7
 				document.getElementById("speedSlider").step = 1
-				document.getElementById("speedSlider").value = 0
 
-
-				var date = explore.dateFromJday(explore.now,timeZone)
+				// var date = explore.dateFromJday(explore.now+(timeZone/24))
 				// document.getElementById('inday').value = date.day
 				// document.getElementById('inmonth').value = date.month
 				// document.getElementById('inyear').value = date.year
@@ -197,9 +195,6 @@
 
 			function animate() {
 				explore.updateTime()
-				speed = parseFloat(document.getElementById("speedSlider").value)
-
-				
 				speed = parseInt(document.getElementById("speedSlider").value)
 
 				var dir = speed > 0
@@ -240,60 +235,39 @@
 					break;
 				}
 
-				//DISPLAY DATE vs CALC DATE
 				var date = explore.dateFromJday(explore.now+tOffset)
-				
-				var dDay = date.day.toString()
-				dDay.length<2 ? dDay = "0"+dDay : {}
-
-				var dMo= date.month.toString()
-				dMo.length<2 ? dMo = "0"+dMo : {}
+				//console.log("m "+explore.jday(date.year,date.month,date.day,date.hour,date.minute,date.sec))
+				console.log("a " + (explore.now+tOffset))
 
 				var dmin = date.minute.toString()
-				if(dmin.length<2) dmin = "0"+dmin
-				
-				var dhour = date.hour//.toString()
-				// dhour.length < 2 ? dhour = "0"+dhour :{}
-				var dspHour = (dhour+timeZone)
-				if(dspHour>23){dspHour=0}
-				if(dspHour<0){dspHour=24+dspHour}
+				dmin.length<2 ? dmin = "0"+dmin : {}
 
-				var dtz = Math.sign(timeZone)>-1 ? "+" : {}
-				// if(date.hour+timeZone<0){
-				// 	dhour = 23+(date.hour)
-				// 	//dDay -= 1
-				// }
-				// if(date.hour+timeZone>23){ 
-				// 	dhour = 0
-				// 	//dDay += 1
-				// }
+				var dhr = date.hour+timeZone
 
-				var curJday = explore.jday(date.year,date.month,date.day,date.hour,date.minute,date.sec)
 
-				
-				//console.log("measured "+curJday)
-				//console.log(date)
-				//var inDay = parseFloat(document.getElementById('inday').value)>0 ? parseFloat(document.getElementById('inday').value) : 0
-				//var inMonth = parseFloat(document.getElementById('inmonth').value)>0 ? parseFloat(document.getElementById('inmonth').value) : 0
-				//var inYear = parseFloat(document.getElementById('inyear').value)>0 ? parseFloat(document.getElementById('inyear').value) : 0
+				var dTZ = timeZone>-1 ? "+"+timeZone.toString() : timeZone.toString()
 
-				//var tset = explore.jday(inYear, inMonth, inDay, date.hour, date.minute, date.sec)
-				//var difTime = explore.now+tOffset-tset+0.04166666651144624
-				//console.log(difTime)
+				// var inDay = parseFloat(document.getElementById('inday').value)>0 ? parseFloat(document.getElementById('inday').value) : 0
+				// var inMonth = parseFloat(document.getElementById('inmonth').value)>0 ? parseFloat(document.getElementById('inmonth').value) : 0
+				// var inYear = parseFloat(document.getElementById('inyear').value)>0 ? parseFloat(document.getElementById('inyear').value) : 0
 
-				document.getElementById('date').innerHTML = "Date: " + dMo + "/" + dDay + "/" +date.year+ " (at meridian)"+
-															"<br>Time: "+dspHour+":"+dmin +"(UTC"+dtz+timeZone+")";
+				// var curJday = explore.jday(inYear,inMonth,inDay,date.hour,date.minute,date.sec)
+
+				document.getElementById('date').innerHTML = "Date: "+ date.month +"/"+date.day+"/"+date.year+"<br>Time: "+dhr+":"+dmin+" (UTC"+dTZ+")";
+															
 				document.getElementById('latlong').innerHTML ="Latitude: "+obsPos.latitude+
 																							"<br> Longitude: "+obsPos.longitude+
 																							"<br> Elevation(m): "+obsPos.elevation*1000+
 																							"<br>Sundial from Villa Palombara Massimi, Rome"
 
+
 				for(var p in planetArray){
 						var pAltAz = explore.PlanetAlt(p,explore.now+tOffset,obsPos)
 						planetArray[p].rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
 				}
-				console.log("actual "+(explore.now+tOffset))
+
 				console.log(explore.PlanetAlt(2,explore.now+tOffset,obsPos)[1],explore.PlanetAlt(2,explore.now+tOffset,obsPos)[0])
+
 				requestAnimationFrame( animate );
 				render();
 			}

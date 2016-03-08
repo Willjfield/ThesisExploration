@@ -1,5 +1,9 @@
 "use strict";
 (function(explore,undefined){
+
+	explore.kmtoau = function(km){
+		return km*6.6846E-9
+	}
 	/////////TIME TOOLS////////////
 
 	explore.daysToSeconds = function (days){
@@ -29,13 +33,15 @@
 	explore.jday = function (year, mon, day, hr, minute, sec){
 		return jday(year, mon, day, hr, minute, sec)
 	}
+
 	function jday(year, mon, day, hr, minute, sec){
 	    return (367.0 * year -
 	          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
 	          Math.floor( 275 * mon / 9.0 ) +
 	          day + 1721013.5 +
-	          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-	          //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
+	          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0//-  //  ut in days
+	            //0.5*Math.sign(100.0*year+mon-190002.5)+0.5
+	            //-Math.floor((year-2000)/100)
 	          );
 	}
 
@@ -77,9 +83,9 @@
 			var m = Math.floor(j5 - 1);
 			if( m > 12 ) m -= 12;
 			var y = Math.floor(j3 - 4715)
-			var centuryDayLost = (2000-y)/100
-			centuryDayLost<0 ? centuryDayLost=Math.ceil(centuryDayLost) : centuryDayLost=Math.floor(centuryDayLost)
-			d+=centuryDayLost
+			//var centuryDayLost = (2000-y)/100
+			//centuryDayLost<0 ? centuryDayLost=Math.ceil(centuryDayLost) : centuryDayLost=Math.floor(centuryDayLost)
+			//d+=centuryDayLost
 			if( m > 2 )   --y;
 			if( y <= 0 )  --y;
 
@@ -191,6 +197,12 @@
 		*/
 	}
 
+	explore.sol = {
+		radius: 696300,
+		dayLength: 587.28,
+		texColor:0xffff44
+	}
+
 	explore.mercury = new planet("Mercury",0,
 	   new Array(48.3313, 3.24587E-5),
 	   new Array(7.0047, 5.00E-8),
@@ -204,7 +216,7 @@
 	   0xffffff
 	   );
 
-	explore.venus = new planet("Venus  ",1,
+	explore.venus = new planet("Venus",1,
 	   new Array(76.6799, 2.46590E-5),
 	   new Array(3.3946, 2.75E-8),
 	   new Array(54.8910, 1.38374E-5),
@@ -217,7 +229,7 @@
 	   0xff9933
 	   );
 
-	explore.earth = new planet("Earth  ",2,
+	explore.earth = new planet("Earth",2,
 	   new Array(0,0),
 	   new Array(0,0),
 	   new Array(282.9404,4.70935E-5),
@@ -230,7 +242,7 @@
 	   0x00ff99
 	   );
 
-	explore.mars = new planet("Mars   ",3,
+	explore.mars = new planet("Mars",3,
 	   new Array(49.5574, 2.11081E-5),
 	   new Array(1.8497, -1.78E-8),
 	   new Array(286.5016, 2.92961E-5),
@@ -256,7 +268,7 @@
 	   0xff4d88
 	   );
 
-	explore.saturn = new planet("Saturn ",5,
+	explore.saturn = new planet("Saturn",5,
 		new Array(113.6634, 2.38980E-5),
 		new Array(2.4886, -1.081E-7),
 		new Array(339.3939, 2.97661E-5),
@@ -269,7 +281,7 @@
 		0x00ff00
 		);
 
-	explore.uranus = new planet("Uranus ",6,
+	explore.uranus = new planet("Uranus",6,
 		new Array(74.0005, 1.3978E-5),
 		new Array(0.7733, 1.9E-8),
 		new Array(96.6612, 3.0565E-5),
@@ -3932,5 +3944,12 @@ explore.tle = function(line1, line2) {
 	getTLE("stations", stations, function(){
 	console.log(stations)
 	})*/
+
+	//TEXTURES
+
+	explore.planetTex = ["mercury","venus","earth_day","mars","jupiter","saturn","uranus","neptune"]
+
+	///PROBES///
+
 
 }(window.explore = window.explore || {}))

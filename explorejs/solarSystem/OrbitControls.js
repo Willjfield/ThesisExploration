@@ -52,6 +52,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.noPan = false;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
+	this.panSpeed = 1
+
 	// Set to true to automatically rotate around the target
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
@@ -195,8 +197,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 			targetDistance *= Math.tan( ( scope.object.fov / 2 ) * Math.PI / 180.0 );
 
 			// we actually don't use screenWidth, since perspective camera is fixed to screen height
-			scope.panLeft( 2 * deltaX * targetDistance / element.clientHeight );
-			scope.panUp( 2 * deltaY * targetDistance / element.clientHeight );
+			scope.panLeft( 2 * deltaX * this.panSpeed * targetDistance / element.clientHeight );
+			scope.panUp( 2 * deltaY * this.panSpeed* targetDistance / element.clientHeight );
 
 		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
