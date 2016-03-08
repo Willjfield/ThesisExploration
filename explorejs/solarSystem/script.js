@@ -44,7 +44,7 @@ var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
 					//document.getElementById("loading").remove()
 					//document.getElementById("loadAmount").remove()
-					console.log( item, loaded, total );
+					//console.log( item, loaded, total );
 				};
 
 				var onProgress = function ( xhr ) {
@@ -56,34 +56,44 @@ var manager = new THREE.LoadingManager();
 
 				var onError = function ( xhr ) {
 				};
+
 var loader = new THREE.ImageLoader( manager );
-for(var p in explore.planets){
-	var texturePath = "../data/images/"
-	texturePath += explore.planets[p].name + ".jpg"
-	loader.load( texturePath, function ( image ) {
-					var ptexture = new THREE.Texture();
-					ptexture.image = image;
-					ptexture.needsUpdate = true;
+
+function makePlanets(){
+	for(var p in explore.planets){	
+			var geometry = new THREE.SphereGeometry( explore.kmtoau(explore.planets[p].radius)*solScale*100,16,16 );
+			var material = new THREE.MeshLambertMaterial( { color:0xffffff} );
+			var sphere = new THREE.Mesh( geometry, material );
 			
+			var materialW = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
+			var geometryW = new THREE.SphereGeometry( explore.planets[p].radius/planScale,8,8 );
+			var sphereW = new THREE.Mesh( geometryW, materialW );
+			sphere.add(sphereW);
 
-	var geometry = new THREE.SphereGeometry( explore.kmtoau(explore.planets[p].radius)*solScale*100,16,16 );
-	var material = new THREE.MeshLambertMaterial( { map:ptexture, side:THREE.DoubleSide } );
-	var sphere = new THREE.Mesh( geometry, material );
-	
-
-	var materialW = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
-	var geometryW = new THREE.SphereGeometry( explore.planets[p].radius/planScale,8,8 );
-	var sphereW = new THREE.Mesh( geometryW, materialW );
-	sphere.add(sphereW);
-
-	var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
-	sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
-	drawPlanets.push(sphere);
-	scene.add( sphere);
-	} );
+			var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
+			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
+			sphere.name = explore.planets[p].name
+			drawPlanets.push(sphere);
+		}
 }
 
+makePlanets()
+
+drawPlanets.forEach(function(planet, index){
+	var texturePath = "../data/images/"
+		texturePath += planet.name + ".jpg"
+		var ptexture
+		loader.load( texturePath, function (image) {
+				ptexture = new THREE.Texture();
+				ptexture.image = image;
+				ptexture.needsUpdate = true;
+				planet.material.map = ptexture
+				scene.add(planet)
+				})		
+});
+
 var render = function () {
+
 	requestAnimationFrame( render );
 	controls.update();
 	var step = 0
