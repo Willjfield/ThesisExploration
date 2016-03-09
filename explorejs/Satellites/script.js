@@ -1,8 +1,8 @@
 //# sourceMappingURL=satellite.js.map
 //ISS:http://www.celestrak.com/NORAD/elements/stations.txt
 
-var tleLine1 = "1 25544U 98067A   16040.89929207  .00012681  00000-0  19534-3 0  9990"
-var tleLine2 = "2 25544  51.6455 337.7904 0007048  99.9517   6.8636 15.54554246985024"
+var tleLine1 = "1 25544U 98067A   16068.60811216  .00006572  00000-0  10711-3 0  9999"
+var tleLine2 = "2 25544  51.6425 199.6230 0001553 265.2287 192.4960 15.53947737989335"
 
 //canyon 1
 //var tleLine1 = "1 03334U 68063A   15352.84992916 0.00000000  00000-0  00000-0 0    03"
@@ -11,7 +11,7 @@ var tleLine2 = "2 25544  51.6455 337.7904 0007048  99.9517   6.8636 15.545542469
 var tlObj = new explore.tle(tleLine1,tleLine2);
 tlObj.update()
 var xyz = tlObj.position_eci
-console.log(xyz)
+// console.log(xyz)
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
@@ -46,7 +46,8 @@ scene.add( sphere );
 
 var render = function () {
 	xyz = tlObj.update()
-
+	console.log(tlObj.getLookAnglesFrom(-74,42, 1).elevation*(180/Math.PI))
+	//tlObj.getLookAnglesFrom(-74,42, 1)
 	requestAnimationFrame( render );
 	controls.update();
 	renderer.render(scene, camera);

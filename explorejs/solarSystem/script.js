@@ -102,21 +102,22 @@ var ISSGeo = new THREE.SphereGeometry( .0001,16,16 );
 
 camera.position.set(drawPlanets[2].position.x+.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
 //camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
-camera.rotateY(Math.PI/2)
+//camera.rotateY(Math.PI/2)
 
 var render = function () {
 	//KEEP CAMERA LOOKING AT EARTH
-	//camera.position.set(drawPlanets[2].position.x+.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
+	camera.position.set(drawPlanets[2].position.x-.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
 	explore.updateTime()
-	var step = .0001
+	var step = 0
 	t+=step;
-	console.log(explore.now+t)
+	//console.log(explore.now+t)
 	//THIS XYZ THING NEEDS TO UPDATE WITH EXPLORE.NOW + T
-	var xyz = tlObj.update(t);
+	var xyz = tlObj.update();
+	console.log(tlObj.getLookAnglesFrom(-73,40,0))
 	var earthPosition = [drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z]
 	xyz = tlObj.position_eci;
 
-	var ISSPosition = explore.translatePositions([explore.kmtoau(xyz.x)*solScale,explore.kmtoau(xyz.y)*solScale,explore.kmtoau(xyz.z)*solScale],earthPosition)
+	var ISSPosition = explore.translatePositions([explore.kmtoau(xyz.x)*solScale,explore.kmtoau(-xyz.y)*solScale,explore.kmtoau(xyz.z)*solScale],earthPosition)
 	ISS.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 
 	requestAnimationFrame( render );
@@ -124,10 +125,11 @@ var render = function () {
 	
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
-		var deltaRotation = -(24/explore.planets[p].dayLength)*(2*Math.PI)
+		var deltaRotation = (24/explore.planets[p].dayLength)*(2*Math.PI)
 
-		var curRotation = (deltaRotation*t)+(Math.PI/2)
-		drawPlanets[p].rotation.set(0,curRotation,explore.planets[p].oblique*(Math.PI/180))
+		var curRotation = (deltaRotation*t)+(Math.PI/2)+.3
+		//explore.planets[p].oblique*(Math.PI/180)
+		drawPlanets[p].rotation.set(0,curRotation,0)
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
 	renderer.render(scene, camera);

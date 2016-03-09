@@ -3805,8 +3805,62 @@ explore.tle = function(line1, line2) {
     this.position_ecf;
     this.deltaSeconds = 0;
 
-    this.update = function(t) {
+    this._update = function(t) {
     	typeof t == undefined ? t = 0 : {}
+        // Initialize a satellite record
+        var satrec = explore.satellite.twoline2satrec (this.line1, this.line2);
+
+        //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION, RIGHT NOW, UPDATE ONLY UPDATES IN REAL TIME B/C now = new DATE
+        //NEED TO MAKE NEW DATE() at CONSTRUCTION AND ADD T IN THIS FUNCTION
+        //PROPAGATE NEEDS TO USE JDAY NOT CAL DATE
+
+        //this.deltaSeconds += t
+        var deltaMinutes = this.deltaSeconds/60;
+        var deltaHours = deltaMinutes/60;
+        var deltaDays = deltaHours/24;
+        // Propagate satellite using current time
+        var now = explore.dateFromJday(explore.now+t)
+        // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
+        var position_and_velocity = explore.satellite.propagate (satrec,
+                                                        now.year,
+                                                        now.month,
+                                                        now.day,
+                                                        now.hour,
+                                                        now.minute,
+                                                        now.sec);
+        // The position_velocity result is a key-value pair of ECI coordinates.
+        // These are the base results from which all other coordinates are derived.
+        var _position_eci = position_and_velocity["position"];
+        var _velocity_eci = position_and_velocity["velocity"];
+        // The coordinates are all stored in key-value pairs.
+        // ECI and ECF are accessed by "x", "y", "z".
+
+		var curgstime = explore.satellite.gstime_from_jday(explore.satellite.jday(
+														now.year,
+                                                        now.month,
+                                                        now.day,
+                                                        now.hour,
+                                                        now.minute,
+                                                        now.sec
+			));
+		//convert current satellite eci to lat/long in degrees and radians
+        var _latlongalt = explore.satellite.eci_to_geodetic(_position_eci, curgstime)
+        _latlongalt.longitude = _latlongalt.longitude;
+        _latlongalt.latitude = _latlongalt.latitude;
+        _latlongalt.height = _latlongalt.height;
+        _latlongalt.longitudeDeg = _latlongalt.longitude*RAD2DEG
+        _latlongalt.latitudeDeg = _latlongalt.latitude*RAD2DEG
+
+        //make position velocity and lat/long available to the outside
+        this.latlongalt = _latlongalt;
+    	this.position_eci = _position_eci;
+    	this.velocity_eci = _velocity_eci;
+
+    	this.position_ecf = explore.satellite.geodetic_to_ecf(this.latlongalt);
+    };
+
+    this.update = function() {
+    	//typeof t == undefined ? t = 0 : {}
         // Initialize a satellite record
         var satrec = explore.satellite.twoline2satrec (this.line1, this.line2);
 
@@ -3835,16 +3889,21 @@ explore.tle = function(line1, line2) {
         // The coordinates are all stored in key-value pairs.
         // ECI and ECF are accessed by "x", "y", "z".
 
-		var curgstime = explore.satellite.gstime_from_jday(explore.satellite.jday(
-														now.getUTCFullYear(),
-                                                        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-                                                        now.getUTCDate()+deltaDays,
-                                                        now.getUTCHours()+deltaHours,
-                                                        now.getUTCMinutes()+deltaMinutes,
-                                                        now.getUTCSeconds()+this.deltaSeconds
-			));
+		// var curgstime = explore.satellite.gstime_from_jday(explore.satellite.jday(
+		// 												now.getUTCFullYear(),
+  //                                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+  //                                                       now.getUTCDate()+deltaDays,
+  //                                                       now.getUTCHours()+deltaHours,
+  //                                                       now.getUTCMinutes()+deltaMinutes,
+  //                                                       now.getUTCSeconds()+this.deltaSeconds
+		// 	));
+		var curgstime = explore.satellite.gstime_from_jday(explore.now)
+		// console.log(curgstime)
+		//console.log(explore.now)
 		//convert current satellite eci to lat/long in degrees and radians
         var _latlongalt = explore.satellite.eci_to_geodetic(_position_eci, curgstime)
+
+        
         _latlongalt.longitude = _latlongalt.longitude;
         _latlongalt.latitude = _latlongalt.latitude;
         _latlongalt.height = _latlongalt.height;
@@ -3853,15 +3912,21 @@ explore.tle = function(line1, line2) {
 
         //make position velocity and lat/long available to the outside
         this.latlongalt = _latlongalt;
+        this.position_ecf = explore.satellite.geodetic_to_ecf(this.latlongalt);
     	this.position_eci = _position_eci;
     	this.velocity_eci = _velocity_eci;
 
-    	this.position_ecf = explore.satellite.geodetic_to_ecf(this.latlongalt);
+    	//this.position_ecf = explore.satellite.geodetic_to_ecf(this.latlongalt);
+
+    	// console.log(this.latlongalt)
     };
 
     this.getLookAnglesFrom = function(_longitude,_latitude, elevation){
     	var my_geodetic = new explore.createGeodetic(_longitude,_latitude, elevation);
-    	//FIRST ARGUMENT TO explore.satellite.ecf_to_look_angles IS GEODETIC, NOT ECF COORDS!!!!!!!!!!
+    	var my_ecf = explore.satellite.geodetic_to_ecf(my_geodetic)	
+    	//return explore.satellite.ecf_to_look_angles(my_ecf,this.position_ecf)
+    	//FIRST ARGUMENT TO explore.satellite.ecf_to_look_angles IS GEODETIC, NOT ECF COORDS!!!!
+    	//RETURNS RADIANS!!!!!!!!!!
     	return explore.satellite.ecf_to_look_angles(my_geodetic,this.position_ecf)
     }
 }
