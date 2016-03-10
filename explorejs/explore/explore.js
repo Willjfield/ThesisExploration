@@ -3804,7 +3804,7 @@ explore.tle = function(line1, line2) {
     this.velocity_eci;
     this.position_ecf;
     this.deltaSeconds = 0;
-
+/*
     this._update = function(t) {
     	typeof t == undefined ? t = 0 : {}
         // Initialize a satellite record
@@ -3858,30 +3858,31 @@ explore.tle = function(line1, line2) {
 
     	this.position_ecf = explore.satellite.geodetic_to_ecf(this.latlongalt);
     };
-
-    this.update = function() {
-    	//typeof t == undefined ? t = 0 : {}
+*/
+    this.update = function(t) {
+    	typeof t == undefined ? t = 0 : {}
         // Initialize a satellite record
         var satrec = explore.satellite.twoline2satrec (this.line1, this.line2);
-
+        
+		var curgstime = explore.satellite.gstime_from_jday(explore.now+t)
+        //console.log(curgstime)
         //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION, RIGHT NOW, UPDATE ONLY UPDATES IN REAL TIME B/C now = new DATE
         //NEED TO MAKE NEW DATE() at CONSTRUCTION AND ADD T IN THIS FUNCTION
         //PROPAGATE NEEDS TO USE JDAY NOT CAL DATE
 
         //this.deltaSeconds += t
-        var deltaMinutes = this.deltaSeconds/60;
-        var deltaHours = deltaMinutes/60;
-        var deltaDays = deltaHours/24;
         // Propagate satellite using current time
         var now = new Date();
+        now.setSeconds(now.getSeconds()+(t*86400))
+        console.log(now)
         // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
         var position_and_velocity = explore.satellite.propagate (satrec,
                                                         now.getUTCFullYear(),
                                                         now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-                                                        now.getUTCDate()+deltaDays,
-                                                        now.getUTCHours()+deltaHours,
-                                                        now.getUTCMinutes()+deltaMinutes,
-                                                        now.getUTCSeconds()+(this.deltaSeconds));
+                                                        now.getUTCDate(),
+                                                        now.getUTCHours(),
+                                                        now.getUTCMinutes(),
+                                                        now.getUTCSeconds());
         // The position_velocity result is a key-value pair of ECI coordinates.
         // These are the base results from which all other coordinates are derived.
         var _position_eci = position_and_velocity["position"];
@@ -3897,7 +3898,6 @@ explore.tle = function(line1, line2) {
   //                                                       now.getUTCMinutes()+deltaMinutes,
   //                                                       now.getUTCSeconds()+this.deltaSeconds
 		// 	));
-		var curgstime = explore.satellite.gstime_from_jday(explore.now)
 		// console.log(curgstime)
 		//console.log(explore.now)
 		//convert current satellite eci to lat/long in degrees and radians

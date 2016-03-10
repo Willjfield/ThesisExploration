@@ -64,7 +64,7 @@ function makePlanets(){
 	for(var p in explore.planets){	
 			var geometry = new THREE.SphereGeometry( explore.kmtoau(explore.planets[p].radius)*solScale,32,32 );
 			console.log(explore.kmtoau(explore.planets[2].radius)*solScale)
-			var material = new THREE.MeshLambertMaterial( { color:0xffffff} );
+			var material = new THREE.MeshLambertMaterial( { color:0xffffff /*,wireframe: true*/} );
 			var sphere = new THREE.Mesh( geometry, material );
 			
 			var materialW = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
@@ -74,7 +74,7 @@ function makePlanets(){
 
 			var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
-			sphere.rotateY(Math.PI/2)
+		//	sphere.rotateY(Math.PI)
 			sphere.name = explore.planets[p].name
 			drawPlanets.push(sphere);
 		}
@@ -95,43 +95,54 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
-var ISSGeo = new THREE.SphereGeometry( .0001,16,16 );
-	var ISSMat = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+    var ISSGeo = new THREE.SphereGeometry( .0001,16,16 );
+	var ISSMat = new THREE.MeshLambertMaterial( { color: 0xffff00 } );
 	var ISS = new THREE.Mesh(ISSGeo,ISSMat);
-	scene.add(ISS)
+	drawPlanets[2].add(ISS)
+///TEST EARTH AXES
+var testGeo = new THREE.SphereGeometry(.0002,16,16);
+var testMaty = new THREE.MeshBasicMaterial({color:0x00ff00})
+var testMeshy = new THREE.Mesh(testGeo,testMaty)
+drawPlanets[2].add(testMeshy)
+testMeshy.position.y = .005
+var testMatx = new THREE.MeshBasicMaterial({color:0xff0000})
+var testMeshx = new THREE.Mesh(testGeo,testMatx)
+drawPlanets[2].add(testMeshx)
+testMeshx.position.x = .005
+var testMatz = new THREE.MeshBasicMaterial({color:0x0000ff})
+var testMeshz = new THREE.Mesh(testGeo,testMatz)
+drawPlanets[2].add(testMeshz)
+testMeshz.position.z = .005
+///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x+.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
+camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 //camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
-//camera.rotateY(Math.PI/2)
+camera.rotateY(-Math.PI)
 
 var render = function () {
 	//KEEP CAMERA LOOKING AT EARTH
-	camera.position.set(drawPlanets[2].position.x-.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
 	explore.updateTime()
 	var step = 0
 	t+=step;
-	//console.log(explore.now+t)
-	//THIS XYZ THING NEEDS TO UPDATE WITH EXPLORE.NOW + T
-	var xyz = tlObj.update();
-	console.log(tlObj.getLookAnglesFrom(-73,40,0))
+	var xyz = tlObj.update(t);
 	var earthPosition = [drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z]
-	xyz = tlObj.position_eci;
+	xyz = tlObj.position_ecf;
 
-	var ISSPosition = explore.translatePositions([explore.kmtoau(xyz.x)*solScale,explore.kmtoau(-xyz.y)*solScale,explore.kmtoau(xyz.z)*solScale],earthPosition)
+	var ISSPosition = [explore.kmtoau(xyz.x)*solScale,explore.kmtoau(xyz.z)*solScale,explore.kmtoau(-xyz.y)*solScale]
 	ISS.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 
 	requestAnimationFrame( render );
-	//controls.update();
 	
 	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
 		var deltaRotation = (24/explore.planets[p].dayLength)*(2*Math.PI)
 
-		var curRotation = (deltaRotation*t)+(Math.PI/2)+.3
-		//explore.planets[p].oblique*(Math.PI/180)
+		var curRotation = (deltaRotation*t)+(Math.PI)+1
+		var oblique = explore.planets[p].oblique*(Math.PI/180)
 		drawPlanets[p].rotation.set(0,curRotation,0)
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
+	camera.position.set(drawPlanets[2].position.x-.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
 	renderer.render(scene, camera);
 };
 
