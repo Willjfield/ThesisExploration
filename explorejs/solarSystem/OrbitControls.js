@@ -219,7 +219,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( dollyScale === undefined ) {
 
-			dollyScale = getZoomScale();
+			dollyScale = .99//getZoomScale();
 
 		}
 
@@ -245,7 +245,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( dollyScale === undefined ) {
 
-			dollyScale = getZoomScale();
+			dollyScale = .99//getZoomScale();
 
 		}
 

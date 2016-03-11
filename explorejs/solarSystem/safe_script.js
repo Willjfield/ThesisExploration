@@ -4,7 +4,7 @@ var tlObj = new xpl.tle(tleLine1,tleLine2);
 var xyz = tlObj.update();
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.00001, 1000 );
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.001, 1000 );
 camera.position.set(0,0,100)
 
 var renderer = new THREE.WebGLRenderer({ /*alpha: true*/ });
@@ -18,11 +18,11 @@ var controls = new THREE.OrbitControls(camera);
 				controls.minDistance = 0;
 				controls.minPolarAngle = 0; // radians
 				controls.maxPolarAngle = Infinity;
-				controls.zoomSpeed = .01
+				controls.zoomSpeed = .001
 				controls.rotateSpeed = .01
 				controls.panSpeed = .01
 
-var light = new THREE.PointLight( 0xffffff, 5, 0 );
+var light = new THREE.PointLight( 0xffffff, 1, 0 );
 light.position.set( 0, 0, 0 );
 scene.add( light );
 
@@ -31,9 +31,9 @@ scene.add( light );
 
 var t = 0;
 var drawPlanets = []
-var solScale = 1;
+var solScale = 100;
 xpl.setScale(solScale)
-var planScale = 250000;
+var planScale = 25000;
 
 //SUN
 var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.sol.radius)*solScale,16,16 );
@@ -64,18 +64,18 @@ var loader = new THREE.ImageLoader( manager );
 function makePlanets(){
 	for(var p in xpl.planets){	
 			var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.planets[p].radius)*solScale,32,32 );
-			//console.log(xpl.kmtoau(xpl.planets[2].radius)*solScale)
+			console.log(xpl.kmtoau(xpl.planets[2].radius)*solScale)
 			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,/*wireframe: true*/} );
 			var sphere = new THREE.Mesh( geometry, material );
 			
-			var materialW = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
+			var materialW = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
 			var geometryW = new THREE.SphereGeometry( xpl.planets[p].radius/planScale,8,8 );
 			var sphereW = new THREE.Mesh( geometryW, materialW );
-			sphere.add(sphereW);
+			//sphere.add(sphereW);
 
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
-			sphere.rotateX(-xpl.planets[p].oblique*Math.PI/180)
+		//	sphere.rotateY(Math.PI)
 			sphere.name = xpl.planets[p].name
 			drawPlanets.push(sphere);
 		}
@@ -84,16 +84,14 @@ function makePlanets(){
 
 makePlanets()
     
-   var mwGeo = new THREE.SphereGeometry(900,32,32)
+   var mwGeo = new THREE.SphereGeometry(100,32,32)
    var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide})
    var mwMesh = new THREE.Mesh(mwGeo,mwMat)
    loader.load("../data/images/milkywaypan_brunier.jpg",function (image){
-        var texture = new THREE.Texture()
-        texture.image = image
-        texture.needsUpdate = true
+       console.log("test")
+        var texture = new THREE.Texture({image:image, needsUpdate:true, name:"milkyway"})
         mwMesh.material.map = texture
-        //how to get tilt of galactic plane?
-        mwMesh.rotation.set(0,0,60*Math.PI/180)
+        mwMesh.material.needsUpdate = true
         scene.add(mwMesh)
    })
 
@@ -111,7 +109,7 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
-    var ISSGeo = new THREE.SphereGeometry( .000001*solScale,16,16 );
+    var ISSGeo = new THREE.SphereGeometry( .0001,16,16 );
 	var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 	var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 	var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
@@ -136,39 +134,35 @@ testMeshz.position.z = .005
 */
 ///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.01,drawPlanets[2].position.z)
+//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 //camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 camera.rotation.y = -1.0301412288052558
 
 var render = function () {
-    mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
 	//KEEP CAMERA LOOKING AT EARTH
-    controls.center = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y+.1,drawPlanets[2].position.z)
-    //controls.update()
+    camera.position.set(drawPlanets[2].position.x-.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
 	xpl.updateTime()
 	var step = 0
 	t+=step;
 	var xyz = tlObj.update(t);
-	//var earthPosition = [drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z]
+	var earthPosition = [drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z]
 	xyz = tlObj.position_ecf;
     
 	var ISSPosition = [xpl.kmtoau(xyz.x)*solScale,xpl.kmtoau(xyz.z)*solScale,xpl.kmtoau(-xyz.y)*solScale]
 	ISS_ecf.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 
     xyz_eci = tlObj.position_eci;
-    var ISSeciPos = new THREE.Vector3(xpl.kmtoau(xyz_eci.x)*solScale,xpl.kmtoau(xyz_eci.z)*solScale,xpl.kmtoau(-xyz_eci.y)*solScale)
-    ISSeciPos.applyAxisAngle(new THREE.Vector3(1,0,0),(-xpl.curEarthOblique(xpl.now+t)*Math.PI/180)-.045)
-    ISSeciPos.add(drawPlanets[2].position)
-    ISS_eci.position.copy(ISSeciPos)
-//    console.log(ISS_eci.position)
+    var ISSeciPos = [xpl.kmtoau(-xyz_eci.y)*solScale,xpl.kmtoau(xyz_eci.z)*solScale,xpl.kmtoau(-xyz_eci.x)*solScale]
+    ISS_eci.position.set(ISSeciPos[0]+earthPosition[0],ISSeciPos[1]+earthPosition[1],ISSeciPos[2]+earthPosition[2])
 	requestAnimationFrame( render );
 	
    	for(p in drawPlanets){
 		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t);
-        //curRotation could be worked into library. Formula is (% of day at time) * (length of day on planet/julian day) * 1 rotation in radians + difference between julian noon and solar noon
-        var curRotation = ((xpl.now+t)%(xpl.planets[p].dayLength/23.9344))*2*Math.PI-0.166667
+		var deltaRotation = (23.93333/xpl.planets[p].dayLength)*(2*Math.PI)
+
+		var curRotation = (deltaRotation*t)+(Math.PI)+(Math.PI/2)
 		var oblique = xpl.planets[p].oblique*(Math.PI/180)
-		drawPlanets[p].rotation.y = curRotation
+		drawPlanets[p].rotation.set(0,curRotation,0)
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
 	renderer.render(scene, camera);
@@ -176,14 +170,14 @@ var render = function () {
 
 document.addEventListener("keydown",function(event){
 	if(event.keyCode === 16 || event.charCode === 16){
-		controls.zoomSpeed = 1
+		controls.zoomSpeed = .1
 		controls.rotateSpeed = 1
 		controls.panSpeed = 1
 	}
 })
 
 document.addEventListener("keyup",function(){
-	controls.zoomSpeed = .1
+	controls.zoomSpeed = .001
 	controls.rotateSpeed = .01
 		controls.panSpeed = .01
 	})
