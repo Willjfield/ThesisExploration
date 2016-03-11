@@ -26,7 +26,7 @@ var light = new THREE.PointLight( 0xffffff, 1, 0 );
 light.position.set( 0, 0, 0 );
 scene.add( light );
 
-var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+var light = new THREE.AmbientLight( 0xffffff ); // soft white light
 scene.add( light );
 
 var t = 0;
@@ -64,13 +64,13 @@ function makePlanets(){
 	for(var p in explore.planets){	
 			var geometry = new THREE.SphereGeometry( explore.kmtoau(explore.planets[p].radius)*solScale,32,32 );
 			console.log(explore.kmtoau(explore.planets[2].radius)*solScale)
-			var material = new THREE.MeshLambertMaterial( { color:0xffffff /*,wireframe: true*/} );
+			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,/*wireframe: true*/} );
 			var sphere = new THREE.Mesh( geometry, material );
 			
 			var materialW = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
 			var geometryW = new THREE.SphereGeometry( explore.planets[p].radius/planScale,8,8 );
 			var sphereW = new THREE.Mesh( geometryW, materialW );
-			sphere.add(sphereW);
+			//sphere.add(sphereW);
 
 			var curPosition = explore.SolarSystem(explore.planets[p],explore.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
@@ -78,9 +78,22 @@ function makePlanets(){
 			sphere.name = explore.planets[p].name
 			drawPlanets.push(sphere);
 		}
+   
 }
 
 makePlanets()
+    
+   var mwGeo = new THREE.SphereGeometry(100,32,32)
+   var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide})
+   var mwMesh = new THREE.Mesh(mwGeo,mwMat)
+   loader.load("../data/images/milkywaypan_brunier.jpg",function (image){
+       console.log("test")
+        var texture = new THREE.Texture({image:image, needsUpdate:true, name:"milkyway"})
+        mwMesh.material.map = texture
+        mwMesh.material.needsUpdate = true
+        scene.add(mwMesh)
+   })
+
 
 drawPlanets.forEach(function(planet, index){
 	var texturePath = "../data/images/"
@@ -96,10 +109,14 @@ drawPlanets.forEach(function(planet, index){
 });
 
     var ISSGeo = new THREE.SphereGeometry( .0001,16,16 );
-	var ISSMat = new THREE.MeshLambertMaterial( { color: 0xffff00 } );
-	var ISS = new THREE.Mesh(ISSGeo,ISSMat);
-	drawPlanets[2].add(ISS)
+	var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+	var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+	var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
+    var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
+    scene.add(ISS_eci)
+	drawPlanets[2].add(ISS_ecf)
 ///TEST EARTH AXES
+/*
 var testGeo = new THREE.SphereGeometry(.0002,16,16);
 var testMaty = new THREE.MeshBasicMaterial({color:0x00ff00})
 var testMeshy = new THREE.Mesh(testGeo,testMaty)
@@ -113,36 +130,40 @@ var testMatz = new THREE.MeshBasicMaterial({color:0x0000ff})
 var testMeshz = new THREE.Mesh(testGeo,testMatz)
 drawPlanets[2].add(testMeshz)
 testMeshz.position.z = .005
+*/
 ///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
+//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 //camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
-camera.rotateY(-Math.PI)
+camera.rotation.y = -1.0301412288052558
 
 var render = function () {
 	//KEEP CAMERA LOOKING AT EARTH
+    camera.position.set(drawPlanets[2].position.x-.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
 	explore.updateTime()
 	var step = 0
 	t+=step;
 	var xyz = tlObj.update(t);
 	var earthPosition = [drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z]
 	xyz = tlObj.position_ecf;
-
+    
 	var ISSPosition = [explore.kmtoau(xyz.x)*solScale,explore.kmtoau(xyz.z)*solScale,explore.kmtoau(-xyz.y)*solScale]
-	ISS.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
+	ISS_ecf.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 
+    xyz_eci = tlObj.position_eci;
+    var ISSeciPos = [explore.kmtoau(-xyz_eci.y)*solScale,explore.kmtoau(xyz_eci.z)*solScale,explore.kmtoau(-xyz_eci.x)*solScale]
+    ISS_eci.position.set(ISSeciPos[0]+earthPosition[0],ISSeciPos[1]+earthPosition[1],ISSeciPos[2]+earthPosition[2])
 	requestAnimationFrame( render );
 	
-	for(p in drawPlanets){
+   	for(p in drawPlanets){
 		var curPosition = explore.SolarSystem(explore.planets[p],explore.now+t);
-		var deltaRotation = (24/explore.planets[p].dayLength)*(2*Math.PI)
+		var deltaRotation = (23.93333/explore.planets[p].dayLength)*(2*Math.PI)
 
-		var curRotation = (deltaRotation*t)+(Math.PI)+1
+		var curRotation = (deltaRotation*t)+(Math.PI)+(Math.PI/2)
 		var oblique = explore.planets[p].oblique*(Math.PI/180)
 		drawPlanets[p].rotation.set(0,curRotation,0)
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
-	camera.position.set(drawPlanets[2].position.x-.01,drawPlanets[2].position.y,drawPlanets[2].position.z)
 	renderer.render(scene, camera);
 };
 

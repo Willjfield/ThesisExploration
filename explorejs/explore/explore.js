@@ -3874,7 +3874,7 @@ explore.tle = function(line1, line2) {
         // Propagate satellite using current time
         var now = new Date();
         now.setSeconds(now.getSeconds()+(t*86400))
-        console.log(now)
+ //       console.log(now)
         // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
         var position_and_velocity = explore.satellite.propagate (satrec,
                                                         now.getUTCFullYear(),
