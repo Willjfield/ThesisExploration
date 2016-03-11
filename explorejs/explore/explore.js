@@ -1,3 +1,12 @@
+/*
+Tilt of milky way isn't right
+position eci and position ecf are slightly off
+is earth tilted on x axis?
+Should scaling be built in? This would be a big time investment!
+Add moons
+add probes
+make it more navigable
+*/
 "use strict";
 (function(xpl,undefined){
     var scl = 1
@@ -3964,7 +3973,8 @@ xpl.tle = function(line1, line2) {
         this.position_ecf = xpl.satellite.geodetic_to_ecf(this.latlongalt);
     	this.position_eci = _position_eci;
     	this.velocity_eci = _velocity_eci;
-
+        //console.log(this.position_eci)
+        this.helioCoords =  eci_to_heliocentric(_position_eci)
     	//this.position_ecf = xpl.satellite.geodetic_to_ecf(this.latlongalt);
 
     	// console.log(this.latlongalt)
@@ -3978,7 +3988,40 @@ xpl.tle = function(line1, line2) {
     	//RETURNS RADIANS!!!!!!!!!!
     	return xpl.satellite.ecf_to_look_angles(my_geodetic,this.position_ecf)
     }
+
 }
+        function mMultiply(a, b) {
+             var aNumRows = a.length, aNumCols = a[0].length,
+              bNumRows = b.length, bNumCols = b[0].length,
+             m = new Array(aNumRows);  // initialize array of rows
+               for (var r = 0; r < aNumRows; ++r) {
+                m[r] = new Array(bNumCols); // initialize the current row
+                for (var c = 0; c < bNumCols; ++c) {
+                    m[r][c] = 0;             // initialize the current cell
+                   for (var i = 0; i < aNumCols; ++i) {
+                       m[r][c] += a[r][i] * b[i][c];
+                     }
+                   }
+                 }
+        return m;
+        }
+
+    function eci_to_heliocentric(eci){
+        if(typeof eci != "undefined"){
+        //console.log(eci)
+        var scaledPos = [xpl.kmtoau(eci.x),xpl.kmtoau(eci.z),xpl.kmtoau(-eci.y)]
+        var theta=xpl.planets[2].oblique*xpl.DEGTORAD
+        var mMatrix=[[1,0,0],[0,Math.cos(theta),Math.sin(theta)],[0,-Math.sin(theta),Math.cos(theta)]]
+        var transCoords = mMultiply(scaledPos,mMatrix)
+        for(var d in transCoords){
+            transCoords[d]+=scaledPos[d]
+        }
+
+        return {x:transCoords[0],y:transCoords[1],z:transCoords[2]}
+        }else{
+            return 0
+        }
+    }
 
 	var corsURL = "http://cors.io/?u="
 	var celestrakTypeURL = "http://www.celestrak.com/NORAD/elements/"

@@ -22,7 +22,7 @@ var controls = new THREE.OrbitControls(camera);
 				controls.rotateSpeed = .01
 				controls.panSpeed = .01
 
-var light = new THREE.PointLight( 0xffffff, 5, 0 );
+                var light = new THREE.PointLight( 0xffffff, 5, 0 );
 light.position.set( 0, 0, 0 );
 scene.add( light );
 
@@ -136,7 +136,7 @@ testMeshz.position.z = .005
 */
 ///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.01,drawPlanets[2].position.z)
+camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
 //camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 camera.rotation.y = -1.0301412288052558
 
@@ -160,7 +160,8 @@ var render = function () {
     ISSeciPos.applyAxisAngle(new THREE.Vector3(1,0,0),(-xpl.curEarthOblique(xpl.now+t)*Math.PI/180)-.045)
     ISSeciPos.add(drawPlanets[2].position)
     ISS_eci.position.copy(ISSeciPos)
-//    console.log(ISS_eci.position)
+    console.log(ISS_eci.position)
+    console.log(tlObj.helioCoords)
 	requestAnimationFrame( render );
 	
    	for(p in drawPlanets){
