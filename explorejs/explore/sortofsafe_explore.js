@@ -401,24 +401,10 @@ make it more navigable
 		this.oblique = oblique;//degrees rotation is off center
 		this.dayLength = dayLength;//length of day
 		this.texColor = color;//hex color to approximate surface
-		this.currentPlanetRotation = 0
 		/*
 		this.webShader = webShader;
 		*/
 	}
-	// function currentPlanetRotation(p,jday){
-	// 	var _jday
-	// 	typeof jday == "undefined" ? _jday = xpl.now : _jday=jday
-	// 	-((_jday)%(xpl.planets[p].dayLength/23.9344))*2*Math.PI-0.166667
-	// }
-
-	planet.prototype.rotationAt = function(jday){	
-		var _jday
-		typeof "jday" == undefined ? _jday = xpl.now : _jday=jday
-		this.currentPlanetRotation = ((_jday)%(this.dayLength/23.9344))*2*Math.PI+0.166667
-		return this.currentPlanetRotation
-	}
-
 
 	xpl.sol = {
 		radius: 696300,
@@ -536,10 +522,6 @@ make it more navigable
 					xpl.mars,xpl.jupiter,xpl.saturn,
 					xpl.uranus,xpl.neptune];
     xpl.planets = planets
-
-    for(var p in planets){
-    		planets[p].rotationAt(xpl.now)
-    	}
 
 	// Body holds current data of planet, Sun or Moon), method .update(jday,obs)
 	function Body(name,number,colour,colleft,colright) {
@@ -4033,22 +4015,78 @@ xpl.tle = function(line1, line2) {
     this.position_ecf;
     this.position_helio;
     this.deltaSeconds = 0;
+/*
+    this._update = function(t) {
+    	typeof t == undefined ? t = 0 : {}
+        // Initialize a satellite record
+        var satrec = xpl.satellite.twoline2satrec (this.line1, this.line2);
 
+        //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION, RIGHT NOW, UPDATE ONLY UPDATES IN REAL TIME B/C now = new DATE
+        //NEED TO MAKE NEW DATE() at CONSTRUCTION AND ADD T IN THIS FUNCTION
+        //PROPAGATE NEEDS TO USE JDAY NOT CAL DATE
+
+        //this.deltaSeconds += t
+        var deltaMinutes = this.deltaSeconds/60;
+        var deltaHours = deltaMinutes/60;
+        var deltaDays = deltaHours/24;
+        // Propagate satellite using current time
+        var now = xpl.dateFromJday(xpl.now+t)
+        // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
+        var position_and_velocity = xpl.satellite.propagate (satrec,
+                                                        now.year,
+                                                        now.month,
+                                                        now.day,
+                                                        now.hour,
+                                                        now.minute,
+                                                        now.sec);
+        // The position_velocity result is a key-value pair of ECI coordinates.
+        // These are the base results from which all other coordinates are derived.
+        var _position_eci = position_and_velocity["position"];
+        var _velocity_eci = position_and_velocity["velocity"];
+        // The coordinates are all stored in key-value pairs.
+        // ECI and ECF are accessed by "x", "y", "z".
+
+		var curgstime = xpl.satellite.gstime_from_jday(xpl.satellite.jday(
+														now.year,
+                                                        now.month,
+                                                        now.day,
+                                                        now.hour,
+                                                        now.minute,
+                                                        now.sec
+			));
+		//convert current satellite eci to lat/long in degrees and radians
+        var _latlongalt = xpl.satellite.eci_to_geodetic(_position_eci, curgstime)
+        _latlongalt.longitude = _latlongalt.longitude;
+        _latlongalt.latitude = _latlongalt.latitude;
+        _latlongalt.height = _latlongalt.height;
+        _latlongalt.longitudeDeg = _latlongalt.longitude*RAD2DEG
+        _latlongalt.latitudeDeg = _latlongalt.latitude*RAD2DEG
+
+        //make position velocity and lat/long available to the outside
+        this.latlongalt = _latlongalt;
+    	this.position_eci = _position_eci;
+    	this.velocity_eci = _velocity_eci;
+
+    	this.position_ecf = xpl.satellite.geodetic_to_ecf(this.latlongalt);
+    };
+*/
     this.update = function(t) {
     	typeof t == undefined ? t = 0 : {}
         // Initialize a satellite record
         var satrec = xpl.satellite.twoline2satrec (this.line1, this.line2);
         
 		var curgstime = xpl.satellite.gstime_from_jday(xpl.now+t)
+        //console.log(curgstime)
         //MAKE DELTA DAYS ACCESSIBLE OUTSIDE THIS FUNCTION, RIGHT NOW, UPDATE ONLY UPDATES IN REAL TIME B/C now = new DATE
         //NEED TO MAKE NEW DATE() at CONSTRUCTION AND ADD T IN THIS FUNCTION
         //PROPAGATE NEEDS TO USE JDAY NOT CAL DATE
 
+        //this.deltaSeconds += t
         // Propagate satellite using current time
         var now = new Date();
         now.setSeconds(now.getSeconds()+(t*86400))
-        //console.log(now)
-        //console.log(t)
+        console.log(now)
+ //       console.log(now)
         // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
         var position_and_velocity = xpl.satellite.propagate (satrec,
                                                         now.getUTCFullYear(),
@@ -4063,7 +4101,18 @@ xpl.tle = function(line1, line2) {
         var _velocity_eci = position_and_velocity["velocity"];
         // The coordinates are all stored in key-value pairs.
         // ECI and ECF are accessed by "x", "y", "z".
-		//convert current satellite eci to lat/long in degrees and radians 
+
+		// var curgstime = xpl.satellite.gstime_from_jday(xpl.satellite.jday(
+		// 												now.getUTCFullYear(),
+  //                                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+  //                                                       now.getUTCDate()+deltaDays,
+  //                                                       now.getUTCHours()+deltaHours,
+  //                                                       now.getUTCMinutes()+deltaMinutes,
+  //                                                       now.getUTCSeconds()+this.deltaSeconds
+		// 	));
+		// console.log(curgstime)
+		//console.log(xpl.now)
+		//convert current satellite eci to lat/long in degrees and radians
         var _latlongalt = xpl.satellite.eci_to_geodetic(_position_eci, curgstime)
 
         
@@ -4083,13 +4132,12 @@ xpl.tle = function(line1, line2) {
     this.getLookAnglesFrom = function(_longitude,_latitude, elevation){
     	var my_geodetic = new xpl.createGeodetic(_longitude,_latitude, elevation);
     	var my_ecf = xpl.satellite.geodetic_to_ecf(my_geodetic)	
-    	//FIRST ARGUMENT TO xpl.satellite.ecf_to_look_angles IS GEODETIC, NOT ECF COORDS
-    	//RETURNS RADIANS
+    	//return xpl.satellite.ecf_to_look_angles(my_ecf,this.position_ecf)
+    	//FIRST ARGUMENT TO xpl.satellite.ecf_to_look_angles IS GEODETIC, NOT ECF COORDS!!!!
+    	//RETURNS RADIANS!!!!!!!!!!
     	return xpl.satellite.ecf_to_look_angles(my_geodetic,this.position_ecf)
     }
 }
-
-/*ecf_to_heliocentric doesn't keep up with earth rotation or over compensates. Also 180 degrees off when in syc
 
 xpl.ecf_to_heliocentric=function(pos_ecf, jday){
 	return ecf_to_heliocentric(pos_ecf, jday)
@@ -4105,6 +4153,7 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	var angleC = xpl.curEarthOblique(jday)*DEG2RAD
 	//console.log(pointA)
 	
+
 	var axisY = new Vector({  x: 0,  y: 1,  z: 0,  w: 0 })
 	var curRotation = -((jday)%(xpl.planets[2].dayLength/23.9344))*2*Math.PI-0.166667
 	var angleD = 180*DEG2RAD
@@ -4118,9 +4167,10 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	pointA.y+=earthPosition[1]
 	pointA.z+=earthPosition[2]
 
+
+
 	return {x:pointA.x,y:pointA.y,z:pointA.z}
 }
-*/
 
 	var corsURL = "http://cors.io/?u="
 	var celestrakTypeURL = "http://www.celestrak.com/NORAD/elements/"

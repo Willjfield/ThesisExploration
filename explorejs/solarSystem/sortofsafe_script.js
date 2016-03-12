@@ -1,5 +1,5 @@
-var tleLine1 = "1 25544U 98067A   16072.60311259  .00012306  00000-0  19343-3 0  9998"
-var tleLine2 = "2 25544  51.6438 179.7093 0001431 279.1916 222.9068 15.54042739989958"
+var tleLine1 = "1 25544U 98067A   16068.60811216  .00006572  00000-0  10711-3 0  9999"
+var tleLine2 = "2 25544  51.6425 199.6230 0001553 265.2287 192.4960 15.53947737989335"
 var tlObj = new xpl.tle(tleLine1,tleLine2);
 var xyz = tlObj.update();
 
@@ -26,7 +26,7 @@ var controls = new THREE.OrbitControls(camera);
 light.position.set( 0, 0, 0 );
 scene.add( light );
 
-var light = new THREE.AmbientLight( 0x444444 ); // soft white light
+var light = new THREE.AmbientLight( 0xffffff ); // soft white light
 scene.add( light );
 
 var t = 0;
@@ -65,7 +65,7 @@ function makePlanets(){
 	for(var p in xpl.planets){	
 			var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.planets[p].radius)*solScale,32,32 );
 			//console.log(xpl.kmtoau(xpl.planets[2].radius)*solScale)
-			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,/*wireframe: true*/} );
+			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,wireframe: true} );
 			var sphere = new THREE.Mesh( geometry, material );
 			
 			var materialW = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
@@ -118,24 +118,23 @@ drawPlanets.forEach(function(planet, index){
     var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
     //scene.add(ISS_eci)
 	drawPlanets[2].add(ISS_ecf)
-
-	///TEST EARTH AXES
-	/*
-	var testGeo = new THREE.SphereGeometry(.0002,16,16);
-	var testMaty = new THREE.MeshBasicMaterial({color:0x00ff00})
-	var testMeshy = new THREE.Mesh(testGeo,testMaty)
-	drawPlanets[2].add(testMeshy)
-	testMeshy.position.y = .005
-	var testMatx = new THREE.MeshBasicMaterial({color:0xff0000})
-	var testMeshx = new THREE.Mesh(testGeo,testMatx)
-	drawPlanets[2].add(testMeshx)
-	testMeshx.position.x = .005
-	var testMatz = new THREE.MeshBasicMaterial({color:0x0000ff})
-	var testMeshz = new THREE.Mesh(testGeo,testMatz)
-	drawPlanets[2].add(testMeshz)
-	testMeshz.position.z = .005
-	*/
-	///TEST EARTH AXES
+///TEST EARTH AXES
+/*
+var testGeo = new THREE.SphereGeometry(.0002,16,16);
+var testMaty = new THREE.MeshBasicMaterial({color:0x00ff00})
+var testMeshy = new THREE.Mesh(testGeo,testMaty)
+drawPlanets[2].add(testMeshy)
+testMeshy.position.y = .005
+var testMatx = new THREE.MeshBasicMaterial({color:0xff0000})
+var testMeshx = new THREE.Mesh(testGeo,testMatx)
+drawPlanets[2].add(testMeshx)
+testMeshx.position.x = .005
+var testMatz = new THREE.MeshBasicMaterial({color:0x0000ff})
+var testMeshz = new THREE.Mesh(testGeo,testMatz)
+drawPlanets[2].add(testMeshz)
+testMeshz.position.z = .005
+*/
+///TEST EARTH AXES
 
 camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
 //camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
@@ -149,16 +148,19 @@ var render = function () {
     controls.center = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y+.1,drawPlanets[2].position.z)
     //controls.update()
 	xpl.updateTime()
-	var step = 0
+	var step = .0005
 	t+=step;
+	console.log(xpl.now+t)
 	var xyz = tlObj.update(t);
 	xyz = tlObj.position_ecf;
     
 	var ISSPosition = [xpl.kmtoau(xyz.x)*solScale,xpl.kmtoau(xyz.z)*solScale,xpl.kmtoau(-xyz.y)*solScale]
 	ISS_ecf.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
-	// var iss_helio = xpl.ecf_to_heliocentric(ISS_ecf.position,xpl.now+t)
-	// ISS_eci.position.set(iss_helio.x,iss_helio.z,iss_helio.y)
+	var iss_helio = xpl.ecf_to_heliocentric(ISS_ecf.position,xpl.now+t)
+	ISS_eci.position.set(iss_helio.x,iss_helio.z,iss_helio.y)
 
+	
+    
    /* ECI Conversion is slightly off 
    xyz_eci = tlObj.position_eci;
     var ISSeciPos = new THREE.Vector3(xpl.kmtoau(xyz_eci.x)*solScale,xpl.kmtoau(xyz_eci.z)*solScale,xpl.kmtoau(-xyz_eci.y)*solScale)
@@ -173,10 +175,7 @@ var render = function () {
    	for(p in drawPlanets){
 		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t);
         //curRotation could be worked into library. Formula is (% of day at time) * (length of day on planet/julian day) * 1 rotation in radians + difference between julian noon and solar noon
-        //var curRotation = ((xpl.now+t)%(xpl.planets[p].dayLength/23.9344))*2*Math.PI-0.166667
-		var curRotation = xpl.planets[p].rotationAt(xpl.now+t)
-		//console.log(_curRotation)
-
+        var curRotation = ((xpl.now+t)%(xpl.planets[p].dayLength/23.9344))*2*Math.PI-0.166667
 		var oblique = xpl.planets[p].oblique*(Math.PI/180)
 		drawPlanets[p].rotation.y = curRotation
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
@@ -196,6 +195,6 @@ document.addEventListener("keyup",function(){
 	controls.zoomSpeed = .1
 	controls.rotateSpeed = .01
 		controls.panSpeed = .01
-})
+	})
 
 render();
