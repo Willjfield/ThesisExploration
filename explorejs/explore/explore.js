@@ -3973,11 +3973,8 @@ xpl.tle = function(line1, line2) {
         this.position_ecf = xpl.satellite.geodetic_to_ecf(this.latlongalt);
     	this.position_eci = _position_eci;
     	this.velocity_eci = _velocity_eci;
-        //console.log(this.position_eci)
-        this.helioCoords =  eci_to_heliocentric(_position_eci)
+        //this.helioCoords =  eci_to_heliocentric(_position_eci)
     	//this.position_ecf = xpl.satellite.geodetic_to_ecf(this.latlongalt);
-
-    	// console.log(this.latlongalt)
     };
 
     this.getLookAnglesFrom = function(_longitude,_latitude, elevation){
@@ -3988,8 +3985,8 @@ xpl.tle = function(line1, line2) {
     	//RETURNS RADIANS!!!!!!!!!!
     	return xpl.satellite.ecf_to_look_angles(my_geodetic,this.position_ecf)
     }
-
 }
+/*
         function mMultiply(a, b) {
              var aNumRows = a.length, aNumCols = a[0].length,
               bNumRows = b.length, bNumCols = b[0].length,
@@ -4008,11 +4005,10 @@ xpl.tle = function(line1, line2) {
 
     function eci_to_heliocentric(eci){
         if(typeof eci != "undefined"){
-        //console.log(eci)
         var scaledPos = [xpl.kmtoau(eci.x),xpl.kmtoau(eci.z),xpl.kmtoau(-eci.y)]
         var theta=xpl.planets[2].oblique*xpl.DEGTORAD
-        var mMatrix=[[1,0,0],[0,Math.cos(theta),Math.sin(theta)],[0,-Math.sin(theta),Math.cos(theta)]]
-        var transCoords = mMultiply(scaledPos,mMatrix)
+        var mMatrix=[[1,0,0],[0,Math.cos(theta),-Math.sin(theta)],[0,Math.sin(theta),Math.cos(theta)]]
+        var transCoords = mMultiply(mMatrix,scaledPos)
         for(var d in transCoords){
             transCoords[d]+=scaledPos[d]
         }
@@ -4022,7 +4018,7 @@ xpl.tle = function(line1, line2) {
             return 0
         }
     }
-
+*/
 	var corsURL = "http://cors.io/?u="
 	var celestrakTypeURL = "http://www.celestrak.com/NORAD/elements/"
 	var celestrakNORAD = "http://celestrak.com/cgi-bin/TLE.pl?CATNR="

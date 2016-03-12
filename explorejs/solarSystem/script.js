@@ -156,12 +156,14 @@ var render = function () {
 	ISS_ecf.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 
     xyz_eci = tlObj.position_eci;
+   /* ECI Conversion is slightly off 
     var ISSeciPos = new THREE.Vector3(xpl.kmtoau(xyz_eci.x)*solScale,xpl.kmtoau(xyz_eci.z)*solScale,xpl.kmtoau(-xyz_eci.y)*solScale)
     ISSeciPos.applyAxisAngle(new THREE.Vector3(1,0,0),(-xpl.curEarthOblique(xpl.now+t)*Math.PI/180)-.045)
     ISSeciPos.add(drawPlanets[2].position)
     ISS_eci.position.copy(ISSeciPos)
     console.log(ISS_eci.position)
     console.log(tlObj.helioCoords)
+   */
 	requestAnimationFrame( render );
 	
    	for(p in drawPlanets){
