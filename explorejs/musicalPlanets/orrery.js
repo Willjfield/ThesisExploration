@@ -33,6 +33,7 @@ function preload(){
 }
 
 function setup(){
+
 	createCanvas(windowWidth, windowHeight)
 	imageMode(CENTER)
 	zoom = 1
@@ -52,9 +53,17 @@ function draw(){
 	for(var p in allPlanets){
 		allPlanets[p].update()
 	}
+
+	for(var p in allPlanets){
+		for(var c in allPlanets[p].connections){
+			allPlanets[p].connections[c].draw()
+		}
+	}
+
 	for(var p in allPlanets){
 		allPlanets[p].drawBody()
 	}
+
 	manageSlider()
 }
 
@@ -88,6 +97,7 @@ var drawPlanet = function(planet){
 	this.connections = []
 	this.strokeColor = color(255,255,255,100)
 	this.isSelected = false
+	this.worldPosition=[centerX-(this.position[0]*zoom),centerY+(this.position[1]*zoom)]
 }
 
 drawPlanet.prototype.update = function(){
@@ -96,6 +106,7 @@ drawPlanet.prototype.update = function(){
 		this.position[coord]*=this.ssScale
 	}
 	this.position[1]*=.5
+	this.worldPosition=[centerX-(this.position[0]*zoom),centerY+(this.position[1]*zoom)]
 }
 
 drawPlanet.prototype.drawLabel = function(){
@@ -119,14 +130,6 @@ drawPlanet.prototype.drawLabel = function(){
 }
 
 drawPlanet.prototype.drawBody = function(){
-	for(var c in this.connections){
-		this.connections[c].draw()
-	}
-	if(this.isSelected){
-		stroke(255)
-		strokeWeight(2)
-		line(centerX-(this.position[0]*zoom),centerY+(this.position[1]*zoom),mouseX,mouseY)
-	}
 	push()
 		translate(centerX,centerY)
 		scale(zoom)
@@ -165,6 +168,13 @@ drawPlanet.prototype.drawBody = function(){
 			pop()
 		pop()
 	pop()
+
+	if(this.isSelected){
+		stroke(255)
+		strokeWeight(2)
+		line(this.worldPosition[0],this.worldPosition[1],mouseX,mouseY)
+	}
+	
 	this.drawLabel()
 }
 
@@ -172,6 +182,11 @@ var connection = function(drawPlanet,otherDrawPlanet){
 	this.planet = drawPlanet
 	this.otherPlanet = otherDrawPlanet
 	this.distance = dist(this.planet.position[0], this.planet.position[1], this.otherPlanet.position[0], this.otherPlanet.position[1])
+	this.osc = new p5.Oscillator()
+	this.osc.setType('sine');
+	this.osc.freq(900-this.distance);
+	this.osc.amp(0,0);
+	this.osc.start();
 }
 
 connection.prototype.draw = function(){
@@ -179,15 +194,49 @@ connection.prototype.draw = function(){
 		translate(centerX,centerY)
 		scale(zoom)
 		var sWidth = (frameCount*(100/this.distance)*(Math.abs(speed)+1))%10
-		strokeWeight(sWidth/zoom)
+		strokeWeight(2/zoom)
 		var strokeOpacity = (1-(sWidth/zoom))*255
-		stroke(255,strokeOpacity)
+		stroke(255,64)
 		line(-this.planet.position[0], this.planet.position[1], -this.otherPlanet.position[0], this.otherPlanet.position[1])
 		sWidth*=.25
-		strokeWeight(sWidth/zoom)
-		stroke(255,strokeOpacity)
+		strokeWeight(2/zoom)
+		stroke(255,64)
 		line(-this.planet.position[0], this.planet.position[1], -this.otherPlanet.position[0], this.otherPlanet.position[1])
 	pop()
+	this.distance = dist(this.planet.position[0], this.planet.position[1], this.otherPlanet.position[0], this.otherPlanet.position[1])
+	this.osc.freq(900-this.distance);
+	
+	var boundedX = false
+	var boundedY = false
+
+	if(this.planet.worldPosition[0]>this.otherPlanet.worldPosition[0]){
+		if((mouseX>this.otherPlanet.worldPosition[0]&&mouseX<this.planet.worldPosition[0])){
+			boundedX=true
+		}
+	}
+	if(this.planet.worldPosition[0]<this.otherPlanet.worldPosition[0]){
+		if((mouseX<this.otherPlanet.worldPosition[0]&&mouseX>this.planet.worldPosition[0])){
+			boundedX=true
+		}
+	}
+
+	if(this.planet.worldPosition[1]>this.otherPlanet.worldPosition[1]){
+		if((mouseY>this.otherPlanet.worldPosition[1]&&mouseY<this.planet.worldPosition[1])){
+			boundedY=true
+		}
+	}
+	if(this.planet.worldPosition[1]<this.otherPlanet.worldPosition[1]){
+		if((mouseY<this.otherPlanet.worldPosition[1]&&mouseY>this.planet.worldPosition[1])){
+			boundedY=true
+		}
+	}
+	var onLineTest=(this.planet.worldPosition[0]-this.otherPlanet.worldPosition[0])*(mouseY-this.otherPlanet.worldPosition[1])-(this.planet.worldPosition[1]-this.otherPlanet.worldPosition[1])*(mouseX-this.otherPlanet.worldPosition[0])
+	
+	if(onLineTest<10000 && boundedX && boundedY){
+		this.osc.amp(1,1);
+	}else{
+		this.osc.amp(0,0);
+	}
 }
 
 function mouseWheel(event) {
@@ -198,8 +247,7 @@ function mouseWheel(event) {
 
 function mousePressed(){
 	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
-	for(var p in allPlanets){
-		
+	for(var p in allPlanets){		
 			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
 				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
 				selectedPlanets.push(allPlanets[p])
