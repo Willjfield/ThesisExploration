@@ -84,7 +84,7 @@ function makePlanets(){
 
 makePlanets()
     
-   var mwGeo = new THREE.SphereGeometry(900,32,32)
+   var mwGeo = new THREE.SphereGeometry(900,48,48)
    var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide})
    var mwMesh = new THREE.Mesh(mwGeo,mwMat)
    loader.load("../data/images/milkywaypan_brunier.jpg",function (image){
@@ -111,7 +111,7 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
-    var ISSGeo = new THREE.SphereGeometry( .00001*solScale,16,16 );
+    var ISSGeo = new THREE.SphereGeometry( .000001*solScale,16,16 );
 	var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 	var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 	var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
@@ -168,6 +168,7 @@ var render = function () {
     console.log(ISS_eci.position)
     console.log(tlObj.helioCoords)
    */
+   console.log(xpl.now+t)
 	requestAnimationFrame( render );
 	
    	for(p in drawPlanets){

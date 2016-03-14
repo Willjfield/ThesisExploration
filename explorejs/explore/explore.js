@@ -387,7 +387,7 @@ make it more navigable
 
 	// The planet object
 
-	function planet(name,num,N,i,w,a,e,M,radius,oblique,dayLength,color) {
+	function planet(name,num,N,i,w,a,e,M,radius,oblique,dayLength,yearLength,color) {
 		this.name=name;
 		this.num=num;
 		this.N=N; 	// longitude of ascending node
@@ -400,17 +400,13 @@ make it more navigable
 		this.radius = radius;//km
 		this.oblique = oblique;//degrees rotation is off center
 		this.dayLength = dayLength;//length of day
+		this.yearLength = yearLength;//length of 1 sidereal year in Earth days
 		this.texColor = color;//hex color to approximate surface
 		this.currentPlanetRotation = 0
 		/*
 		this.webShader = webShader;
 		*/
 	}
-	// function currentPlanetRotation(p,jday){
-	// 	var _jday
-	// 	typeof jday == "undefined" ? _jday = xpl.now : _jday=jday
-	// 	-((_jday)%(xpl.planets[p].dayLength/23.9344))*2*Math.PI-0.166667
-	// }
 
 	planet.prototype.rotationAt = function(jday){	
 		var _jday
@@ -418,8 +414,7 @@ make it more navigable
 		this.currentPlanetRotation = ((_jday)%(this.dayLength/23.9344))*2*Math.PI+0.166667
 		return this.currentPlanetRotation
 	}
-
-
+	//http://nssdc.gsfc.nasa.gov/planetary/planetfact.html
 	xpl.sol = {
 		radius: 696300,
 		dayLength: 587.28,
@@ -436,6 +431,7 @@ make it more navigable
 	   2439.5/2,
 	   0.01,
 	   4222.6,
+	   87.969,
 	   0xffffff
 	   );
 
@@ -449,6 +445,7 @@ make it more navigable
 	   12104/2,
 	   177.4,
 	   2802,
+	   224.701,
 	   0xff9933
 	   );
 
@@ -463,6 +460,7 @@ make it more navigable
 	   12756/2,
 	   eObl,
 	   23.9344,
+	   365.256,
 	   0x00ff99
 	   );
 
@@ -476,6 +474,7 @@ make it more navigable
 	   6792/2,
 	   25.2,
 	   24.7,
+	   686.98,
 	   0xff0000
 	   );
 
@@ -489,6 +488,7 @@ make it more navigable
 	   142984/2,
 	   3.1,
 	   9.9,
+	   4332.589,
 	   0xff4d88
 	   );
 
@@ -502,6 +502,7 @@ make it more navigable
 		120536/2,
 		26.7,
 		10.7,
+		10759.22,
 		0x00ff00
 		);
 
@@ -515,6 +516,7 @@ make it more navigable
 		51118/2,
 		97.8,
 		17.2,
+		30685.4,
 		0x0055ff
 		);
 
@@ -528,6 +530,7 @@ make it more navigable
 		49528/2,
 		28.3,
 		16.1,
+		60189,
 		0x730099
 		);
 
