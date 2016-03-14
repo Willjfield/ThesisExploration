@@ -48,14 +48,14 @@ function setup(){
 function draw(){
 	background(0, 25, 50)
 	ellipse(centerX,centerY,10*zoom,10*zoom)
-	manageSlider()
+	
 	for(var p in allPlanets){
 		allPlanets[p].update()
 	}
 	for(var p in allPlanets){
 		allPlanets[p].drawBody()
 	}
-	
+	manageSlider()
 }
 
 function manageSlider(){
@@ -119,8 +119,13 @@ drawPlanet.prototype.drawLabel = function(){
 }
 
 drawPlanet.prototype.drawBody = function(){
-		for(var c in this.connections){
+	for(var c in this.connections){
 		this.connections[c].draw()
+	}
+	if(this.isSelected){
+		stroke(255)
+		strokeWeight(2)
+		line(centerX-(this.position[0]*zoom),centerY+(this.position[1]*zoom),mouseX,mouseY)
 	}
 	push()
 		translate(centerX,centerY)
@@ -130,10 +135,10 @@ drawPlanet.prototype.drawBody = function(){
 			var distanceSq = ((curPosition[0])*(curPosition[0]))+((curPosition[1])*(curPosition[1]))
 			strokeWeight(1/zoom)
 			stroke(255,100)
-
-			for(var trail = 0;trail<this.data.yearLength;trail+=20){
+			var trailStep = (this.data.yearLength/100)
+			for(var trail = 0;trail<this.data.yearLength;trail+=trailStep){
 				var t1 = xpl.SolarSystem(xpl.planets[this.data.num],xpl.now+tOffset-trail)
-				var t2 = xpl.SolarSystem(xpl.planets[this.data.num],xpl.now+tOffset-trail-10)
+				var t2 = xpl.SolarSystem(xpl.planets[this.data.num],xpl.now+tOffset-trail-trailStep)
 				line(-t1[0]*this.ssScale,(t1[1]*this.ssScale)*.5,-t2[0]*this.ssScale,t2[1]*this.ssScale*.5)
 			}
 
@@ -148,6 +153,7 @@ drawPlanet.prototype.drawBody = function(){
 				if(this.isSelected){
 					tint(0,255,0)					
 					strokeWeight((zoom)*10)
+					stroke(255)
 					noFill()
 					var selectSize = (frameCount*100)%1000
 					stroke(((1000-selectSize)/1000)*255)
@@ -174,11 +180,12 @@ connection.prototype.draw = function(){
 		scale(zoom)
 		var sWidth = (frameCount*(100/this.distance)*(Math.abs(speed)+1))%10
 		strokeWeight(sWidth/zoom)
-		stroke(255,64)
+		var strokeOpacity = (1-(sWidth/zoom))*255
+		stroke(255,strokeOpacity)
 		line(-this.planet.position[0], this.planet.position[1], -this.otherPlanet.position[0], this.otherPlanet.position[1])
 		sWidth*=.25
 		strokeWeight(sWidth/zoom)
-		stroke(255,64)
+		stroke(255,strokeOpacity)
 		line(-this.planet.position[0], this.planet.position[1], -this.otherPlanet.position[0], this.otherPlanet.position[1])
 	pop()
 }
@@ -196,7 +203,6 @@ function mousePressed(){
 			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
 				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
 				selectedPlanets.push(allPlanets[p])
-				//selectedPlanets[0].strokeColor = color(0,255,0,100)stroke(0,255,0)
 				selectedPlanets[0].isSelected = true
 				if(selectedPlanets.length>1){
 					selectedPlanets[0].connections.push(new connection(selectedPlanets[0],selectedPlanets[1]))					
@@ -208,49 +214,4 @@ function mousePressed(){
 	}
 }
 
-function mouseReleased(){
-
-}
-
-// function drawPlanets(){
-// 	push()
-// 		translate(centerX,centerY)
-// 		scale(zoom)
-// 		push()
-// 		scale(1+(zoom*.1))
-// 		pop()
-// 		ellipse(0,0,10,10)
-// 		for(var p in xpl.planets){
-// 			push()
-// 				var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+tOffset)
-// 				var distanceSq = ((curPosition[0]*25)*(curPosition[0]*25))+((curPosition[1]*25)*(curPosition[1]*25))
-// 				strokeWeight(1/zoom)
-// 				for(var trail = 0;trail<xpl.planets[p].yearLength;trail+=20){
-// 					var t1 = xpl.SolarSystem(xpl.planets[p],xpl.now+tOffset-trail)
-// 					var t2 = xpl.SolarSystem(xpl.planets[p],xpl.now+tOffset-trail-10)
-// 					line(-t1[0]*25,(t1[1]*25),-t2[0]*25,t2[1]*25)
-// 				}
-
-// 				translate(-curPosition[0]*25,curPosition[1]*25)
-
-// 				push()
-// 					scale(xpl.planets[p].radius*.0005)
-// 					fill(255)
-// 					strokeWeight(.5)
-// 					stroke(255,100)
-// 					ellipseMode(CENTER)
-// 					ellipse(0,0,1,1)
-// 				pop()
-
-// 				if(abs(mouseX-(width/2)+(curPosition[0]*25*zoom))<15){
-// 					if(abs(mouseY-(height/2)-(curPosition[1]*25*zoom))<15){
-// 						fill(255)
-// 						noStroke()
-// 						textSize(16/zoom)
-// 						text(xpl.planets[p].name,xpl.planets[p].radius*.0005/zoom,xpl.planets[p].radius*.0005/zoom)
-// 					}
-// 				}
-// 			pop()
-// 		}
-// 	pop()
-// }
+function mouseReleased(){}
