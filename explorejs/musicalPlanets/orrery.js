@@ -33,7 +33,6 @@ function preload(){
 }
 
 function setup(){
-
 	createCanvas(windowWidth, windowHeight)
 	imageMode(CENTER)
 	zoom = 1
@@ -121,8 +120,8 @@ drawPlanet.prototype.drawLabel = function(){
 				stroke(0)
 				textSize(20)
 				push()
-				scale(1/zoom)
-				text(this.data.name,0,0)
+					scale(1/zoom)
+					text(this.data.name,0,0)
 				pop()
 			pop()
 		}
@@ -185,8 +184,8 @@ var connection = function(drawPlanet,otherDrawPlanet){
 	this.osc = new p5.Oscillator()
 	this.osc.setType('sine');
 	this.osc.freq(900-this.distance);
-	this.osc.amp(0,0);
-	this.osc.start();
+	this.osc.amp(1,1);
+	this.osc.start()
 }
 
 connection.prototype.draw = function(){
@@ -204,7 +203,7 @@ connection.prototype.draw = function(){
 		line(-this.planet.position[0], this.planet.position[1], -this.otherPlanet.position[0], this.otherPlanet.position[1])
 	pop()
 	this.distance = dist(this.planet.position[0], this.planet.position[1], this.otherPlanet.position[0], this.otherPlanet.position[1])
-	this.osc.freq(900-this.distance);
+	this.osc.freq(600-this.distance);
 	
 	var boundedX = false
 	var boundedY = false
@@ -231,11 +230,11 @@ connection.prototype.draw = function(){
 		}
 	}
 	var onLineTest=(this.planet.worldPosition[0]-this.otherPlanet.worldPosition[0])*(mouseY-this.otherPlanet.worldPosition[1])-(this.planet.worldPosition[1]-this.otherPlanet.worldPosition[1])*(mouseX-this.otherPlanet.worldPosition[0])
-	
-	if(onLineTest<10000 && boundedX && boundedY){
-		this.osc.amp(1,1);
+	var multAmnt = Math.abs((1000/(1000-(onLineTest/zoom))))
+	if(boundedX && boundedY){
+		this.osc.amp(multAmnt)
 	}else{
-		this.osc.amp(0,0);
+		this.osc.amp(.05)
 	}
 }
 
@@ -247,9 +246,18 @@ function mouseWheel(event) {
 
 function mousePressed(){
 	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
-	for(var p in allPlanets){		
+		for(var p in allPlanets){		
 			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
 				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
+					if (keyIsPressed === true) {
+						if(keyCode==SHIFT){
+							for(c in allPlanets[p].connections){
+								allPlanets[p].connections[c].osc.stop()
+							}
+							allPlanets[p].connections = []
+							break;
+						}
+					}
 				selectedPlanets.push(allPlanets[p])
 				selectedPlanets[0].isSelected = true
 				if(selectedPlanets.length>1){
@@ -260,6 +268,12 @@ function mousePressed(){
 			}
 		}
 	}
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  centerX = windowWidth/2
+  centerY = windowHeight/2
 }
 
 function mouseReleased(){}
