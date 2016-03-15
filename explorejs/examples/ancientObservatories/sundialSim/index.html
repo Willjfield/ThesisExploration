@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Sundial Simulator</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<!-- <script src="three.js"></script> -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r74/three.min.js"></script>
+		<script src="OrbitControls.js"></script>
+		<script src="OBJLoader.js"></script>
+		<!--<script src="explore.js"></script>-->
+		<!--<script type="text/javascript" src="../../explore/explore.js"></script>-->
+		<script src="../../../lib/explore.js"></script>
+	</head>
+
+	<body>
+		<!-- <div id="sliderTitle"> Time Speed </div> -->
+		<h1 id="loading"> LOADING </h1>
+		<h1 id="loadAmount"></h1>
+		<div id = "info">
+			<p id="date"></p>
+<!-- 			<p id="dText">Date:</p>
+			<input type="text" class="tin" id="inmonth">
+			/
+			<input type="text" class="tin" id="inday">
+			/
+			<input type="text" class="tin" id="inyear"> -->
+
+			<p id="latlong"></p>
+		</div>
+		<div id="timeline">
+			<input id="speedSlider" onmouseup="mouseUp()" type="range"></input><br>
+			<!--FOR PLACING GNOMON ONLY-->
+			<!-- <input id="zGnomon" onchange="gzMouseDown()" type="range"></input>
+			<input id="yGnomon" onchange="gyMouseDown()" type="range"></input> -->
+
+			<div id="rt">Real-Time</div>
+			<div id="wrapper">
+				<div id="rewind"> Rewind</div>
+				<div id="forward">Fast Forward </div>
+			</div>
+		</div>
+		<script src="scene.js"></script>
+		<p id="credit"> Sundial Simulator <a href="willjfield.com">Will Field</a>, 2016. Computational Photography and 3D Modeling for the Ancient World
+		with Sebastian Heath, NYU
+        Photogrammetry by the <a href = "https://www.topoi.org/project/d-5-6/">Berlin Sundial Project</a>        
+	</body>
+</html>
