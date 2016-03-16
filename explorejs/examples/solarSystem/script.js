@@ -22,11 +22,11 @@ var controls = new THREE.OrbitControls(camera);
 				controls.rotateSpeed = .01
 				controls.panSpeed = .01
 
-                var light = new THREE.PointLight( 0xffffff, 5, 0 );
+                var light = new THREE.PointLight( 0xffffff, 1.5, 0 );
 light.position.set( 0, 0, 0 );
 scene.add( light );
 
-var light = new THREE.AmbientLight( 0x444444 ); // soft white light
+var light = new THREE.AmbientLight( 0x343434 ); // soft white light
 scene.add( light );
 
 var t = 0;
@@ -139,15 +139,17 @@ drawPlanets.forEach(function(planet, index){
 
 camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
 //camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
-camera.rotation.y = -1.0301412288052558
+// camera.rotation.y = -1.0301412288052558
+// camera.rotateX(-1.5)
+controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
+
 
 var render = function () {
-	camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
+	//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
 
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
 	//KEEP CAMERA LOOKING AT EARTH
-    controls.center = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y+.1,drawPlanets[2].position.z)
-    //controls.update()
+    controls.update()
 	xpl.updateTime()
 	var step = 0
 	t+=step;
@@ -168,7 +170,7 @@ var render = function () {
     console.log(ISS_eci.position)
     console.log(tlObj.helioCoords)
    */
-   console.log(xpl.now+t)
+   //console.log(xpl.now+t)
 	requestAnimationFrame( render );
 	
    	for(p in drawPlanets){
@@ -186,10 +188,41 @@ var render = function () {
 };
 
 document.addEventListener("keydown",function(event){
-	if(event.keyCode === 16 || event.charCode === 16){
-		controls.zoomSpeed = 1
-		controls.rotateSpeed = 1
-		controls.panSpeed = 1
+	switch(event.keyCode){
+		case 16:
+			console.log("shift")
+			controls.zoomSpeed = 1
+			controls.rotateSpeed = 1
+			controls.panSpeed = 1
+		break;
+		case 48:
+			controls.target = new THREE.Vector3(0,0,0)
+		break;
+		case 49:
+			controls.target = new THREE.Vector3(drawPlanets[0].position.x,drawPlanets[0].position.y,drawPlanets[0].position.z)
+		break;
+		case 50:
+			controls.target = new THREE.Vector3(drawPlanets[1].position.x,drawPlanets[1].position.y,drawPlanets[1].position.z)
+		break;
+		case 51:
+			controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
+		break;
+		case 52:
+			controls.target = new THREE.Vector3(drawPlanets[3].position.x,drawPlanets[3].position.y,drawPlanets[3].position.z)
+		break;
+		case 53:
+			controls.target = new THREE.Vector3(drawPlanets[4].position.x,drawPlanets[4].position.y,drawPlanets[4].position.z)
+		break;
+		case 54:
+			controls.target = new THREE.Vector3(drawPlanets[5].position.x,drawPlanets[5].position.y,drawPlanets[5].position.z)
+		break;
+		case 55:
+			controls.target = new THREE.Vector3(drawPlanets[6].position.x,drawPlanets[6].position.y,drawPlanets[6].position.z)
+		break;
+		case 56:
+			controls.target = new THREE.Vector3(drawPlanets[7].position.x,drawPlanets[7].position.y,drawPlanets[7].position.z)
+		break;
+
 	}
 })
 

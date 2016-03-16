@@ -4041,7 +4041,7 @@ xpl.tle = function(line1, line2) {
     this.deltaSeconds = 0;
 
     this.update = function(t) {
-    	typeof t == undefined ? t = 0 : {}
+    	typeof t == "undefined" ? t = 0 : {}
         // Initialize a satellite record
         var satrec = xpl.satellite.twoline2satrec (this.line1, this.line2);
         
@@ -4091,7 +4091,10 @@ xpl.tle = function(line1, line2) {
     	var my_ecf = xpl.satellite.geodetic_to_ecf(my_geodetic)	
     	//FIRST ARGUMENT TO xpl.satellite.ecf_to_look_angles IS GEODETIC, NOT ECF COORDS
     	//RETURNS RADIANS
-    	return xpl.satellite.ecf_to_look_angles(my_geodetic,this.position_ecf)
+    	var lookAngles = xpl.satellite.ecf_to_look_angles(my_geodetic,this.position_ecf)
+    	lookAngles.azimuth*=RAD2DEG
+    	lookAngles.elevation*=RAD2DEG
+    	return lookAngles
     }
 }
 

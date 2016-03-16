@@ -1,0 +1,46 @@
+body{
+	background:black;
+	margin: 0 auto;
+}
+
+ul {
+	z-index: 999;
+	position: fixed;
+	top:0px;
+	left:10px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: transparent;
+    font-weight: lighter;
+    font-family: "futura-pt",sans-serif;
+}
+
+li a {
+    display: block;
+    border: 1px solid white;
+    color: white;
+    padding: 8px 0 8px 0;
+    margin-bottom: 5px;
+    text-decoration: none;
+    text-align: center;
+}
+
+/* Change the link color on hover */
+li a:hover {
+    background-color: #555;
+    color: white;
+}
+
+.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.top-title{
+	font-weight: bolder;
+	color:white;
+	text-align: center;
+	font-family: "futura-pt",sans-serif;
+}

@@ -33,7 +33,7 @@ function draw(){
 function drawSats(){
             drawSky()
             for(var sat in satellites){
-                var satellite = new explore.tle(satellites[sat].line1,satellites[sat].line2)
+                var satellite = new xpl.tle(satellites[sat].line1,satellites[sat].line2)
                 satellite.update()
                 var lookAngles = satellite.getLookAnglesFrom(latLong.longitude,latLong.latitude,1)
                 lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
@@ -80,7 +80,7 @@ function drawSky(){
 
 function parseTLE(satellites, callback){
     var xmlhttp = new XMLHttpRequest();
-    var url = "inttles.txt"
+    var url = "assets/inttles.txt"
     xmlhttp.open("GET", url, true);
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
