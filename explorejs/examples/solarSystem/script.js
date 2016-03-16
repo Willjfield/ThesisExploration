@@ -7,6 +7,8 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 65, window.innerWidth/window.innerHeight, 0.00001, 1000 );
 camera.position.set(0,0,100)
 
+var focusedPlanet = 2
+
 var renderer = new THREE.WebGLRenderer({ /*alpha: true*/ });
 renderer.setSize( window.innerWidth, window.innerHeight );
 //renderer.setClearColor( 0xffffff, 0);
@@ -79,7 +81,7 @@ function makePlanets(){
 
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
-			sphere.rotateX(-xpl.planets[p].oblique*Math.PI/180)
+			sphere.rotateX(xpl.planets[p].oblique*Math.PI/180)
 			sphere.name = xpl.planets[p].name
 			drawPlanets.push(sphere);
 		}
@@ -120,7 +122,7 @@ drawPlanets.forEach(function(planet, index){
 	var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 	var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
     var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
-    //scene.add(ISS_eci)
+   	scene.add(ISS_eci)
 	drawPlanets[2].add(ISS_ecf)
 
 	///TEST EARTH AXES
@@ -150,6 +152,7 @@ controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].pos
 
 var render = function () {
 	//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
+	controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
 
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
 	//KEEP CAMERA LOOKING AT EARTH
@@ -165,15 +168,18 @@ var render = function () {
 	// var iss_helio = xpl.ecf_to_heliocentric(ISS_ecf.position,xpl.now+t)
 	// ISS_eci.position.set(iss_helio.x,iss_helio.z,iss_helio.y)
 
-   /* ECI Conversion is slightly off 
-   xyz_eci = tlObj.position_eci;
+   /* ECI Conversion is slightly off. Probably has something to do with barycenter vs center 
+   	xyz_eci = tlObj.position_eci;
     var ISSeciPos = new THREE.Vector3(xpl.kmtoau(xyz_eci.x)*solScale,xpl.kmtoau(xyz_eci.z)*solScale,xpl.kmtoau(-xyz_eci.y)*solScale)
-    ISSeciPos.applyAxisAngle(new THREE.Vector3(1,0,0),(-xpl.curEarthOblique(xpl.now+t)*Math.PI/180)-.045)
+    ISSeciPos.applyAxisAngle(new THREE.Vector3(0,1,0),(-0.03926991))
+    ISSeciPos.applyAxisAngle(new THREE.Vector3(1,0,0),(xpl.curEarthOblique(xpl.now+t)*Math.PI/180)-.045)
+    
     ISSeciPos.add(drawPlanets[2].position)
     ISS_eci.position.copy(ISSeciPos)
-    console.log(ISS_eci.position)
-    console.log(tlObj.helioCoords)
-   */
+    */
+    // console.log(ISS_eci.position)
+    // console.log(tlObj.helioCoords)
+  
    //console.log(xpl.now+t)
 	requestAnimationFrame( render );
 	
@@ -184,7 +190,8 @@ var render = function () {
 		var curRotation = xpl.planets[p].rotationAt(xpl.now+t)
 		//console.log(_curRotation)
 
-		var oblique = xpl.planets[p].oblique*(Math.PI/180)
+		//var oblique = xpl.planets[p].oblique*(Math.PI/180)
+		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
 	}
@@ -193,38 +200,40 @@ var render = function () {
 
 document.addEventListener("keydown",function(event){
 	switch(event.keyCode){
-		// case 16:
-		// 	console.log("shift")
-		// 	controls.zoomSpeed = 1
-		// 	controls.rotateSpeed = 1
-		// 	controls.panSpeed = 1
-		// break;
 		case 48:
 			controls.target = new THREE.Vector3(0,0,0)
 		break;
 		case 49:
-			controls.target = new THREE.Vector3(drawPlanets[0].position.x,drawPlanets[0].position.y,drawPlanets[0].position.z)
+			focusedPlanet = 0
+			//controls.target = new THREE.Vector3(drawPlanets[0].position.x,drawPlanets[0].position.y,drawPlanets[0].position.z)
 		break;
 		case 50:
-			controls.target = new THREE.Vector3(drawPlanets[1].position.x,drawPlanets[1].position.y,drawPlanets[1].position.z)
+			focusedPlanet = 1
+			//controls.target = new THREE.Vector3(drawPlanets[1].position.x,drawPlanets[1].position.y,drawPlanets[1].position.z)
 		break;
 		case 51:
-			controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
+			focusedPlanet = 2
+			//controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 		break;
 		case 52:
-			controls.target = new THREE.Vector3(drawPlanets[3].position.x,drawPlanets[3].position.y,drawPlanets[3].position.z)
+			focusedPlanet = 3
+			//controls.target = new THREE.Vector3(drawPlanets[3].position.x,drawPlanets[3].position.y,drawPlanets[3].position.z)
 		break;
 		case 53:
-			controls.target = new THREE.Vector3(drawPlanets[4].position.x,drawPlanets[4].position.y,drawPlanets[4].position.z)
+			focusedPlanet = 4
+			//controls.target = new THREE.Vector3(drawPlanets[4].position.x,drawPlanets[4].position.y,drawPlanets[4].position.z)
 		break;
 		case 54:
-			controls.target = new THREE.Vector3(drawPlanets[5].position.x,drawPlanets[5].position.y,drawPlanets[5].position.z)
+			focusedPlanet = 5
+			//controls.target = new THREE.Vector3(drawPlanets[5].position.x,drawPlanets[5].position.y,drawPlanets[5].position.z)
 		break;
 		case 55:
-			controls.target = new THREE.Vector3(drawPlanets[6].position.x,drawPlanets[6].position.y,drawPlanets[6].position.z)
+			focusedPlanet = 6
+			//controls.target = new THREE.Vector3(drawPlanets[6].position.x,drawPlanets[6].position.y,drawPlanets[6].position.z)
 		break;
 		case 56:
-			controls.target = new THREE.Vector3(drawPlanets[7].position.x,drawPlanets[7].position.y,drawPlanets[7].position.z)
+			focusedPlanet = 7
+			//controls.target = new THREE.Vector3(drawPlanets[7].position.x,drawPlanets[7].position.y,drawPlanets[7].position.z)
 		break;
 
 	}

@@ -1,10 +1,10 @@
 /*
+scaling
+porting spice code or building on it?
 Tilt of milky way isn't right
 position eci are slightly off
 convert eci to helio isn't working
 moon ephemerides
-scaling
-porting spice code?
 
 Add moons
 add probes
@@ -414,7 +414,7 @@ make it more navigable
 	planet.prototype.rotationAt = function(jday){	
 		var _jday
 		typeof "jday" == undefined ? _jday = xpl.now : _jday=jday
-		this.currentPlanetRotation = ((_jday)%(this.dayLength/23.9344))*2*Math.PI+0.166667
+		this.currentPlanetRotation = ((_jday)%(this.dayLength/23.9344))*2*Math.PI-0.166667
 		return this.currentPlanetRotation
 	}
 	//http://nssdc.gsfc.nasa.gov/planetary/planetfact.html
