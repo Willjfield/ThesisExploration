@@ -241,9 +241,9 @@ connection.prototype.draw = function(){
 	var onLineTest=(this.planet.worldPosition[0]-this.otherPlanet.worldPosition[0])*(mouseY-this.otherPlanet.worldPosition[1])-(this.planet.worldPosition[1]-this.otherPlanet.worldPosition[1])*(mouseX-this.otherPlanet.worldPosition[0])
 	var multAmnt = Math.abs((1000/(1000-(onLineTest/zoom))))
 	if(boundedX && boundedY){
-		this.osc.amp(multAmnt)
+		this.osc.amp(multAmnt*.1)
 	}else{
-		this.osc.amp(.05)
+		this.osc.amp(.1)
 	}
 }
 

@@ -4,7 +4,7 @@ var tlObj = new xpl.tle(tleLine1,tleLine2);
 var xyz = tlObj.update();
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.00001, 1000 );
+var camera = new THREE.PerspectiveCamera( 65, window.innerWidth/window.innerHeight, 0.00001, 1000 );
 camera.position.set(0,0,100)
 
 var renderer = new THREE.WebGLRenderer({ /*alpha: true*/ });
@@ -18,9 +18,13 @@ var controls = new THREE.OrbitControls(camera);
 				controls.minDistance = 0;
 				controls.minPolarAngle = 0; // radians
 				controls.maxPolarAngle = Infinity;
-				controls.zoomSpeed = .01
-				controls.rotateSpeed = .01
-				controls.panSpeed = .01
+				// controls.zoomSpeed = .01
+				// controls.rotateSpeed = .01
+				// controls.panSpeed = .01
+
+				controls.zoomSpeed = 1
+				controls.rotateSpeed = 1
+				controls.panSpeed = 1
 
                 var light = new THREE.PointLight( 0xffffff, 1.5, 0 );
 light.position.set( 0, 0, 0 );
@@ -189,12 +193,12 @@ var render = function () {
 
 document.addEventListener("keydown",function(event){
 	switch(event.keyCode){
-		case 16:
-			console.log("shift")
-			controls.zoomSpeed = 1
-			controls.rotateSpeed = 1
-			controls.panSpeed = 1
-		break;
+		// case 16:
+		// 	console.log("shift")
+		// 	controls.zoomSpeed = 1
+		// 	controls.rotateSpeed = 1
+		// 	controls.panSpeed = 1
+		// break;
 		case 48:
 			controls.target = new THREE.Vector3(0,0,0)
 		break;
@@ -226,10 +230,18 @@ document.addEventListener("keydown",function(event){
 	}
 })
 
-document.addEventListener("keyup",function(){
-	controls.zoomSpeed = .1
-	controls.rotateSpeed = .01
-		controls.panSpeed = .01
-})
+// document.addEventListener("keyup",function(){
+// 	controls.zoomSpeed = .1
+// 	controls.rotateSpeed = .01
+// 	controls.panSpeed = .01
+// })
+window.addEventListener( 'resize', onWindowResize, false );
+function onWindowResize(){
 
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
 render();

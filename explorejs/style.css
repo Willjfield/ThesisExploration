@@ -7,7 +7,7 @@ ul {
 	z-index: 999;
 	position: fixed;
 	top:0px;
-	left:10px;
+	left:4%;
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -19,6 +19,7 @@ ul {
 
 li a {
     display: block;
+    background-color: rgba(0,0,0,.3);
     border: 1px solid white;
     color: white;
     padding: 8px 0 8px 0;
@@ -43,4 +44,26 @@ li a:hover {
 	color:white;
 	text-align: center;
 	font-family: "futura-pt",sans-serif;
+}
+
+.welcome{
+	position: absolute;
+	padding: 50px;
+	top: 11%;
+	left: 25%;
+	margin: 0 auto;
+	width:50%;
+	height: 100%;
+	background: rgba(0,0,0,.4);
+	font-family: "futura-pt",sans-serif;
+	color:white;
+	text-align: center;
+	font-family: "futura-pt",sans-serif;
+	font-size: 24px;
+}
+.exampleMenu{
+	position: absolute;
+	width:25%;
+	top:25%;
+	left:37.5%;
 }
