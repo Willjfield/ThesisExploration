@@ -4220,6 +4220,39 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	xpl.planetTex = ["mercury","venus","earth_day","mars","jupiter","saturn","uranus","neptune"]
 
 	///PROBES///
+	//http://omniweb.gsfc.nasa.gov/coho/helios/heli.html
+	function probePositions(probeName,array,callback,pathToData){
+		var baseUrl = pathToData || "data/probes/"
+		var xmlhttp = new XMLHttpRequest();
+		var probePositions = []
+		var endUrl = "_solarEcliptic.txt"
+		var url = baseUrl+probeName+endUrl
 
+		xmlhttp.open("GET", url, true);
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				    var data = xmlhttp.responseText;
+				    data = data.split('\n');
+				    for(var d in data){
+				    	probePositions.push(data[d].split(/[ ]+/))
+				    }
+				    for(var p = 1; p<probePositions.length-1;p++){
+				    	array.push({
+				    		x:parseFloat(probePositions[p][2]),
+				    		y:parseFloat(probePositions[p][4]),
+				    		z:parseFloat(probePositions[p][3]),
+				    		year:parseFloat(probePositions[p][0]),
+				    		day:parseFloat(probePositions[p][1]),
+				    		//jday: jday(...)
+				    	})
+				    }	
+				   callback()			
+			    }
+			}
+		xmlhttp.send(null);
+	}
 
+	xpl.probePositions = function(probeName,array,callback,pathToData){
+		return probePositions(probeName,array,callback,pathToData)
+	}
 }(window.xpl = window.xpl || {}))

@@ -4,14 +4,13 @@ var tlObj = new xpl.tle(tleLine1,tleLine2);
 var xyz = tlObj.update();
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 65, window.innerWidth/window.innerHeight, 0.00001, 1000 );
+var camera = new THREE.PerspectiveCamera( 65, window.innerWidth/window.innerHeight, 0.000001, 1000 );
 camera.position.set(0,0,100)
 
 var focusedPlanet = 2
 
-var renderer = new THREE.WebGLRenderer({ /*alpha: true*/ });
+var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
-//renderer.setClearColor( 0xffffff, 0);
 document.body.appendChild( renderer.domElement );
 
 var controls = new THREE.OrbitControls(camera);
@@ -20,9 +19,6 @@ var controls = new THREE.OrbitControls(camera);
 				controls.minDistance = 0;
 				controls.minPolarAngle = 0; // radians
 				controls.maxPolarAngle = Infinity;
-				// controls.zoomSpeed = .01
-				// controls.rotateSpeed = .01
-				// controls.panSpeed = .01
 
 				controls.zoomSpeed = 1
 				controls.rotateSpeed = 1
@@ -69,8 +65,7 @@ var loader = new THREE.ImageLoader( manager );
 
 function makePlanets(){
 	for(var p in xpl.planets){	
-			var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.planets[p].radius)*solScale,32,32 );
-			//console.log(xpl.kmtoau(xpl.planets[2].radius)*solScale)
+			var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.planets[p].radius)*solScale,48,48 );
 			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,/*wireframe: true*/} );
 			var sphere = new THREE.Mesh( geometry, material );
 			
@@ -116,7 +111,7 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
-var ISSGeo = new THREE.SphereGeometry( .000001*solScale,16,16 );
+var ISSGeo = new THREE.SphereGeometry( .0000001*solScale,16,16 );
 var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
@@ -143,9 +138,6 @@ drawPlanets[2].add(ISS_ecf)
 	///TEST EARTH AXES
 
 camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
-//camera.lookAt(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
-// camera.rotation.y = -1.0301412288052558
-// camera.rotateX(-1.5)
 controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 
 
@@ -155,7 +147,6 @@ var render = function () {
 		controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
 	}
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
-	//KEEP CAMERA LOOKING AT EARTH
     controls.update()
 	xpl.updateTime()
 	var step = 0
@@ -177,10 +168,7 @@ var render = function () {
     ISSeciPos.add(drawPlanets[2].position)
     ISS_eci.position.copy(ISSeciPos)
     */
-    // console.log(ISS_eci.position)
-    // console.log(tlObj.helioCoords)
-  
-   //console.log(xpl.now+t)
+    
 	requestAnimationFrame( render );
 	
    	for(p in drawPlanets){
@@ -203,71 +191,82 @@ document.addEventListener("keydown",function(event){
 		break;
 		case 49:
 			focusedPlanet = 0
-			//controls.target = new THREE.Vector3(drawPlanets[0].position.x,drawPlanets[0].position.y,drawPlanets[0].position.z)
 		break;
 		case 50:
 			focusedPlanet = 1
-			//controls.target = new THREE.Vector3(drawPlanets[1].position.x,drawPlanets[1].position.y,drawPlanets[1].position.z)
 		break;
 		case 51:
 			focusedPlanet = 2
-			//controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 		break;
 		case 52:
 			focusedPlanet = 3
-			//controls.target = new THREE.Vector3(drawPlanets[3].position.x,drawPlanets[3].position.y,drawPlanets[3].position.z)
 		break;
 		case 53:
 			focusedPlanet = 4
-			//controls.target = new THREE.Vector3(drawPlanets[4].position.x,drawPlanets[4].position.y,drawPlanets[4].position.z)
 		break;
 		case 54:
 			focusedPlanet = 5
-			//controls.target = new THREE.Vector3(drawPlanets[5].position.x,drawPlanets[5].position.y,drawPlanets[5].position.z)
 		break;
 		case 55:
 			focusedPlanet = 6
-			//controls.target = new THREE.Vector3(drawPlanets[6].position.x,drawPlanets[6].position.y,drawPlanets[6].position.z)
 		break;
 		case 56:
 			focusedPlanet = 7
-			//controls.target = new THREE.Vector3(drawPlanets[7].position.x,drawPlanets[7].position.y,drawPlanets[7].position.z)
 		break;
-
 	}
 })
-var xmlhttp = new XMLHttpRequest();
-var probePositions = []
-var url = "../../lib/data/probes/voyager1_solarEcliptic.txt"
-var probeGeometry = new THREE.Geometry();
-	probeGeometry.verticesNeedUpdate = true
-xmlhttp.open("GET", url, true);
-		xmlhttp.onreadystatechange = function() {
-			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			    var data = xmlhttp.responseText;
-			    data = data.split('\n');
-			    for(var d in data){
-			    	probePositions.push(data[d].split(/[ ]+/))
-			    }
-			    var probeMaterial = new THREE.LineBasicMaterial({
-					color: 0x0000ff
-				});
 
-			   	for(var p=1;p<probePositions.length-1;p++){ 
-					probeGeometry.vertices.push(
-						new THREE.Vector3( parseFloat(probePositions[p][2]), parseFloat(probePositions[p][4]), parseFloat(probePositions[p][3]) )
-					);
+var voyager1Positions = []
+xpl.probePositions('voyager1',voyager1Positions,function(){
+	var probeGeometry = new THREE.Geometry();
+		probeGeometry.verticesNeedUpdate = true
+	for(var v in voyager1Positions){
+		probeGeometry.vertices.push(
+			new THREE.Vector3( voyager1Positions[v].x, voyager1Positions[v].y, voyager1Positions[v].z )
+		);
+	}
+	var probeMaterial = new THREE.LineBasicMaterial({
+		color: 0x00ff00});
+	var line = new THREE.Line(probeGeometry,probeMaterial );
+	line.geometry.verticesNeedUpdate = true
+	scene.add(line)
+},"../../lib/data/probes/")
 
-				}
-				var line = new THREE.Line( probeGeometry, probeMaterial );
-				scene.add( line );
-		    }
-		}
-		xmlhttp.send(null);
+var voyager2Positions = []
+xpl.probePositions('voyager2',voyager2Positions,function(){
+	var probeGeometry = new THREE.Geometry();
+		probeGeometry.verticesNeedUpdate = true
+	for(var v in voyager2Positions){
+		probeGeometry.vertices.push(
+			new THREE.Vector3( voyager2Positions[v].x, voyager2Positions[v].y, voyager2Positions[v].z )
+		);
+	}
+	var probeMaterial = new THREE.LineBasicMaterial({
+		color: 0xffff00});
+	var line = new THREE.Line(probeGeometry,probeMaterial );
+	line.geometry.verticesNeedUpdate = true
+	scene.add(line)
+},"../../lib/data/probes/")
 
+var dawnPositions = []
+xpl.probePositions('dawn',dawnPositions,function(){
+	var probeGeometry = new THREE.Geometry();
+		probeGeometry.verticesNeedUpdate = true
+	for(var v in dawnPositions){
+		probeGeometry.vertices.push(
+			new THREE.Vector3( dawnPositions[v].x, dawnPositions[v].y, dawnPositions[v].z )
+		);
+	}
+	var probeMaterial = new THREE.LineBasicMaterial({
+		color: 0xff0000});
+	var line = new THREE.Line(probeGeometry,probeMaterial );
+	line.geometry.verticesNeedUpdate = true
+	scene.add(line)
+},"../../lib/data/probes/")
 
 
 window.addEventListener( 'resize', onWindowResize, false );
+
 function onWindowResize(){
 
     camera.aspect = window.innerWidth / window.innerHeight;
