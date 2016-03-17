@@ -90,19 +90,18 @@ function makePlanets(){
 
 makePlanets()
     
-   var mwGeo = new THREE.SphereGeometry(900,48,48)
-   var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide})
-   var mwMesh = new THREE.Mesh(mwGeo,mwMat)
-   loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
-        var texture = new THREE.Texture()
-        texture.image = image
-        texture.needsUpdate = true
-        mwMesh.material.map = texture
-        //how to get tilt of galactic plane?
-        mwMesh.rotation.set(0,0,60*Math.PI/180)
-        scene.add(mwMesh)
-   })
-
+var mwGeo = new THREE.SphereGeometry(900,48,48)
+var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide})
+var mwMesh = new THREE.Mesh(mwGeo,mwMat)
+loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
+    var texture = new THREE.Texture()
+    texture.image = image
+    texture.needsUpdate = true
+    mwMesh.material.map = texture
+    //how to get tilt of galactic plane?
+    mwMesh.rotation.set(0,0,60*Math.PI/180)
+    scene.add(mwMesh)
+})
 
 drawPlanets.forEach(function(planet, index){
 	var texturePath = "../../lib/data/images/"
@@ -117,13 +116,13 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
-    var ISSGeo = new THREE.SphereGeometry( .000001*solScale,16,16 );
-	var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-	var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
-	var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
-    var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
-   	scene.add(ISS_eci)
-	drawPlanets[2].add(ISS_ecf)
+var ISSGeo = new THREE.SphereGeometry( .000001*solScale,16,16 );
+var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
+var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
+	scene.add(ISS_eci)
+drawPlanets[2].add(ISS_ecf)
 
 	///TEST EARTH AXES
 	/*
@@ -152,8 +151,9 @@ controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].pos
 
 var render = function () {
 	//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
-	controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
-
+	if(focusedPlanet<9){
+		controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
+	}
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
 	//KEEP CAMERA LOOKING AT EARTH
     controls.update()
@@ -185,12 +185,9 @@ var render = function () {
 	
    	for(p in drawPlanets){
 		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t);
-        //curRotation could be worked into library. Formula is (% of day at time) * (length of day on planet/julian day) * 1 rotation in radians + difference between julian noon and solar noon
-        //var curRotation = ((xpl.now+t)%(xpl.planets[p].dayLength/23.9344))*2*Math.PI-0.166667
+		//launch of voyager 1
+        //var curPosition = xpl.SolarSystem(xpl.planets[p],2443391.500000+t);
 		var curRotation = xpl.planets[p].rotationAt(xpl.now+t)
-		//console.log(_curRotation)
-
-		//var oblique = xpl.planets[p].oblique*(Math.PI/180)
 		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
@@ -201,6 +198,7 @@ var render = function () {
 document.addEventListener("keydown",function(event){
 	switch(event.keyCode){
 		case 48:
+			focusedPlanet = 9
 			controls.target = new THREE.Vector3(0,0,0)
 		break;
 		case 49:
@@ -238,12 +236,37 @@ document.addEventListener("keydown",function(event){
 
 	}
 })
+var xmlhttp = new XMLHttpRequest();
+var probePositions = []
+var url = "../../lib/data/probes/voyager1_solarEcliptic.txt"
+var probeGeometry = new THREE.Geometry();
+	probeGeometry.verticesNeedUpdate = true
+xmlhttp.open("GET", url, true);
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			    var data = xmlhttp.responseText;
+			    data = data.split('\n');
+			    for(var d in data){
+			    	probePositions.push(data[d].split(/[ ]+/))
+			    }
+			    var probeMaterial = new THREE.LineBasicMaterial({
+					color: 0x0000ff
+				});
 
-// document.addEventListener("keyup",function(){
-// 	controls.zoomSpeed = .1
-// 	controls.rotateSpeed = .01
-// 	controls.panSpeed = .01
-// })
+			   	for(var p=1;p<probePositions.length-1;p++){ 
+					probeGeometry.vertices.push(
+						new THREE.Vector3( parseFloat(probePositions[p][2]), parseFloat(probePositions[p][4]), parseFloat(probePositions[p][3]) )
+					);
+
+				}
+				var line = new THREE.Line( probeGeometry, probeMaterial );
+				scene.add( line );
+		    }
+		}
+		xmlhttp.send(null);
+
+
+
 window.addEventListener( 'resize', onWindowResize, false );
 function onWindowResize(){
 
