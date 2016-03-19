@@ -69,6 +69,7 @@ li a:hover {
 }
 
 .documentationTop{
+	z-index: 0;
 	position: absolute;
 	margin: 0 auto;
 	width: 100%;
@@ -92,4 +93,19 @@ li a:hover {
 
 .topic{
 	margin: 0;
+}
+.credits{
+	position: absolute;
+	padding: 50px;
+	top: 11%;
+	left: 25%;
+	margin: 0 auto;
+	width:50%;
+	height: 100%;
+	background: rgba(0,0,0,.4);
+	font-family: "futura-pt",sans-serif;
+	color:white;
+	text-align: left;
+	font-family: "futura-pt",sans-serif;
+	font-size: 24px;
 }
