@@ -47,6 +47,7 @@ make it more navigable
 	}
 	//Basic vector math
 	//http://bitlab.io/vector-rotations-with-javascript
+	/*
 	function Vector(optional) { 
 	    if (optional) {
 	        this.x = optional.x
@@ -264,9 +265,6 @@ make it more navigable
 	//From http://www.onlineconversion.com/julian_date.htm
 	function dateFromJday(jd){
 			var	j1, j2, j3, j4, j5;			//scratch
-			// if(timezoneOffset!=0){
-			// 	jd+=timezoneOffset/24
-			// }
 			//
 			// get the date from the Julian day number
 			//
@@ -295,9 +293,6 @@ make it more navigable
 			var m = Math.floor(j5 - 1);
 			if( m > 12 ) m -= 12;
 			var y = Math.floor(j3 - 4715)
-			//var centuryDayLost = (2000-y)/100
-			//centuryDayLost<0 ? centuryDayLost=Math.ceil(centuryDayLost) : centuryDayLost=Math.floor(centuryDayLost)
-			//d+=centuryDayLost
 			if( m > 2 )   --y;
 			if( y <= 0 )  --y;
 
@@ -375,6 +370,9 @@ make it more navigable
 	}
 
 	///////////////////////COMPUTE PLANET POSITIONS//////////////////////////////
+
+	//1. Solar Ecliptic Coordinate System (SE)
+	//The SE is a heliocentric coordinate system with the Z-axis normal to and northward from the ecliptic plane. The X-axis extends toward the first point of Aries (Vernal Equinox, i.e. to the Sun from Earth in the first day of Spring). The Y-axis completes the right handed set. The Vernal Equinox direction changes slowly; commonly invoked equinox epochs are (1) B-1950, (2) Mean-of-(current) Date, and (3) J-2000. The ecliptic longitude SE_LONG increases from zero in the x-direction towards Y-direction; the latitude, SE_LAT increases to +90 deg towards north ecliptic pole and to -90 deg towards south pole.
 
 	// Functions for the planets from bkinsey808/simple_cal/astrotools/planets.js
 	// Copyright Ole Nielsen 2002-2004
@@ -820,6 +818,9 @@ make it more navigable
 				sdat[3], -26.74);
 	}
 	///WHERE DOES THE MOON FIT INTO ALL THIS?
+	xpl.MoonPos = function(jday,obs){
+		return MoonPos(jday,obs)
+	}
 	function MoonPos(jday, obs) {
 		// MoonPos calculates the Moon position and distance, based on Meeus chapter
 		// 47
@@ -4216,6 +4217,7 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	})*/
 
 	//TEXTURES
+	//http://www.solarsystemscope.com/nexus/
 
 	xpl.planetTex = ["mercury","venus","earth_day","mars","jupiter","saturn","uranus","neptune"]
 

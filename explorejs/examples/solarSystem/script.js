@@ -76,7 +76,8 @@ function makePlanets(){
 
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
-			sphere.rotateX(xpl.planets[p].oblique*Math.PI/180)
+			///ROTATE SPHERE OR TEXTURE 180?
+			sphere.rotateX((-xpl.planets[p].oblique*Math.PI/180)+Math.PI)
 			sphere.name = xpl.planets[p].name
 			drawPlanets.push(sphere);
 		}
@@ -111,13 +112,35 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
+var moonGeo = new THREE.SphereGeometry(xpl.kmtoau(1736.482)*solScale,32,32)
+var moonMat = new THREE.MeshLambertMaterial({color:0xffffff})
+var moonMesh = new THREE.Mesh(moonGeo,moonMat)
+var earthCenter = new THREE.Object3D()
+earthCenter.position.copy(drawPlanets[2].position)
+scene.add(earthCenter)
+loader.load( "../../lib/data/images/Moon.jpg", function (image) {
+				ptexture = new THREE.Texture();
+				ptexture.image = image;
+				ptexture.needsUpdate = true;
+				moonMesh.material.map = ptexture
+				moonMesh.rotateY(Math.PI/2)
+				earthCenter.add(moonMesh)
+				})	
+
+
+moonMesh.position.x = xpl.kmtoau(397111)
+var obs = {latitude:0,longitude:0,elevation:0}
+moonPosition = xpl.MoonPos(xpl.now, obs)
+earthCenter.rotation.y = moonPosition[3]
+earthCenter.rotation.x = drawPlanets[2].rotation.x+moonPosition[4]
+
 var ISSGeo = new THREE.SphereGeometry( .0000001*solScale,16,16 );
 var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
 var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
 	scene.add(ISS_eci)
-drawPlanets[2].add(ISS_ecf)
+	drawPlanets[2].add(ISS_ecf)
 
 	///TEST EARTH AXES
 	/*
@@ -137,9 +160,8 @@ drawPlanets[2].add(ISS_ecf)
 	*/
 	///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
+camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z-.0001)
 controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
-
 
 var render = function () {
 	//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
@@ -151,6 +173,7 @@ var render = function () {
 	xpl.updateTime()
 	var step = 0
 	t+=step;
+
 	var xyz = tlObj.update(t);
 	xyz = tlObj.position_ecf;
     
