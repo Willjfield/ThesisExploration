@@ -32,6 +32,7 @@ var light = new THREE.AmbientLight( 0x343434 ); // soft white light
 scene.add( light );
 
 var t = 0;
+var step = 0
 var drawPlanets = []
 var solScale = 1;
 xpl.setScale(solScale)
@@ -77,7 +78,8 @@ function makePlanets(){
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
 			///ROTATE SPHERE OR TEXTURE 180?
-			sphere.rotateX((-xpl.planets[p].oblique*Math.PI/180)+Math.PI)
+			//sphere.rotateX((-xpl.planets[p].oblique*Math.PI/180)+Math.PI)
+			sphere.rotateX(-xpl.planets[p].oblique*Math.PI/180)
 			sphere.name = xpl.planets[p].name
 			drawPlanets.push(sphere);
 		}
@@ -112,29 +114,33 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
-var moonGeo = new THREE.SphereGeometry(xpl.kmtoau(1736.482)*solScale,32,32)
+var moonGeo = new THREE.SphereGeometry(xpl.kmtoau(1736.482)*solScale*10,32,32)
 var moonMat = new THREE.MeshLambertMaterial({color:0xffffff})
 var moonMesh = new THREE.Mesh(moonGeo,moonMat)
 var earthCenter = new THREE.Object3D()
 earthCenter.position.copy(drawPlanets[2].position)
 scene.add(earthCenter)
+
+moonMesh.position.x = xpl.kmtoau(397111)
+var obs = {latitude:0,longitude:0,elevation:0}
+var moonPosition = xpl.MoonPos(xpl.now+t, obs)
+
 loader.load( "../../lib/data/images/Moon.jpg", function (image) {
 				ptexture = new THREE.Texture();
 				ptexture.image = image;
 				ptexture.needsUpdate = true;
 				moonMesh.material.map = ptexture
-				moonMesh.rotateY(Math.PI/2)
+				moonMesh.rotateY(Math.PI)
 				earthCenter.add(moonMesh)
+				earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
+				earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
 				})	
 
 
-moonMesh.position.x = xpl.kmtoau(397111)
-var obs = {latitude:0,longitude:0,elevation:0}
-moonPosition = xpl.MoonPos(xpl.now, obs)
-earthCenter.rotation.y = moonPosition[3]
-earthCenter.rotation.x = drawPlanets[2].rotation.x+moonPosition[4]
 
-var ISSGeo = new THREE.SphereGeometry( .0000001*solScale,16,16 );
+
+
+var ISSGeo = new THREE.SphereGeometry( .000001*solScale,16,16 );
 var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
@@ -160,10 +166,14 @@ var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
 	*/
 	///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z-.0001)
+camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z-.00001)
 controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 
 var render = function () {
+	earthCenter.position.copy(drawPlanets[2].position)
+	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
+	earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
+	moonPosition = xpl.MoonPos(xpl.now+t, obs)
 	//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
 	if(focusedPlanet<9){
 		controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
@@ -171,7 +181,7 @@ var render = function () {
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
     controls.update()
 	xpl.updateTime()
-	var step = 0
+	
 	t+=step;
 
 	var xyz = tlObj.update(t);
@@ -201,7 +211,7 @@ var render = function () {
 		var curRotation = xpl.planets[p].rotationAt(xpl.now+t)
 		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
-		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
+		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,-curPosition[1]*solScale)
 	}
 	renderer.render(scene, camera);
 };
@@ -214,27 +224,35 @@ document.addEventListener("keydown",function(event){
 		break;
 		case 49:
 			focusedPlanet = 0
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
 		break;
 		case 50:
 			focusedPlanet = 1
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
 		break;
 		case 51:
 			focusedPlanet = 2
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
 		break;
 		case 52:
 			focusedPlanet = 3
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
 		break;
 		case 53:
 			focusedPlanet = 4
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
 		break;
 		case 54:
 			focusedPlanet = 5
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
 		break;
 		case 55:
 			focusedPlanet = 6
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
 		break;
 		case 56:
 			focusedPlanet = 7
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
 		break;
 	}
 })
@@ -245,7 +263,7 @@ xpl.probePositions('voyager1',voyager1Positions,function(){
 		probeGeometry.verticesNeedUpdate = true
 	for(var v in voyager1Positions){
 		probeGeometry.vertices.push(
-			new THREE.Vector3( voyager1Positions[v].x, voyager1Positions[v].y, voyager1Positions[v].z )
+			new THREE.Vector3( voyager1Positions[v].x, voyager1Positions[v].y, -voyager1Positions[v].z )
 		);
 	}
 	var probeMaterial = new THREE.LineBasicMaterial({
@@ -261,7 +279,7 @@ xpl.probePositions('voyager2',voyager2Positions,function(){
 		probeGeometry.verticesNeedUpdate = true
 	for(var v in voyager2Positions){
 		probeGeometry.vertices.push(
-			new THREE.Vector3( voyager2Positions[v].x, voyager2Positions[v].y, voyager2Positions[v].z )
+			new THREE.Vector3( voyager2Positions[v].x, voyager2Positions[v].y, -voyager2Positions[v].z )
 		);
 	}
 	var probeMaterial = new THREE.LineBasicMaterial({
@@ -277,7 +295,7 @@ xpl.probePositions('dawn',dawnPositions,function(){
 		probeGeometry.verticesNeedUpdate = true
 	for(var v in dawnPositions){
 		probeGeometry.vertices.push(
-			new THREE.Vector3( dawnPositions[v].x, dawnPositions[v].y, dawnPositions[v].z )
+			new THREE.Vector3( dawnPositions[v].x, dawnPositions[v].y, -dawnPositions[v].z )
 		);
 	}
 	var probeMaterial = new THREE.LineBasicMaterial({
