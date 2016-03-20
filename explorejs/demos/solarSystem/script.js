@@ -114,16 +114,17 @@ drawPlanets.forEach(function(planet, index){
 				})		
 });
 
-var moonGeo = new THREE.SphereGeometry(xpl.kmtoau(1736.482)*solScale*10,32,32)
+var moonGeo = new THREE.SphereGeometry(xpl.kmtoau(1736.482)*solScale,32,32)
 var moonMat = new THREE.MeshLambertMaterial({color:0xffffff})
 var moonMesh = new THREE.Mesh(moonGeo,moonMat)
 var earthCenter = new THREE.Object3D()
 earthCenter.position.copy(drawPlanets[2].position)
 scene.add(earthCenter)
 
-moonMesh.position.x = xpl.kmtoau(397111)
+
 var obs = {latitude:0,longitude:0,elevation:0}
 var moonPosition = xpl.MoonPos(xpl.now+t, obs)
+moonMesh.position.x = xpl.kmtoau(moonPosition[9])
 
 loader.load( "../../lib/data/images/Moon.jpg", function (image) {
 				ptexture = new THREE.Texture();
@@ -173,7 +174,9 @@ var render = function () {
 	earthCenter.position.copy(drawPlanets[2].position)
 	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
 	earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
+
 	moonPosition = xpl.MoonPos(xpl.now+t, obs)
+	moonMesh.position.x = xpl.kmtoau(moonPosition[9])
 	//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
 	if(focusedPlanet<9){
 		controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)

@@ -4245,7 +4245,7 @@ function ecf_to_heliocentric(pos_ecf, jday){
 				    		z:parseFloat(probePositions[p][3]),
 				    		year:parseFloat(probePositions[p][0]),
 				    		day:parseFloat(probePositions[p][1]),
-				    		//jday: jday(...)
+				    		jday: jday(parseFloat(probePositions[p][0]), 1, 1, 0, 0, 0)+parseFloat(probePositions[p][1])
 				    	})
 				    }	
 				   callback()			
