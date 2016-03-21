@@ -357,11 +357,12 @@ document.addEventListener("keydown",function(event){
 document.getElementById("fastForward").addEventListener('click',function(){
 	speed++
 	if(speed<6){
-		// var highlightName = "speed"+speed
-		// document.getElementById(highlightName).style.boxShadow = '10px 5px 5px black;'
+		//var highlightName = "speed"+speed
+
 		for(var s=0; s<speed; s++){
-			var name = "speed"+speed
+			var name = "speed"+speed+1
 			document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
+			document.getElementById(name).style.borderColor = "transparent transparent transparent #0f0"
 			document.getElementById(name).style.left = (speed*20)+'px'
 		}
 	}
@@ -372,8 +373,8 @@ document.getElementById("rewind").addEventListener('click',function(){
 	if(speed>-6){
 		for(var s=0; s>speed; s--){
 			var name = "speed-"+speed
-			console.log(name)
 			document.getElementById("rewind").innerHTML+="<div id="+name+" class='speedRW'></div>"
+			document.getElementById(name).style.borderColor = "transparent transparent transparent #f00"
 			document.getElementById(name).style.left = (speed*20)+'px'
 		}
 	}

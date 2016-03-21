@@ -77,7 +77,7 @@ body{
 .speedRW{
   position: absolute;
   transform: rotate(180deg);
-  bottom:25%;
+  bottom:-10px;
   width: 0;
   height: 0;
   border-style: solid;
@@ -95,12 +95,12 @@ body{
 
 .speedFF{
   position: absolute;
-  bottom:25%;
+  bottom:-10px;
   width: 0;
   height: 0;
   border-style: solid;
   border-width: 12.5px 0 12.5px 21.667px;
-  border-color: transparent transparent transparent #3ec732;
+  border-color: transparent transparent transparent #4ea742;
 }
 
 #speed1{
@@ -113,7 +113,7 @@ body{
 
 #play{
   position: absolute;
-  top:25%;
+  bottom:52px;
   left:  50%;
   width: 0;
   height: 0;
