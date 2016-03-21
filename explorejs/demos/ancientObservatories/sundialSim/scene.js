@@ -197,7 +197,7 @@
 
 			function animate() {
 				xpl.updateTime()
-				speed = parseFloat(document.getElementById("speedSlider").value)
+				//speed = parseFloat(document.getElementById("speedSlider").value)
 
 				
 				speed = parseInt(document.getElementById("speedSlider").value)

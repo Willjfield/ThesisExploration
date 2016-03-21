@@ -2,11 +2,43 @@
 	<head>
 		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>-->
 		<script src="../../lib/three.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="../../style.css">
+		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>	
 		<script src="../../lib/explore.js"></script>
 		<script src="OrbitControls.js"></script>
-		<script src="script.js"></script>
+		
+		  <aside id="controls">
+			    <select id="planetSelector">
+			      <option value="9">Sun</option>
+			      <option value="0">Mercury</option>
+			      <option value="1">Venus</option>
+			      <option value="2">Earth</option>
+			      <option value="3">Mars</option>
+			      <option value="4">Jupiter</option>
+			      <option value="5">Saturn</option>
+			      <option value="6">Uranus</option>
+			      <option value="7">Neptune</option>
+			    </select>
+			    <button id="planetSelect">Select</button>
+			    <br>
+			    Move camera with planet <input id="moveWithPlanet" type="checkbox"> 
+			    <br>
+			    <div class="speed-" id="speed-1"></div>
+			    <div class="speed-" id="speed-2"></div>
+			    <div class="speed-" id="speed-3"></div>
+			    <div class="speed-" id="speed-4"></div>
+			    <div class="speed-" id="speed-5"></div>
+
+			    <div class="speed" id="speed1"></div>
+			    <div class="speed" id="speed2"></div>
+			    <div class="speed" id="speed3"></div>
+			    <div class="speed" id="speed4"></div>
+			    <div class="speed" id="speed5"></div>
+			    <h2 class="time">1 Second = 1 <span id="timescale">Second</span></h2>
+			    <input id="speedSlider" type="range"></input>
+			    <button id="resetTime">Reset to current time</button>
+		   </aside>
+		   <script src="script.js"></script>
 	</body>
 </html>

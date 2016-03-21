@@ -167,19 +167,55 @@ var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
 	*/
 	///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z-.00001)
+camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,-drawPlanets[2].position.z-.0001)
 controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 
+var planetSelector = document.getElementById("planetSelector")
+var planetSelected = 3
 var render = function () {
+
+	var speed = parseInt(document.getElementById("speedSlider").value)
+	var dir = speed > 0
+	dir *= 2
+	dir -= 1
+	//min hr day month year decade century
+	switch(Math.abs(speed)){
+		case 0:
+			step = 0
+			document.getElementById("timescale").innerHTML = 'Second'
+		break;
+		case 1:
+			step = 0.00001157407 * dir// 1 min/sec
+			document.getElementById("timescale").innerHTML = 'Minute'
+		break;
+		case 2:
+			step = 0.00069166666 * dir// 1 hr/sec
+			document.getElementById("timescale").innerHTML = 'Hour'
+		break;
+		case 3:
+			step = 0.0166 * dir// 1 day/sec
+			document.getElementById("timescale").innerHTML = 'Day'
+		break;
+		case 4:
+		 	step = 0.498 * dir// 1 month/sec
+		 	document.getElementById("timescale").innerHTML = 'Month'
+		break;
+		case 5:
+			step = 5.976 * dir// 1 yr/sec
+			document.getElementById("timescale").innerHTML = 'Year'
+		break;
+	}
+
 	earthCenter.position.copy(drawPlanets[2].position)
 	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
 	earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
 
 	moonPosition = xpl.MoonPos(xpl.now+t, obs)
 	moonMesh.position.x = xpl.kmtoau(moonPosition[9])
-	//camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y+.0001,drawPlanets[2].position.z)
 	if(focusedPlanet<9){
 		controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
+	}else{
+		controls.target = new THREE.Vector3(0,0,0)
 	}
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
     controls.update()
@@ -215,6 +251,14 @@ var render = function () {
 		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,-curPosition[1]*solScale)
+	}
+
+	if(document.getElementById("moveWithPlanet").checked){
+		camera.position.copy(drawPlanets[focusedPlanet].position)
+		var dist
+		focusedPlanet>3 ? dist = .002 : dist = .0001
+		camera.position.x+=dist
+		camera.position.z+=dist
 	}
 	renderer.render(scene, camera);
 };
@@ -311,12 +355,32 @@ xpl.probePositions('dawn',dawnPositions,function(){
 
 window.addEventListener( 'resize', onWindowResize, false );
 
+
+document.getElementById("speedSlider").min = -5
+document.getElementById("speedSlider").max = 5
+document.getElementById("speedSlider").step = 1
+document.getElementById("speedSlider").value = 0
+
 function onWindowResize(){
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize( window.innerWidth, window.innerHeight );
 
 }
+
+document.getElementById("planetSelect").addEventListener("mouseup",function(event){
+	planetSelected=parseInt(planetSelector.options[planetSelector.selectedIndex].value)
+	focusedPlanet = planetSelected
+	console.log(focusedPlanet)
+	var dist
+	focusedPlanet>3 ? dist = .001 : dist = .00005
+	camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-dist)
+
+})
+
+document.getElementById("resetTime").addEventListener("mouseup",function(event){
+	t = 0
+})
+
 render();
