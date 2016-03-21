@@ -16,9 +16,9 @@ var planetTextures
 function preload(){
 	var thisYear = xpl.dateFromJday(xpl.now,-5).year
 	
-	document.getElementById("speedSlider").min = -5
-	document.getElementById("speedSlider").max = 5
-	document.getElementById("speedSlider").step = .01
+	// document.getElementById("speedSlider").min = -5
+	// document.getElementById("speedSlider").max = 5
+	// document.getElementById("speedSlider").step = .01
 	document.getElementById("defaultCanvas0").style.position = 'absolute'
 
 	var mercuryTex = loadImage("img/mercury.png");
@@ -69,12 +69,44 @@ function draw(){
 }
 
 function manageSlider(){
-	speed = parseFloat(document.getElementById("speedSlider").value)
-	if(speed>0){
-		tOffset+=speed*speed*speed
-	}else{
-		tOffset+=speed*speed*speed
+	// speed = parseFloat(document.getElementById("speedSlider").value)
+	var dir = speed > 0
+	dir *= 2
+	dir -= 1
+	//min hr day month year decade century
+	switch(Math.abs(speed)){
+		case 0:
+			step = 0
+			document.getElementById("timescale").innerHTML = 'Second'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
+		break;
+		case 1:
+			step = 0.00001157407 * dir// 1 min/sec
+			document.getElementById("timescale").innerHTML = 'Minute'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
+		break;
+		case 2:
+			step = 0.00069166666 * dir// 1 hr/sec
+			document.getElementById("timescale").innerHTML = 'Hour'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
+		break;
+		case 3:
+			step = 0.0166 * dir// 1 day/sec
+			document.getElementById("timescale").innerHTML = 'Day'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
+		break;
+		case 4:
+		 	step = 0.498 * dir// 1 month/sec
+		 	document.getElementById("timescale").innerHTML = 'Month'
+		 	speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
+		break;
+		case 5:
+			step = 5.976 * dir// 1 yr/sec
+			document.getElementById("timescale").innerHTML = 'Year'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
+		break;
 	}
+	tOffset+=step
 	date = xpl.dateFromJday(xpl.now+tOffset,-5)
 
 	noStroke()
@@ -247,37 +279,37 @@ connection.prototype.draw = function(){
 	}
 }
 
-function mouseWheel(event) {
-	zoom-=(event.delta*.01)
-	zoom < .3 ? zoom = .3 : {}
-	zoom > 20 ? zoom = 20 : {}
-}
+// function mouseWheel(event) {
+// 	zoom-=(event.delta*.01)
+// 	zoom < .3 ? zoom = .3 : {}
+// 	zoom > 20 ? zoom = 20 : {}
+// }
 
-function mousePressed(){
-	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
-		for(var p in allPlanets){		
-			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
-				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
-					if (keyIsPressed === true) {
-						if(keyCode==SHIFT){
-							for(c in allPlanets[p].connections){
-								allPlanets[p].connections[c].osc.stop()
-							}
-							allPlanets[p].connections = []
-							break;
-						}
-					}
-				selectedPlanets.push(allPlanets[p])
-				selectedPlanets[0].isSelected = true
-				if(selectedPlanets.length>1){
-					selectedPlanets[0].connections.push(new connection(selectedPlanets[0],selectedPlanets[1]))					
-					selectedPlanets[0].isSelected = false
-					selectedPlanets = []
-				}
-			}
-		}
-	}
-}
+// function mousePressed(){
+// 	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
+// 		for(var p in allPlanets){		
+// 			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
+// 				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
+// 					if (keyIsPressed === true) {
+// 						if(keyCode==SHIFT){
+// 							for(c in allPlanets[p].connections){
+// 								allPlanets[p].connections[c].osc.stop()
+// 							}
+// 							allPlanets[p].connections = []
+// 							break;
+// 						}
+// 					}
+// 				selectedPlanets.push(allPlanets[p])
+// 				selectedPlanets[0].isSelected = true
+// 				if(selectedPlanets.length>1){
+// 					selectedPlanets[0].connections.push(new connection(selectedPlanets[0],selectedPlanets[1]))					
+// 					selectedPlanets[0].isSelected = false
+// 					selectedPlanets = []
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -285,4 +317,44 @@ function windowResized() {
   centerY = windowHeight/2
 }
 
-function mouseReleased(){}
+
+
+document.getElementById("fastForward").addEventListener('click',function(){
+	console.log("set speed "+speed)
+	speed++
+	speed < 0 ? speed = 0 : {}
+	if(speed<6){
+		for(var s=0; s<speed; s++){
+			var name = "speed"+speed+1
+			document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
+			document.getElementById(name).style.borderColor = "transparent transparent transparent #0f0"
+			document.getElementById(name).style.left = (speed*20)+'px'
+		}
+	}
+})
+
+document.getElementById("rewind").addEventListener('click',function(){
+	console.log("set speed "+speed)
+	speed--
+	speed > 0 ? speed = 0 : {}
+	if(speed>-6){
+		for(var s=0; s>speed; s--){
+			var name = "speed-"+speed
+			document.getElementById("rewind").innerHTML+="<div id="+name+" class='speedRW'></div>"
+			document.getElementById(name).style.borderColor = "transparent transparent transparent #f00"
+			document.getElementById(name).style.left = (speed*20)+'px'
+		}
+	}
+})
+
+document.getElementById("play").addEventListener('click',function(){
+	console.log("play")
+	speed=0
+	document.getElementById("fastForward").innerHTML = "<div id='speed1' class='speedFF'></div><div id='speed2' class='speedFF'></div>"
+	document.getElementById("rewind").innerHTML = "<div id='speed-1' class='speedRW'></div><div id='speed-2' class='speedRW'></div>"
+})
+
+document.getElementById("resetTime").addEventListener("click",function(event){
+	console.log("reset")
+	tOffset = 0
+})

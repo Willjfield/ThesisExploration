@@ -185,26 +185,33 @@ var render = function () {
 		case 0:
 			step = 0
 			document.getElementById("timescale").innerHTML = 'Second'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
+
 		break;
 		case 1:
 			step = 0.00001157407 * dir// 1 min/sec
 			document.getElementById("timescale").innerHTML = 'Minute'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 		break;
 		case 2:
 			step = 0.00069166666 * dir// 1 hr/sec
 			document.getElementById("timescale").innerHTML = 'Hour'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 		break;
 		case 3:
 			step = 0.0166 * dir// 1 day/sec
 			document.getElementById("timescale").innerHTML = 'Day'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 		break;
 		case 4:
 		 	step = 0.498 * dir// 1 month/sec
 		 	document.getElementById("timescale").innerHTML = 'Month'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 		break;
 		case 5:
 			step = 5.976 * dir// 1 yr/sec
 			document.getElementById("timescale").innerHTML = 'Year'
+			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 		break;
 	}
 
@@ -356,9 +363,9 @@ document.addEventListener("keydown",function(event){
 
 document.getElementById("fastForward").addEventListener('click',function(){
 	speed++
+	speed < 0 ? speed = 0 : {}
 	if(speed<6){
 		//var highlightName = "speed"+speed
-
 		for(var s=0; s<speed; s++){
 			var name = "speed"+speed+1
 			document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
@@ -370,6 +377,7 @@ document.getElementById("fastForward").addEventListener('click',function(){
 
 document.getElementById("rewind").addEventListener('click',function(){
 	speed--
+	speed > 0 ? speed = 0 : {}
 	if(speed>-6){
 		for(var s=0; s>speed; s--){
 			var name = "speed-"+speed
@@ -405,7 +413,7 @@ document.getElementById("planetSelect").addEventListener("mouseup",function(even
 	focusedPlanet = planetSelected
 	console.log(focusedPlanet)
 	var dist
-	focusedPlanet>3 ? dist = .001 : dist = .00005
+	focusedPlanet>3 ? dist = .001 : dist = .0001
 	camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-dist)
 
 })

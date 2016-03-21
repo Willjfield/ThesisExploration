@@ -32,10 +32,10 @@
 				speed = 0
 				tOffset = 0
 				//min hr day month year decade century
-				document.getElementById("speedSlider").min = -7
-				document.getElementById("speedSlider").max = 7
-				document.getElementById("speedSlider").step = 1
-				document.getElementById("speedSlider").value = 0
+				// document.getElementById("speedSlider").min = -7
+				// document.getElementById("speedSlider").max = 7
+				// document.getElementById("speedSlider").step = 1
+				// document.getElementById("speedSlider").value = 0
 
 
 				var date = xpl.dateFromJday(xpl.now,timeZone)
@@ -194,13 +194,12 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 			}
-
 			function animate() {
 				xpl.updateTime()
 				//speed = parseFloat(document.getElementById("speedSlider").value)
 
 				
-				speed = parseInt(document.getElementById("speedSlider").value)
+				// speed = parseInt(document.getElementById("speedSlider").value)
 
 				var dir = speed > 0
 				dir *= 2
@@ -208,38 +207,37 @@
 				//min hr day month year decade century
 				switch(Math.abs(speed)){
 					case 0:
-						document.getElementById("speedSlider").style.background = 'transparent'
+						step = 0
+						document.getElementById("timescale").innerHTML = 'Second'
+						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 					break;
 					case 1:
-						tOffset += 0.00001157407 * dir// 1 min/sec
-						document.getElementById("speedSlider").style.background = 'rgba(255,0,0,.1)'
+						step = 0.00001157407 * dir// 1 min/sec
+						document.getElementById("timescale").innerHTML = 'Minute'
+						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 					break;
 					case 2:
-						tOffset += 0.00069166666 * dir// 1 hr/sec
-						document.getElementById("speedSlider").style.background = 'rgba(255,100,0,.15)'
+						step = 0.00069166666 * dir// 1 hr/sec
+						document.getElementById("timescale").innerHTML = 'Hour'
+						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 					break;
 					case 3:
-						tOffset += 0.0166 * dir// 1 day/sec
-						document.getElementById("speedSlider").style.background = 'rgba(255,200,0,.2)'
+						step = 0.0166 * dir// 1 day/sec
+						document.getElementById("timescale").innerHTML = 'Day'
+						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 					break;
 					case 4:
-					 	tOffset += 0.498 * dir// 1 month/sec
-					 	document.getElementById("speedSlider").style.background = 'rgba(200,255,0,.25)'
+					 	step = 0.498 * dir// 1 month/sec
+					 	document.getElementById("timescale").innerHTML = 'Month'
+					 	speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 					break;
 					case 5:
-						tOffset += 5.976 * dir// 1 yr/sec
-						document.getElementById("speedSlider").style.background = 'rgba(100,255,0,.3)'
-					break;
-					case 6:
-						tOffset += 59.76 * dir// 1 decade/sec
-						document.getElementById("speedSlider").style.background = 'rgba(0,255,0,.35)'
-					break;
-					case 7:
-						tOffset += 597.6 * dir// 1 century/sec
-						document.getElementById("speedSlider").style.background = 'rgba(0,255,0,.45)'
+						step = 5.976 * dir// 1 yr/sec
+						document.getElementById("timescale").innerHTML = 'Year'
+						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
 					break;
 				}
-
+				tOffset+=step
 				//DISPLAY DATE vs CALC DATE
 				var date = xpl.dateFromJday(xpl.now+tOffset)
 				
@@ -292,8 +290,8 @@
 						var pAltAz = xpl.PlanetAlt(p,xpl.now+tOffset,obsPos)
 						planetArray[p].rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
 				}
-				console.log("actual "+(xpl.now+tOffset))
-				console.log(xpl.PlanetAlt(2,xpl.now+tOffset,obsPos)[1],xpl.PlanetAlt(2,xpl.now+tOffset,obsPos)[0])
+				//console.log("actual "+(xpl.now+tOffset))
+				//console.log(xpl.PlanetAlt(2,xpl.now+tOffset,obsPos)[1],xpl.PlanetAlt(2,xpl.now+tOffset,obsPos)[0])
 				requestAnimationFrame( animate );
 				render();
 			}
@@ -319,6 +317,43 @@
 				console.log(gnomonMesh.position)
 			}
 
+			document.getElementById("fastForward").addEventListener('click',function(){
+				speed++
+				speed < 0 ? speed = 0 : {}
+				if(speed<6){
+					//var highlightName = "speed"+speed
+
+					for(var s=0; s<speed; s++){
+						var name = "speed"+speed+1
+						document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
+						document.getElementById(name).style.borderColor = "transparent transparent transparent #0f0"
+						document.getElementById(name).style.left = (speed*20)+'px'
+					}
+				}
+			})
+
+			document.getElementById("rewind").addEventListener('click',function(){
+				speed--
+				speed > 0 ? speed = 0 : {}
+				if(speed>-6){
+					for(var s=0; s>speed; s--){
+						var name = "speed-"+speed
+						document.getElementById("rewind").innerHTML+="<div id="+name+" class='speedRW'></div>"
+						document.getElementById(name).style.borderColor = "transparent transparent transparent #f00"
+						document.getElementById(name).style.left = (speed*20)+'px'
+					}
+				}
+			})
+
+			document.getElementById("play").addEventListener('click',function(){
+				speed=0
+				document.getElementById("fastForward").innerHTML = "<div id='speed1' class='speedFF'></div><div id='speed2' class='speedFF'></div>"
+				document.getElementById("rewind").innerHTML = "<div id='speed-1' class='speedRW'></div><div id='speed-2' class='speedRW'></div>"
+			})
+
+			document.getElementById("resetTime").addEventListener("mouseup",function(event){
+				tOffset = 0
+			})
 			//FOR PLACING GNOMON
 			// document.getElementById("zGnomon").min = -2
 			// document.getElementById("zGnomon").max = 2
