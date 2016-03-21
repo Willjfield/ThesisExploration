@@ -279,37 +279,46 @@ connection.prototype.draw = function(){
 	}
 }
 
-// function mouseWheel(event) {
-// 	zoom-=(event.delta*.01)
-// 	zoom < .3 ? zoom = .3 : {}
-// 	zoom > 20 ? zoom = 20 : {}
-// }
+function mouseWheel(event) {
+	zoom-=(event.delta*.01)
+	zoom < .3 ? zoom = .3 : {}
+	zoom > 20 ? zoom = 20 : {}
+}
 
-// function mousePressed(){
-// 	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
-// 		for(var p in allPlanets){		
-// 			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
-// 				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
-// 					if (keyIsPressed === true) {
-// 						if(keyCode==SHIFT){
-// 							for(c in allPlanets[p].connections){
-// 								allPlanets[p].connections[c].osc.stop()
-// 							}
-// 							allPlanets[p].connections = []
-// 							break;
-// 						}
-// 					}
-// 				selectedPlanets.push(allPlanets[p])
-// 				selectedPlanets[0].isSelected = true
-// 				if(selectedPlanets.length>1){
-// 					selectedPlanets[0].connections.push(new connection(selectedPlanets[0],selectedPlanets[1]))					
-// 					selectedPlanets[0].isSelected = false
-// 					selectedPlanets = []
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+function mousePressed(){
+	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
+		for(var p in allPlanets){		
+			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
+				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
+					if (keyIsPressed === true) {
+						if(keyCode==SHIFT){
+							for(var op in allPlanets){
+								for( var cop in allPlanets[op].connections){
+									if(allPlanets[p].data.name==allPlanets[op].connections[cop].otherPlanet.data.name){
+										console.log(allPlanets[p].data.name)
+										allPlanets[op].connections[cop].osc.stop()
+										allPlanets[op].connections.splice(cop,1)
+									}
+								}
+							}
+							for(var c in allPlanets[p].connections){
+								allPlanets[p].connections[c].osc.stop()
+							}
+							allPlanets[p].connections = []
+							break;
+						}
+					}
+				selectedPlanets.push(allPlanets[p])
+				selectedPlanets[0].isSelected = true
+				if(selectedPlanets.length>1){
+					selectedPlanets[0].connections.push(new connection(selectedPlanets[0],selectedPlanets[1]))					
+					selectedPlanets[0].isSelected = false
+					selectedPlanets = []
+				}
+			}
+		}
+	}
+}
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
