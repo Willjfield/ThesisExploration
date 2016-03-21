@@ -172,9 +172,11 @@ controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].pos
 
 var planetSelector = document.getElementById("planetSelector")
 var planetSelected = 3
+var speed=0
 var render = function () {
 
-	var speed = parseInt(document.getElementById("speedSlider").value)
+	// var speed = parseInt(document.getElementById("speedSlider").value)
+	
 	var dir = speed > 0
 	dir *= 2
 	dir -= 1
@@ -263,47 +265,6 @@ var render = function () {
 	renderer.render(scene, camera);
 };
 
-document.addEventListener("keydown",function(event){
-	switch(event.keyCode){
-		case 48:
-			focusedPlanet = 9
-			controls.target = new THREE.Vector3(0,0,0)
-		break;
-		case 49:
-			focusedPlanet = 0
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 50:
-			focusedPlanet = 1
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 51:
-			focusedPlanet = 2
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 52:
-			focusedPlanet = 3
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 53:
-			focusedPlanet = 4
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-		case 54:
-			focusedPlanet = 5
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-		case 55:
-			focusedPlanet = 6
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-		case 56:
-			focusedPlanet = 7
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-	}
-})
-
 var voyager1Positions = []
 xpl.probePositions('voyager1',voyager1Positions,function(){
 	var probeGeometry = new THREE.Geometry();
@@ -352,21 +313,90 @@ xpl.probePositions('dawn',dawnPositions,function(){
 	scene.add(line)
 },"../../lib/data/probes/")
 
+document.addEventListener("keydown",function(event){
+	switch(event.keyCode){
+		case 48:
+			focusedPlanet = 9
+			controls.target = new THREE.Vector3(0,0,0)
+		break;
+		case 49:
+			focusedPlanet = 0
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
+		break;
+		case 50:
+			focusedPlanet = 1
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
+		break;
+		case 51:
+			focusedPlanet = 2
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
+		break;
+		case 52:
+			focusedPlanet = 3
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
+		break;
+		case 53:
+			focusedPlanet = 4
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
+		break;
+		case 54:
+			focusedPlanet = 5
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
+		break;
+		case 55:
+			focusedPlanet = 6
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
+		break;
+		case 56:
+			focusedPlanet = 7
+			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
+		break;
+	}
+})
+
+document.getElementById("fastForward").addEventListener('click',function(){
+	speed++
+	if(speed<6){
+		// var highlightName = "speed"+speed
+		// document.getElementById(highlightName).style.boxShadow = '10px 5px 5px black;'
+		for(var s=0; s<speed; s++){
+			var name = "speed"+speed
+			document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
+			document.getElementById(name).style.left = (speed*20)+'px'
+		}
+	}
+})
+
+document.getElementById("rewind").addEventListener('click',function(){
+	speed--
+	if(speed>-6){
+		for(var s=0; s>speed; s--){
+			var name = "speed-"+speed
+			console.log(name)
+			document.getElementById("rewind").innerHTML+="<div id="+name+" class='speedRW'></div>"
+			document.getElementById(name).style.left = (speed*20)+'px'
+		}
+	}
+})
+
+document.getElementById("play").addEventListener('click',function(){
+	speed=0
+	document.getElementById("fastForward").innerHTML = "<div id='speed1' class='speedFF'></div><div id='speed2' class='speedFF'></div>"
+	document.getElementById("rewind").innerHTML = "<div id='speed-1' class='speedRW'></div><div id='speed-2' class='speedRW'></div>"
+})
 
 window.addEventListener( 'resize', onWindowResize, false );
 
 
-document.getElementById("speedSlider").min = -5
-document.getElementById("speedSlider").max = 5
-document.getElementById("speedSlider").step = 1
-document.getElementById("speedSlider").value = 0
+// document.getElementById("speedSlider").min = -5
+// document.getElementById("speedSlider").max = 5
+// document.getElementById("speedSlider").step = 1
+// document.getElementById("speedSlider").value = 0
 
 function onWindowResize(){
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
-
 }
 
 document.getElementById("planetSelect").addEventListener("mouseup",function(event){

@@ -24,19 +24,18 @@
 			    <br>
 			    Move camera with planet <input id="moveWithPlanet" type="checkbox"> 
 			    <br>
-			    <div class="speed-" id="speed-1"></div>
-			    <div class="speed-" id="speed-2"></div>
-			    <div class="speed-" id="speed-3"></div>
-			    <div class="speed-" id="speed-4"></div>
-			    <div class="speed-" id="speed-5"></div>
-
-			    <div class="speed" id="speed1"></div>
-			    <div class="speed" id="speed2"></div>
-			    <div class="speed" id="speed3"></div>
-			    <div class="speed" id="speed4"></div>
-			    <div class="speed" id="speed5"></div>
+			    <div id="rewind">
+				    <div id="speed-1" class="speedRW"></div>
+				    <div id="speed-2" class="speedRW"></div>
+				</div>
+				<div id="play">
+				</div>
+				<div id="fastForward">
+				    <div id="speed1" class="speedFF"></div>
+				    <div id="speed2" class="speedFF"></div>
+				</div>
 			    <h2 class="time">1 Second = 1 <span id="timescale">Second</span></h2>
-			    <input id="speedSlider" type="range"></input>
+			    <!-- <input id="speedSlider" type="range"></input> -->
 			    <button id="resetTime">Reset to current time</button>
 		   </aside>
 		   <script src="script.js"></script>

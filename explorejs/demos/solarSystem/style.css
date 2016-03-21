@@ -63,20 +63,21 @@ body{
   bottom:-15px;
   text-align: center;
 }
-.speed{
+
+#fastforward{
   position: absolute;
-  top:25%;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 12.5px 0 12.5px 21.667px;
-  border-color: transparent transparent transparent #3ec732;
+  left:54%;
 }
 
-.speed-{
+#rewind{
+  position: absolute;
+  left:46%;
+}
+
+.speedRW{
   position: absolute;
   transform: rotate(180deg);
-  top:25%;
+  bottom:25%;
   width: 0;
   height: 0;
   border-style: solid;
@@ -85,33 +86,38 @@ body{
 }
 
 #speed-1{
-  left:48%;
+  left:0px;
 }
+
 #speed-2{
-  left:46%;
+    left:-20px;
 }
-#speed-3{
-  left:44%;
-}
-#speed-4{
-  left:42%;
-}
-#speed-5{
-  left:40%;
+
+.speedFF{
+  position: absolute;
+  bottom:25%;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 12.5px 0 12.5px 21.667px;
+  border-color: transparent transparent transparent #3ec732;
 }
 
 #speed1{
-  left:52%;
+  left:0px;
 }
+
 #speed2{
-  left:54%;
+  left:  20px;
 }
-#speed3{
-  left:56%;
-}
-#speed4{
-  left:58%;
-}
-#speed5{
-  left:60%;
+
+#play{
+  position: absolute;
+  top:25%;
+  left:  50%;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 12.5px 0 12.5px 21.667px;
+  border-color: transparent transparent transparent #999;
 }
