@@ -20,6 +20,7 @@ $(document).ready(function(){
         $("#intro").css("visibility","hidden")
    })
 })
+
 var satellites = []
 var visibleSats = []
 var img;

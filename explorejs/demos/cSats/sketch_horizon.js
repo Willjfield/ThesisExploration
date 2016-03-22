@@ -7,6 +7,21 @@ myAudio.addEventListener('ended', function() {
 }, false);
 myAudio.play();
 */
+$(document).ready(function(){
+  document.getElementById("loading").style.visibility="hidden"
+    if(sessionStorage.equirec_intro){
+        document.getElementById("loading").style.visibility="visible"
+        $("#equirec_intro").hide()
+    }
+   $("#equirec_close").click(function(){
+        $("#equirec_intro").hide()
+        sessionStorage.equirec_intro = true
+   })
+   $("#next").click(function(){
+        $("#equirec_intro").css("visibility","hidden")
+   })
+})
+
 var satellites = []
 var visibileSatsLookAngles = []
 var img;
@@ -27,6 +42,7 @@ function setup(){
         parseTLE(satellites, function(){
             drawSats()
             document.getElementById("loading").style.visibility="hidden"
+            document.getElementById("equirec_close").style.visibility="visible"
         })
     })
 }

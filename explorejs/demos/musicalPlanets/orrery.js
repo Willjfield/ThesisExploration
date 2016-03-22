@@ -1,6 +1,6 @@
 var planets=[]
 var allPlanets = []
-var spaceBackground, spaceMatte
+var spaceBackground
 var zoom
 var sun
 var centerX, centerY
@@ -32,6 +32,8 @@ function preload(){
 
 	planetTextures = 	[mercuryTex,venusTex,earthTex,marsTex,
 						jupiterTex,saturnTex,uranusTex,neptuneTex]
+
+	spaceBackground = loadImage("img/galaxy.png")
 }
 
 function setup(){
@@ -48,7 +50,9 @@ function setup(){
 }
 
 function draw(){
-	background(0, 25, 50)
+	imageMode(CORNER)
+	image(spaceBackground,0,0,width,height)
+	imageMode(CENTER)
 	ellipse(centerX,centerY,10*zoom,10*zoom)
 	
 	for(var p in allPlanets){
@@ -113,9 +117,9 @@ function manageSlider(){
 	fill(255)
 	textSize(30)
 	textAlign(CENTER)
-	text(date.month + "/",50,70)
-	text(date.day + "/",90,70)
-	text(date.year,150,70)
+	text(date.month + "/",50,height-50)
+	text(date.day + "/",90,height-50)
+	text(date.year,150,height-50)
 }
 
 var drawPlanet = function(planet){
@@ -270,13 +274,13 @@ connection.prototype.draw = function(){
 			boundedY=true
 		}
 	}
-	var onLineTest=(this.planet.worldPosition[0]-this.otherPlanet.worldPosition[0])*(mouseY-this.otherPlanet.worldPosition[1])-(this.planet.worldPosition[1]-this.otherPlanet.worldPosition[1])*(mouseX-this.otherPlanet.worldPosition[0])
-	var multAmnt = Math.abs((1000/(1000-(onLineTest/zoom))))
-	if(boundedX && boundedY){
-		this.osc.amp(multAmnt*.1)
-	}else{
-		this.osc.amp(.1)
-	}
+	// var onLineTest=(this.planet.worldPosition[0]-this.otherPlanet.worldPosition[0])*(mouseY-this.otherPlanet.worldPosition[1])-(this.planet.worldPosition[1]-this.otherPlanet.worldPosition[1])*(mouseX-this.otherPlanet.worldPosition[0])
+	// var multAmnt = Math.abs((1000/(1000-(onLineTest/zoom))))
+	// if(boundedX && boundedY){
+	// 	this.osc.amp(multAmnt*.1)
+	// }else{
+	// 	this.osc.amp(.1)
+	// }
 }
 
 function mouseWheel(event) {

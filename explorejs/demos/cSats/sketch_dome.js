@@ -7,6 +7,22 @@ myAudio.addEventListener('ended', function() {
 }, false);
 myAudio.play();
 */
+
+$(document).ready(function(){
+  document.getElementById("loading").style.visibility="hidden"
+    if(sessionStorage.dome_intro){
+        document.getElementById("loading").style.visibility="visible"
+        $("#dome_intro").hide()
+    }
+   $("#dome_close").click(function(){
+        $("#dome_intro").hide()
+        sessionStorage.dome_intro = true
+   })
+   $("#next").click(function(){
+        $("#dome_intro").css("visibility","hidden")
+   })
+})
+
 var satellites = []
 var visibileSatsLookAngles = []
 var img;
@@ -24,6 +40,7 @@ function setup(){
         latLong.longitude = location.coords.longitude
         parseTLE(satellites, function(){    
           document.getElementById("loading").style.visibility="hidden"
+          document.getElementById("dome_close").style.visibility="visible"
         })
     })
 }

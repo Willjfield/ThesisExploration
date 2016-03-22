@@ -122,3 +122,22 @@ canvas{
   color:white;
   font-family: Helvetica;
 }
+
+.info{
+  font-weight: lighter;
+  z-index: 999;
+  transition: top 0.2s ease;
+  position:absolute;
+  top:-190px;
+  padding-top:15px;
+  width:20%;
+  height:220px;
+  background:rgba(0,0,0,.2);
+  color:white;
+  font-family: Helvetica;
+}
+
+.info:hover{
+  background:rgba(0,0,0,.7);
+  top:0px;
+}
