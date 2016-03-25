@@ -91,6 +91,7 @@ makePlanets()
 var mwGeo = new THREE.SphereGeometry(900,48,48)
 var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide})
 var mwMesh = new THREE.Mesh(mwGeo,mwMat)
+
 loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
     var texture = new THREE.Texture()
     texture.image = image
@@ -136,10 +137,6 @@ loader.load( "../../lib/data/images/Moon.jpg", function (image) {
 				earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
 				earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
 				})	
-
-
-
-
 
 var ISSGeo = new THREE.SphereGeometry( .000001*solScale,16,16 );
 var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );

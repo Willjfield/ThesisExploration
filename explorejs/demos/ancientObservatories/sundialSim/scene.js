@@ -52,7 +52,7 @@
 				camera.position.set(0,0,0);
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x111116, 1);
+				renderer.setClearColor( 0x224488, 1);
 				renderer.shadowMap.enabled = true;
 				//renderer.shadowMapType = THREE.PCFSoftShadowMap;
 				//renderer.shadowMapSoft = true;
@@ -196,9 +196,7 @@
 			}
 			function animate() {
 				xpl.updateTime()
-				//speed = parseFloat(document.getElementById("speedSlider").value)
-
-				
+				//speed = parseFloat(document.getElementById("speedSlider").value)	
 				// speed = parseInt(document.getElementById("speedSlider").value)
 
 				var dir = speed > 0

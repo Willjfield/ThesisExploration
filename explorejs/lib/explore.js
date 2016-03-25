@@ -1,14 +1,8 @@
 /*
-scaling
-porting spice code or building on it?
 Tilt of milky way isn't right
 position eci are slightly off
 convert eci to helio isn't working
-moon ephemerides
-
 Add moons
-add probes
-make it more navigable
 */
 "use strict";
 (function(xpl,undefined){
@@ -4218,8 +4212,40 @@ function ecf_to_heliocentric(pos_ecf, jday){
 
 	//TEXTURES
 	//http://www.solarsystemscope.com/nexus/
+	//http://www.celestiamotherlode.net/
+	//http://visibleearth.nasa.gov/
 
 	xpl.planetTex = ["mercury","venus","earth_day","mars","jupiter","saturn","uranus","neptune"]
+
+	function loadPlanetImage(planet,type,callback,pathToData){
+		var name = planet.name
+		var baseUrl = pathToData || "data/probes/"
+		var _type = "_"+type
+
+		var url = corsURL+baseUrl+name+_type+".jpg"
+
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', url , true);
+		xhr.responseType = 'blob';
+
+		xhr.onload = function(e) {
+		  if (this.status == 200) {
+		    var blob = new Blob([this.response], {type: 'image/jpg'});
+		    callback()
+		  }
+		};
+		xhr.send();
+	}
+
+	function loadPlanetTextures(planet,callback,pathToData){
+		loadPlanetImage(planet,day,function(){
+			loadPlanetImage(planet,normal,function(){
+				loadPlanetImage(planet,specular,function(){
+						callback()
+				},pathToData)
+			},pathToData)
+		},pathToData)
+	}
 
 	///PROBES///
 	//http://omniweb.gsfc.nasa.gov/coho/helios/heli.html
