@@ -4217,35 +4217,36 @@ function ecf_to_heliocentric(pos_ecf, jday){
 
 	xpl.planetTex = ["mercury","venus","earth_day","mars","jupiter","saturn","uranus","neptune"]
 
-	function loadPlanetImage(planet,type,callback,pathToData){
-		var name = planet.name
-		var baseUrl = pathToData || "data/probes/"
-		var _type = "_"+type
+	///WHAT IF I APPEND THE PLANET OBJECT WITH THESE TEXTURES??
+	// function loadPlanetImage(planet,type,callback,pathToData){
+	// 	var name = planet.name
+	// 	var baseUrl = pathToData || "data/probes/"
+	// 	var _type = "_"+type
 
-		var url = corsURL+baseUrl+name+_type+".jpg"
+	// 	var url = corsURL+baseUrl+name+_type+".jpg"
 
-		var xhr = new XMLHttpRequest();
-		xhr.open('GET', url , true);
-		xhr.responseType = 'blob';
+	// 	var xhr = new XMLHttpRequest();
+	// 	xhr.open('GET', url , true);
+	// 	xhr.responseType = 'blob';
 
-		xhr.onload = function(e) {
-		  if (this.status == 200) {
-		    var blob = new Blob([this.response], {type: 'image/jpg'});
-		    callback()
-		  }
-		};
-		xhr.send();
-	}
+	// 	xhr.onload = function(e) {
+	// 	  if (this.status == 200) {
+	// 	    var blob = new Blob([this.response], {type: 'image/jpg'});
+	// 	    callback()
+	// 	  }
+	// 	};
+	// 	xhr.send();
+	// }
 
-	function loadPlanetTextures(planet,callback,pathToData){
-		loadPlanetImage(planet,day,function(){
-			loadPlanetImage(planet,normal,function(){
-				loadPlanetImage(planet,specular,function(){
-						callback()
-				},pathToData)
-			},pathToData)
-		},pathToData)
-	}
+	// function loadPlanetTextures(planet,callback,pathToData){
+	// 	loadPlanetImage(planet,day,function(){
+	// 		loadPlanetImage(planet,normal,function(){
+	// 			loadPlanetImage(planet,specular,function(){
+	// 					callback()
+	// 			},pathToData)
+	// 		},pathToData)
+	// 	},pathToData)
+	// }
 
 	///PROBES///
 	//http://omniweb.gsfc.nasa.gov/coho/helios/heli.html
