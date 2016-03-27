@@ -3,7 +3,7 @@
   z-index: 999;
   transition: bottom 0.2s ease;
   position:absolute;
-  bottom:-80px;
+  bottom:0px;
   padding-top:15px;
   width:100%;
   height:100px;
@@ -12,10 +12,10 @@
   font-family: Helvetica;
 }
 
-#controls:hover{
+/*#controls:hover{
   background:rgba(0,0,0,.7);
   bottom:0px;
-}
+}*/
 
 .selectPlanet{
    border: 0px;
@@ -123,6 +123,13 @@ body{
   border-style: solid;
   border-width: 12.5px 0 12.5px 21.667px;
   border-color: transparent transparent transparent #999;
+}
+
+#demo{
+  position: absolute;
+  bottom:52px;
+  left:  50%;
+  transform: translate(-50.5px,0px);
 }
 
 .speedControls{
