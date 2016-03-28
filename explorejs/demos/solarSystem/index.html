@@ -25,9 +25,18 @@
 			    Move camera with planet <input id="moveWithPlanet" type="checkbox"> 
 			    <br>
 					<div id="demo"></div>
-				    <h4 class="time">1 Second = 1 <span id="timescale">Second</span></h4>
-				    <button id="resetTime">Reset to now</button>
-				
+				    <h4 class="time">1 Spin = 1 
+				    	<select id="timeSelector">
+						      <option value="1">Minute</option>
+						      <option value="60">Hour</option>
+						      <option value="1440">Day</option>
+						      <option value="10080">Week</option>
+						      <option value="43800">Month</option>
+						      <option value="525600" selected="selected">Year</option>
+						      <option value="5256000">Decade</option>
+						      <option value="52560000">Century</option>
+						</select>
+					</h4>
 		   </aside>
 		   <script src="script.js"></script>
 	</body>

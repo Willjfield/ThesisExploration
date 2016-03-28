@@ -3,6 +3,8 @@ var tleLine2 = "2 25544  51.6438 179.7093 0001431 279.1916 222.9068 15.540427399
 var tlObj = new xpl.tle(tleLine1,tleLine2);
 var xyz = tlObj.update();
 
+var dial
+
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 65, window.innerWidth/window.innerHeight, 0.000001, 1000 );
 camera.position.set(0,0,100)
@@ -32,6 +34,7 @@ var light = new THREE.AmbientLight( 0x343434 ); // soft white light
 scene.add( light );
 
 var t = 0;
+var sumT = 0
 var step = 0
 var drawPlanets = []
 var solScale = 1;
@@ -172,44 +175,8 @@ var planetSelected = 3
 var speed=0
 var render = function () {
 
-	// var speed = parseInt(document.getElementById("speedSlider").value)
-	
-	var dir = speed > 0
-	dir *= 2
-	dir -= 1
-	//min hr day month year decade century
-	switch(Math.abs(speed)){
-		case 0:
-			step = 0
-			document.getElementById("timescale").innerHTML = 'Second'
-			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-
-		break;
-		case 1:
-			step = 0.00001157407 * dir// 1 min/sec
-			document.getElementById("timescale").innerHTML = 'Minute'
-			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-		break;
-		case 2:
-			step = 0.00069166666 * dir// 1 hr/sec
-			document.getElementById("timescale").innerHTML = 'Hour'
-			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-		break;
-		case 3:
-			step = 0.0166 * dir// 1 day/sec
-			document.getElementById("timescale").innerHTML = 'Day'
-			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-		break;
-		case 4:
-		 	step = 0.498 * dir// 1 month/sec
-		 	document.getElementById("timescale").innerHTML = 'Month'
-			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-		break;
-		case 5:
-			step = 5.976 * dir// 1 yr/sec
-			document.getElementById("timescale").innerHTML = 'Year'
-			speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-		break;
+	if(typeof dial != 'undefined'){
+		dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
 	}
 
 	earthCenter.position.copy(drawPlanets[2].position)
@@ -358,46 +325,7 @@ document.addEventListener("keydown",function(event){
 	}
 })
 
-// document.getElementById("fastForward").addEventListener('click',function(){
-// 	speed++
-// 	speed < 0 ? speed = 0 : {}
-// 	if(speed<6){
-// 		//var highlightName = "speed"+speed
-// 		for(var s=0; s<speed; s++){
-// 			var name = "speed"+speed+1
-// 			document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
-// 			document.getElementById(name).style.borderColor = "transparent transparent transparent #0f0"
-// 			document.getElementById(name).style.left = (speed*20)+'px'
-// 		}
-// 	}
-// })
-
-// document.getElementById("rewind").addEventListener('click',function(){
-// 	speed--
-// 	speed > 0 ? speed = 0 : {}
-// 	if(speed>-6){
-// 		for(var s=0; s>speed; s--){
-// 			var name = "speed-"+speed
-// 			document.getElementById("rewind").innerHTML+="<div id="+name+" class='speedRW'></div>"
-// 			document.getElementById(name).style.borderColor = "transparent transparent transparent #f00"
-// 			document.getElementById(name).style.left = (speed*20)+'px'
-// 		}
-// 	}
-// })
-
-// document.getElementById("play").addEventListener('click',function(){
-// 	speed=0
-// 	document.getElementById("fastForward").innerHTML = "<div id='speed1' class='speedFF'></div><div id='speed2' class='speedFF'></div>"
-// 	document.getElementById("rewind").innerHTML = "<div id='speed-1' class='speedRW'></div><div id='speed-2' class='speedRW'></div>"
-// })
-
 window.addEventListener( 'resize', onWindowResize, false );
-
-
-// document.getElementById("speedSlider").min = -5
-// document.getElementById("speedSlider").max = 5
-// document.getElementById("speedSlider").step = 1
-// document.getElementById("speedSlider").value = 0
 
 function onWindowResize(){
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -415,30 +343,29 @@ document.getElementById("planetSelect").addEventListener("mouseup",function(even
 
 })
 
-document.getElementById("resetTime").addEventListener("mouseup",function(event){
-	t = 0
-})
+document.getElementById('timeSelector').addEventListener("change", function() {
+    sumT = t
+    dial.set('value',0)
+});
 
 var logValue = function(e){
-		console.log(e.newVal)
-		t = e.newVal
-	}
+		t = sumT+(e.newVal/1440)
+}
 
-	YUI().use('dial', function(Y) {
-	    var dial = new Y.Dial({
-	        min:-100000,
-	        max:100000,
-	        stepsPerRevolution:365,
+YUI().use('dial', function(Y) {
+    	dial = new Y.Dial({
+	        min:-100000000000,
+	        max:100000000000,
+	        stepsPerRevolution:525600,
 	        value: 0,
 	        strings:{label:'',resetStr: 'Reset'},
 	        after : {
 	           valueChange: Y.bind(logValue, dial)
 	        }
-
-	    });
-		dial.render("#demo");
-		var labels = document.getElementsByClassName('yui3-dial-label')
-		labels[0].style.visibility='hidden'
-	});
+    	});
+	dial.render("#demo");
+	var labels = document.getElementsByClassName('yui3-dial-label')
+	labels[0].style.visibility='hidden'
+});
 
 render();
