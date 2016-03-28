@@ -4199,8 +4199,9 @@ function ecf_to_heliocentric(pos_ecf, jday){
 			    			line2 : tleresponse[s+2]
 			    		})
 			        }
+			    callback();
 		    }
-		    callback();
+		    
 		}
 		xmlhttp.send(null);
 	}
