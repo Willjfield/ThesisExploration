@@ -269,7 +269,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.update = function () {
 
-
 		var position = this.object.position;
 
 		offset.copy( position ).sub( this.target );
@@ -387,7 +386,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 		//event.preventDefault();
 		//see if controls are selected
-		if(parseInt(document.getElementById("controls").getBoundingClientRect().bottom)==window.innerHeight) return;
+		// if(parseInt(document.getElementById("controls").getBoundingClientRect().bottom)==window.innerHeight) return;
 		if ( event.button === scope.mouseButtons.ORBIT ) {
 			if ( scope.noRotate === true ) return;
 

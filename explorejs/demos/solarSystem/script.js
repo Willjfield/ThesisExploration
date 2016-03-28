@@ -1,14 +1,14 @@
-// var tleLine1 = "1 25544U 98067A   16072.60311259  .00012306  00000-0  19343-3 0  9998"
-// var tleLine2 = "2 25544  51.6438 179.7093 0001431 279.1916 222.9068 15.54042739989958"
-// var tlObj = new xpl.tle(tleLine1,tleLine2);
-var tlObj
-var satellites = []
-var xyz = new THREE.Vector3()
-xpl.getTLE('stations', satellites, function(){
-	console.log(satellites[0])
-	tlObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
-})
+var tleLine1 = "1 25544U 98067A   16072.60311259  .00012306  00000-0  19343-3 0  9998"
+var tleLine2 = "2 25544  51.6438 179.7093 0001431 279.1916 222.9068 15.54042739989958"
+var tlObj = new xpl.tle(tleLine1,tleLine2);
+// var tlObj
+// var satellites = []
+// var xyz = new THREE.Vector3()
 
+// xpl.getTLE('stations', satellites, function(){
+// 	console.log(satellites[0])
+// 	tlObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
+// })
 
 var dial
 
@@ -74,16 +74,17 @@ var manager = new THREE.LoadingManager();
 
 var loader = new THREE.ImageLoader( manager );
 
+var wireFrameMeshes=[]
 function makePlanets(){
 	for(var p in xpl.planets){	
 			var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.planets[p].radius)*solScale,48,48 );
 			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,/*wireframe: true*/} );
 			var sphere = new THREE.Mesh( geometry, material );
 			
-			var materialW = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: .5 } );
-			var geometryW = new THREE.SphereGeometry( xpl.planets[p].radius/planScale,8,8 );
+			var materialW = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: 1 } );
+			var geometryW = new THREE.SphereGeometry( xpl.planets[p].radius/planScale,6,6);
 			var sphereW = new THREE.Mesh( geometryW, materialW );
-			sphere.add(sphereW);
+			wireFrameMeshes.push(sphereW)
 
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
@@ -93,7 +94,6 @@ function makePlanets(){
 			sphere.name = xpl.planets[p].name
 			drawPlanets.push(sphere);
 		}
-   
 }
 
 makePlanets()
@@ -186,6 +186,10 @@ var render = function () {
 		dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
 	}
 
+	var date = xpl.dateFromJday(xpl.now+t+sumT)
+	document.getElementById('curDate').innerHTML='Current Date at Meridian: '+date.day+'/'+date.month+'/'+date.year
+
+
 	earthCenter.position.copy(drawPlanets[2].position)
 	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
 	earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
@@ -226,7 +230,7 @@ var render = function () {
     
 	requestAnimationFrame( render );
 	
-   	for(p in drawPlanets){
+   	for(var p in drawPlanets){
 		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t);
 		//launch of voyager 1
         //var curPosition = xpl.SolarSystem(xpl.planets[p],2443391.500000+t);
@@ -234,6 +238,10 @@ var render = function () {
 		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,-curPosition[1]*solScale)
+	
+		if(camera.position.distanceTo(drawPlanets[p].position)>.05){
+			drawPlanets[p].add(wireFrameMeshes[p])
+		}
 	}
 
 	if(document.getElementById("moveWithPlanet").checked){
@@ -244,6 +252,9 @@ var render = function () {
 		camera.position.z+=dist
 	}
 	renderer.render(scene, camera);
+	for(var p in wireFrameMeshes){
+		scene.remove(scene.add(wireFrameMeshes[p]))
+	}
 };
 
 var voyager1Positions = []
@@ -294,47 +305,6 @@ xpl.probePositions('dawn',dawnPositions,function(){
 	scene.add(line)
 },"../../lib/data/probes/")
 
-document.addEventListener("keydown",function(event){
-	switch(event.keyCode){
-		case 48:
-			focusedPlanet = 9
-			controls.target = new THREE.Vector3(0,0,0)
-		break;
-		case 49:
-			focusedPlanet = 0
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 50:
-			focusedPlanet = 1
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 51:
-			focusedPlanet = 2
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 52:
-			focusedPlanet = 3
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.0001)
-		break;
-		case 53:
-			focusedPlanet = 4
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-		case 54:
-			focusedPlanet = 5
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-		case 55:
-			focusedPlanet = 6
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-		case 56:
-			focusedPlanet = 7
-			camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-.001)
-		break;
-	}
-})
-
 window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
@@ -359,14 +329,14 @@ document.getElementById('timeSelector').addEventListener("change", function() {
 });
 
 var logValue = function(e){
-		t = sumT+(e.newVal/1440)
+		t = sumT+(e.newVal/14400)
 }
 
 YUI().use('dial', function(Y) {
     	dial = new Y.Dial({
 	        min:-100000000000,
 	        max:100000000000,
-	        stepsPerRevolution:525600,
+	        stepsPerRevolution:5256000,
 	        value: 0,
 	        strings:{label:'',resetStr: 'Reset'},
 	        after : {
@@ -376,6 +346,12 @@ YUI().use('dial', function(Y) {
 	dial.render("#demo");
 	var labels = document.getElementsByClassName('yui3-dial-label')
 	labels[0].style.visibility='hidden'
+	var resetButton = document.getElementsByClassName('yui3-dial-center-button')
+	resetButton[0].addEventListener('click',function(){
+			sumT = 0
+			t = 0
+			dial.set('value',0)
+		}, false)
 });
 
 render();
