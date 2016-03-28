@@ -125,6 +125,13 @@ body{
   border-color: transparent transparent transparent #999;
 }
 
+#demo{
+  position: absolute;
+  bottom:52px;
+  left:  50%;
+  transform: translate(-50.5px,0px);
+}
+
 .speedControls{
   width:400px;
   border: solid 1px white;
