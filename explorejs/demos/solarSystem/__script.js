@@ -358,46 +358,7 @@ document.addEventListener("keydown",function(event){
 	}
 })
 
-document.getElementById("fastForward").addEventListener('click',function(){
-	speed++
-	speed < 0 ? speed = 0 : {}
-	if(speed<6){
-		//var highlightName = "speed"+speed
-		for(var s=0; s<speed; s++){
-			var name = "speed"+speed+1
-			document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
-			document.getElementById(name).style.borderColor = "transparent transparent transparent #0f0"
-			document.getElementById(name).style.left = (speed*20)+'px'
-		}
-	}
-})
-
-document.getElementById("rewind").addEventListener('click',function(){
-	speed--
-	speed > 0 ? speed = 0 : {}
-	if(speed>-6){
-		for(var s=0; s>speed; s--){
-			var name = "speed-"+speed
-			document.getElementById("rewind").innerHTML+="<div id="+name+" class='speedRW'></div>"
-			document.getElementById(name).style.borderColor = "transparent transparent transparent #f00"
-			document.getElementById(name).style.left = (speed*20)+'px'
-		}
-	}
-})
-
-document.getElementById("play").addEventListener('click',function(){
-	speed=0
-	document.getElementById("fastForward").innerHTML = "<div id='speed1' class='speedFF'></div><div id='speed2' class='speedFF'></div>"
-	document.getElementById("rewind").innerHTML = "<div id='speed-1' class='speedRW'></div><div id='speed-2' class='speedRW'></div>"
-})
-
-window.addEventListener( 'resize', onWindowResize, false );
-
-
-// document.getElementById("speedSlider").min = -5
-// document.getElementById("speedSlider").max = 5
-// document.getElementById("speedSlider").step = 1
-// document.getElementById("speedSlider").value = 0
+window.addEventListener( 'resize', onWindowResize, false )
 
 function onWindowResize(){
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -418,5 +379,26 @@ document.getElementById("planetSelect").addEventListener("mouseup",function(even
 document.getElementById("resetTime").addEventListener("mouseup",function(event){
 	t = 0
 })
+
+// var logValue = function(e){
+// 		console.log(e.newVal)
+// 	}
+
+// 	YUI().use('dial', function(Y) {
+// 	    var dial = new Y.Dial({
+// 	        min:-100000,
+// 	        max:100000,
+// 	        stepsPerRevolution:100,
+// 	        value: 0,
+// 	        strings:{label:'',resetStr: 'Reset'},
+// 	        after : {
+// 	           valueChange: Y.bind(logValue, dial)
+// 	        }
+
+// 	    });
+// 		dial.render("#demo");
+// 		var labels = document.getElementsByClassName('yui3-dial-label')
+// 		labels[0].style.visibility='hidden'
+// 	});
 
 render();

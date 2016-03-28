@@ -24,9 +24,12 @@
 }
 
 body{
+  z-index: -999;
   margin: 0 auto;
 }
-
+canvas{
+  z-index: 999;
+}
 #speedSlider{
   position: absolute;
   display: block;
