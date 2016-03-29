@@ -52,6 +52,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.noPan = false;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
+	this.panSpeed = 1
+
 	// Set to true to automatically rotate around the target
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
@@ -195,8 +197,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 			targetDistance *= Math.tan( ( scope.object.fov / 2 ) * Math.PI / 180.0 );
 
 			// we actually don't use screenWidth, since perspective camera is fixed to screen height
-			scope.panLeft( 2 * deltaX * targetDistance / element.clientHeight );
-			scope.panUp( 2 * deltaY * targetDistance / element.clientHeight );
+			scope.panLeft( 2 * deltaX * this.panSpeed * targetDistance / element.clientHeight );
+			scope.panUp( 2 * deltaY * this.panSpeed* targetDistance / element.clientHeight );
 
 		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
@@ -217,7 +219,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( dollyScale === undefined ) {
 
-			dollyScale = getZoomScale();
+			dollyScale = .99//getZoomScale();
 
 		}
 
@@ -243,7 +245,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( dollyScale === undefined ) {
 
-			dollyScale = getZoomScale();
+			dollyScale = .99//getZoomScale();
 
 		}
 
@@ -382,14 +384,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseDown( event ) {
 		if ( scope.enabled === false ) return;
-		event.preventDefault();
+		//event.preventDefault();
+		//see if controls are selected
+		// if(parseInt(document.getElementById("controls").getBoundingClientRect().bottom)==window.innerHeight) return;
 		if ( event.button === scope.mouseButtons.ORBIT ) {
 			if ( scope.noRotate === true ) return;
 
 			state = STATE.ROTATE;
-
+			
 			rotateStart.set( event.clientX, event.clientY );
-
+			
 		} else if ( event.button === scope.mouseButtons.ZOOM ) {
 			if ( scope.noZoom === true ) return;
 

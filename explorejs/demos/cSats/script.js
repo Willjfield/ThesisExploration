@@ -56,16 +56,16 @@ function init() {
 
        //Background
         var geometryBG = new THREE.SphereGeometry( 2000, 48, 48 );
-        var materialBG = new THREE.MeshLambertMaterial( {  map: THREE.ImageUtils.loadTexture( 'textures/milkyway.png' ), color: 0xffffff, emmisive: 0xffffff} );
+        var materialBG = new THREE.MeshLambertMaterial( {  map: THREE.ImageUtils.loadTexture( '../../lib/data/images/milkywaypan_brunier.jpg' ), color: 0xffffff, emmisive: 0xffffff} );
 
         skybox = new THREE.Mesh( geometryBG, materialBG);
         skybox.material.side = THREE.DoubleSide;
+        skybox.rotateX(60*(Math.PI/180))
         scene.add( skybox );
 
         //Earth
         var earthGeo = new THREE.SphereGeometry(100,48,48);
 
-        //var earthMaterial = new THREE.MeshLambertMaterial();
         earthMaterial = new THREE.ShaderMaterial( {
             uniforms: {
                 time: { type: "f", value: 1.0 },
@@ -84,19 +84,16 @@ function init() {
             fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 	   
         } );
-	   earthMaterial.uniforms.cloudTexture.value.wrapS = THREE.RepeatWrapping;
+        earthMaterial.uniforms.cloudTexture.value.wrapS = THREE.RepeatWrapping;
 
         earth = new THREE.Mesh(earthGeo,earthMaterial);
-        //
+        
         scene.add(earth);
+        var earthAxis = new THREE.Vector3(0,1,0)
+        lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now)+.2)
         //earth.rotateY(xpl.planets[2].rotationAt(xpl.now))
         // Lights
         scene.add( new THREE.AmbientLight( 1 * 0x202020 ) );
-        // var directionalLight = new THREE.DirectionalLight( 1 * 0xffffff );
-        // directionalLight.position.x = 0.5;
-        // directionalLight.position.y = 0.5;
-        // directionalLight.position.z = 0.5;
-        // directionalLight.position.normalize();
 
         pointLight = new THREE.PointLight( 0xffffff, .2 );
         scene.add( pointLight );
@@ -105,18 +102,18 @@ function init() {
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild( renderer.domElement );
 
-        var debugCanvas = document.createElement( 'canvas' );
-        debugCanvas.width = 512;
-        debugCanvas.height = 512;
-        debugCanvas.style.position = 'absolute';
-        debugCanvas.style.top = '0px';
-        debugCanvas.style.left = '0px';
+        // var debugCanvas = document.createElement( 'canvas' );
+        // debugCanvas.width = 512;
+        // debugCanvas.height = 512;
+        // debugCanvas.style.position = 'absolute';
+        // debugCanvas.style.top = '0px';
+        // debugCanvas.style.left = '0px';
 
-        container.appendChild( debugCanvas );
+        // container.appendChild( debugCanvas );
 
-        debugContext = debugCanvas.getContext( '2d' );
-        debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
-        debugContext.strokeStyle = '#000000';
+        // debugContext = debugCanvas.getContext( '2d' );
+        // debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
+        // debugContext.strokeStyle = '#000000';
 
         window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -182,7 +179,6 @@ function createSats(){
                 geoC= new THREE.Geometry({ verticesNeedUpdate: true});
 
                 var satVelocity = [];
-                //console.log(tle_data)
 
                 for ( i = 0; i < 100; i ++ ) {
 
@@ -251,4 +247,30 @@ function createSats(){
 			}
                                                            
 }
+
+var logValue = function(e){
+        
+}
+
+YUI().use('dial', function(Y) {
+        var dial = new Y.Dial({
+            min:-100000000000,
+            max:100000000000,
+            stepsPerRevolution:5256000,
+            value: 0,
+            strings:{label:'',resetStr: 'Reset'},
+            after : {
+               valueChange: Y.bind(logValue, dial)
+            }
+        });
+    dial.render("#demo");
+    var labels = document.getElementsByClassName('yui3-dial-label')
+    labels[0].style.visibility='hidden'
+    var resetButton = document.getElementsByClassName('yui3-dial-center-button')
+    resetButton[0].addEventListener('click',function(){
+            sumT = 0
+            t = 0
+            dial.set('value',0)
+        }, false)
+});
 

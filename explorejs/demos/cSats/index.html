@@ -3,12 +3,14 @@
     <head>
         <title>Space Trash</title>
         <link rel="stylesheet" type="text/css" href="styles/styles.css">
+        <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
         <!--<script src="../../lib/three.min.js"></script>-->
         <script src="scripts/three.min.js"></script>
         <script src="../../lib/explore.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        
     </head>
-    <body>
+    <body class="yui3-skin-sam">
       <div class="modal">
         <span class="btn-close">x</span>
         <p>Space travel has produced enormous amounts of space trash. The trash consists of defunct satellites,
@@ -18,7 +20,7 @@
           Red dots represent areas where two pieces of debris will fly past each other at a close range, risking collision. In the lower left, you can fast forward to see where potential collisions may happen in the future.
         </p>
       </div>
-      <nav class="float-nav closed">
+<!--       <nav class="float-nav closed">
         <ul>
           <li>
             <a href="#">Time</a>
@@ -33,8 +35,25 @@
           </li>
         </ul>
         <a class="toggle" href="#">+</a>
-      </nav>
-      <div class ="credits"><b>By Team Kessler:</b><br> <a href="http://www.willjfield.com"target="_blank">Will Field</a> / <a href="http://www.adilsoubki.com/"target="_blank">Adil Soubki</a> / <a href="http://virtue68k.com/"target="_blank">Oskar Maria Grande</a> <br> Katie Orenstein / Olivia Ross / Nikola Soldeus</div>
+      </nav>  -->
+      
+        <aside id="controls">
+          <img src="Arrows.png" class="arrows">
+          <div id="demo"></div>     
+          <h4 class="time">Time Dial: 1 Spin = 1 
+            <select id="timeSelector">
+                  <option value="10">Minute</option>
+                  <option value="600">Hour</option>
+                  <option value="14400">Day</option>
+                  <option value="100800">Week</option>
+                  <option value="438000">Month</option>
+                  <option value="5256000" selected="selected">Year</option>
+                  <option value="52560000">Decade</option>
+                  <option value="525600000">Century</option>
+            </select>
+          </h4>
+
+        </aside>
     </body>
     <script>
       $('.btn-close').on('click', function() {
