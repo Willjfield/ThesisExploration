@@ -1,3 +1,4 @@
+var obs={}
 var container, stats;
 var camera, scene, controls, renderer, objects;
 var pointLight;
@@ -5,6 +6,8 @@ var roty;
 var sphere,earth, skybox;
 var earthMaterial;
 var materialP,particles, particleCount, geoP, geoC, particlesP, particlesC;
+
+var meshObs
 
 var particleTrail = [];
 var particleHeadArr = [];
@@ -25,12 +28,19 @@ var earthAxis = new THREE.Vector3(0,1,0)
 
 
 xpl.getTLE('classified', satellites, function(){
+    
     for(var sat in satellites){
        tle_data.push(new xpl.tle(satellites[sat].line1,satellites[sat].line2))
        tle_data[sat].update()
     }
-    init()
-    animate()
+
+    navigator.geolocation.getCurrentPosition(function(location){
+        obs.latitude = location.coords.latitude
+        obs.longitude = location.coords.longitude
+        obs.height = 0
+        init()
+        animate()
+    }) 
 })
 
 function map (val, in_min, in_max, out_min, out_max) {
@@ -38,17 +48,28 @@ function map (val, in_min, in_max, out_min, out_max) {
 }
 
 function init() {
+        // for(var sat in tle_data){
+        //     console.log(tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0))
+        //     // lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
+        //     // visibileSatsLookAngles.push(lookAngles)
+        // }
 
+
+                    
         roty = 0;
 
         container = document.createElement('div');
         document.body.appendChild(container);
 
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight,.01, 4000 );
+        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight,.01, 6000 );
         camera.position.set( 0, 0, 400 );
 
         controls = new THREE.OrbitControls( camera );
                                 controls.damping = 0.2;
+                                controls.minDistance = 0;
+                                controls.maxDistance = 2700;
+                                controls.minPolarAngle = 0; // radians
+                                controls.maxPolarAngle = Infinity;
                                 controls.addEventListener( 'change',render);
 			
 
@@ -60,7 +81,7 @@ function init() {
         var size = 500, step = 100;
 
        //Background
-        var geometryBG = new THREE.SphereGeometry( 2000, 48, 48 );
+        var geometryBG = new THREE.SphereGeometry( 5000, 48, 48 );
         var materialBG = new THREE.MeshLambertMaterial( {  map: THREE.ImageUtils.loadTexture( '../../lib/data/images/milkywaypan_brunier.jpg' ), color: 0xffffff, emmisive: 0xffffff} );
 
         skybox = new THREE.Mesh( geometryBG, materialBG);
@@ -101,6 +122,15 @@ function init() {
 
         pointLight = new THREE.PointLight( 0xffffff, .2 );
         scene.add( pointLight );
+        var my_geodetic = new xpl.createGeodetic(obs.longitude,obs.latitude, obs.height);
+        var myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
+        
+        var geometryObs= new THREE.SphereGeometry( 1, 48, 48 );
+        var materialObs = new THREE.MeshBasicMaterial( {  color: 0xff0000} );
+
+        meshObs = new THREE.Mesh( geometryObs, materialObs);
+        meshObs.position.set(myposition.x*.0156,myposition.z*.0156,myposition.y*-.0156)
+        scene.add( meshObs );
 
         renderer = new THREE.WebGLRenderer({ antialias: true, autoClear: true });
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -137,8 +167,11 @@ function loadImage( path ) {
 }
 
 function animate() {
+    skybox.rotation.z = ((xpl.now+timeOffset+sumT)%1)*2*Math.PI
     var date = xpl.dateFromJday(xpl.now+timeOffset+sumT)
-    document.getElementById('curDate').innerHTML=date.day+'/'+date.month+'/'+date.year+'<br>'+date.hour+':'+date.minute
+    var minute = date.minute
+    date.minute<10 ? minute = '0'+date.minute.toString() : {}
+    document.getElementById('curDate').innerHTML=date.day+'/'+date.month+'/'+date.year+'<br>'+date.hour+':'+minute + " UTC"
 
     if(typeof dial != 'undefined'){
         dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
@@ -147,10 +180,9 @@ function animate() {
         var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
         lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
         requestAnimationFrame( animate );
-	   changeRot = 0.00000243*speedupFactor;
         xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
 	   earthMaterial.uniforms.sunDirection.value = lightDir 
-     	earthMaterial.uniforms.texOffset.value -= changeRot/10;	
+     	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
 	createSats();
     }, 1000/30);
 
@@ -163,9 +195,9 @@ function animate() {
 	particleHeadArr.shift();	
    }
     
-    if(particleTrail.length>(1/Math.pow(speedupFactor,2))*1000){
+    if(particleTrail.length>500){
     	scene.remove(particleTrail[0]);
-	particleTrail.shift();
+	   particleTrail.shift();
     }
 
     if(collisionArr.length>20){
@@ -234,8 +266,6 @@ function createSats(){
                         materialT = new THREE.PointCloudMaterial( { size: 1, sizeAttenuation: false, transparent: true, alpha: .5 } );
                        materialT.color.setHSL(.6,1,.6); 	
 
-                        materialC = new THREE.PointCloudMaterial( { color: 0xFFFFFF,size: 30, sizeAttenuation: true, map: THREE.ImageUtils.loadTexture('textures/collision.png'), transparent: true, alphaTest: 0.01 } );
-
                         particleHead = new THREE.PointCloud( geoP, materialP );
                         particleHead.sortParticles = true;
 			
@@ -249,13 +279,6 @@ function createSats(){
 			particleHeadArr.push(particleHead)
 			for(p in particleHeadArr){
 				scene.add(particleHeadArr[p])
-			}
-
-
-                        particlesC = new THREE.PointCloud( geoC, materialC );
-                        collisionArr.push(particlesC)
-			for(c in collisionArr){
-				scene.add(collisionArr[c])
 			}
                                                            
 }

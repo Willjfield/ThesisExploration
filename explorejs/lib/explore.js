@@ -3848,7 +3848,7 @@ function ecf_to_eci (ecf_coords, gmst){
     var Z =  ecf_coords["z"];
     return { x : X, y : Y, z : Z };
 }
-
+// xpl.geodetic_to_ecf = function(geodetic_coords){}
 function geodetic_to_ecf (geodetic_coords){
     var longitude   = geodetic_coords["longitude"];
     var latitude    = geodetic_coords["latitude"];
