@@ -4222,11 +4222,12 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	console.log(stations)
 	})*/
 
-	xpl.batchTLEUpdate = function (tle_data) {
+	xpl.batchTLEUpdate = function (tle_data, t) {
+		typeof t == "undefined" ? t = 0 : {}
 	    for (var key in tle_data) {
 	        if (tle_data.hasOwnProperty(key)) {
 	            var obj = tle_data[key];
-	            obj.update();
+	            obj.update(t);
 	        }
 	    }
 	}

@@ -19,6 +19,11 @@ var tle_data = []
 var xyz = new THREE.Vector3()
 var satellites = []
 
+var timeOffset = 0
+var sumT = 0
+var earthAxis = new THREE.Vector3(0,1,0)
+
+
 xpl.getTLE('classified', satellites, function(){
     for(var sat in satellites){
        tle_data.push(new xpl.tle(satellites[sat].line1,satellites[sat].line2))
@@ -89,8 +94,7 @@ function init() {
         earth = new THREE.Mesh(earthGeo,earthMaterial);
         
         scene.add(earth);
-        var earthAxis = new THREE.Vector3(0,1,0)
-        lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now)+.2)
+        lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset)+.2)
         //earth.rotateY(xpl.planets[2].rotationAt(xpl.now))
         // Lights
         scene.add( new THREE.AmbientLight( 1 * 0x202020 ) );
@@ -133,10 +137,16 @@ function loadImage( path ) {
 }
 
 function animate() {
+    
+    if(typeof dial != 'undefined'){
+        dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
+    }
     setTimeout(function() {
+        var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
+        lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset)+.2)
         requestAnimationFrame( animate );
 	   changeRot = 0.00000243*speedupFactor;
-        xpl.batchTLEUpdate(tle_data)
+        xpl.batchTLEUpdate(tle_data, timeOffset)
 	   earthMaterial.uniforms.sunDirection.value = lightDir 
      	earthMaterial.uniforms.texOffset.value -= changeRot/10;	
 	createSats();
@@ -169,7 +179,7 @@ function render() {
         pointLight.position.y = 0;
         pointLight.position.z = -100;
     }
-
+    skybox.position.copy(camera.position)
     renderer.render( scene, camera );
 }
 
@@ -247,16 +257,21 @@ function createSats(){
 			}
                                                            
 }
+var dial
+document.getElementById('timeSelector').addEventListener("change", function() {
+    sumT = timeOffset
+    dial.set('value',0)
+});
 
 var logValue = function(e){
-        
+        timeOffset = sumT+(e.newVal/14400)
 }
 
 YUI().use('dial', function(Y) {
-        var dial = new Y.Dial({
+        dial = new Y.Dial({
             min:-100000000000,
             max:100000000000,
-            stepsPerRevolution:5256000,
+            stepsPerRevolution:10,
             value: 0,
             strings:{label:'',resetStr: 'Reset'},
             after : {
@@ -269,7 +284,7 @@ YUI().use('dial', function(Y) {
     var resetButton = document.getElementsByClassName('yui3-dial-center-button')
     resetButton[0].addEventListener('click',function(){
             sumT = 0
-            t = 0
+            timeOffset = 0
             dial.set('value',0)
         }, false)
 });
