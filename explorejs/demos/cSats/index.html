@@ -1,14 +1,107 @@
+<!DOCTYPE HTML>
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <script src="../../lib/p5.min.js"></script>
+        <title>Space Trash</title>
+        <link rel="stylesheet" type="text/css" href="styles/styles.css">
+        <!--<script src="../../lib/three.min.js"></script>-->
+        <script src="scripts/three.min.js"></script>
         <script src="../../lib/explore.js"></script>
-        <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-        <script src="sketch_alt.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     </head>
     <body>
-        <div id="intro">Around the world, a small but dedicated group of amateur astronomers track undocumented satellites using mainly consumer telescopes and stopwatches. Most of these are classified military and reconaissance satellites. Others are pieces of debris or items of completely unknown origin. The following are real-time visualizations of the altitude of these spacecraft above the horizon at your current location, as well as cylindrical and polar maps you can use to spot them yourself. Learn more about amateur satellite tracking at the <a href="http://www.satobs.org/">Visual Satellite Observer's Home Page</a><div id="close">close</div></div>
-        <h1 id="loading">looking for satellites...<br> (figuring out how high up the satellites are above you right now)</h1>
-        <a href="equirec.html" id="next" style="position:absolute; text-decoration: none; font-size:32px; font-family:helvetica; bottom:50%; right:15px; z-index:1; color:white">NEXT</a>
+      <div class="modal">
+        <span class="btn-close">x</span>
+        <p>Space travel has produced enormous amounts of space trash. The trash consists of defunct satellites,
+          spent fuselages, and random debris that breaks away from ships. This site tracks some of that trash in real time.
+          <br>
+          <br>
+          Red dots represent areas where two pieces of debris will fly past each other at a close range, risking collision. In the lower left, you can fast forward to see where potential collisions may happen in the future.
+        </p>
+      </div>
+      <nav class="float-nav closed">
+        <ul>
+          <li>
+            <a href="#">Time</a>
+            <a href="#" class="current-time pull-right">1</a>
+          </li>
+          <li>
+            <a href="#">Speed</a>
+            <a href="#" class="speed-factor pull-right">1</a>
+          </li>
+          <li>
+            <input type="range" min="1" max="1000" step="1" value="0"/>
+          </li>
+        </ul>
+        <a class="toggle" href="#">+</a>
+      </nav>
+      <div class ="credits"><b>By Team Kessler:</b><br> <a href="http://www.willjfield.com"target="_blank">Will Field</a> / <a href="http://www.adilsoubki.com/"target="_blank">Adil Soubki</a> / <a href="http://virtue68k.com/"target="_blank">Oskar Maria Grande</a> <br> Katie Orenstein / Olivia Ross / Nikola Soldeus</div>
     </body>
+    <script>
+      $('.btn-close').on('click', function() {
+        $('.modal').hide();
+      });
+    </script>
+    <script language="javascript" src="lib/clock-speedup.js"></script>
+    <!--<script language="javascript" src="scripts/tle.js"></script>-->
+    <script language="javascript" src="scripts/OrbitControls.js"></script>
+    <script id="fragmentShader" type="x-shader/x-fragment">
+
+      uniform sampler2D dayTexture;
+      uniform sampler2D nightTexture;
+      uniform sampler2D normalTexture;
+      uniform sampler2D cloudTexture;
+      uniform float texOffset;
+
+      uniform vec3 sunDirection;
+
+      varying vec2 vUv;
+      varying vec3 vNormal;
+
+      void main( void ) {
+
+      		vec3 bumpDir = vec3(0.0,-0.2,1.0);
+                      vec3 dayColor = texture2D( dayTexture, vUv ).rgb;
+                      vec3 nightColor = texture2D( nightTexture, vUv ).rgb;
+                      vec3 cloudColor = texture2D(cloudTexture, vUv+vec2(texOffset,0.0)).rgb; 
+      		//RGB of our normal map
+      		vec3 NormalMap = texture2D(normalTexture, vUv).rgb;
+
+      		 //normalize our vectors
+      		vec3 N = normalize(NormalMap * 2.0 - 1.0);
+      		vec3 L = normalize(bumpDir * 2.0 - 1.0);
+      		float Diffuse = (dot(N, L)-0.5)*.25;
+
+      		// compute cosine sun to normal so -1 is away from sun and +1 is toward sun.
+          float cosineAngleSunToNormal = dot(normalize(vNormal), sunDirection);
+
+          // sharpen the edge beween the transition
+          cosineAngleSunToNormal = clamp( cosineAngleSunToNormal * 10.0, -1.0, 1.0);
+
+          // convert to 0 to 1 for mixing
+          float mixAmount = cosineAngleSunToNormal*0.5 + 0.5;
+
+          // Select day or night texture based on mix.
+          vec3 color = mix( (nightColor+(cloudColor*.2)), (dayColor+cloudColor), mixAmount )+Diffuse;
+          //the calculation which brings it all together
+          gl_FragColor = vec4( color, 1.0 );
+      }
+    </script>
+
+    <script id="vertexShader" type="x-shader/x-vertex">
+
+      varying vec2 vUv;
+      varying vec3 vNormal;
+
+      void main()
+      {
+        vUv = uv;
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        //vNormal = normalMatrix * normal;
+        vNormal = normal;
+        gl_Position = projectionMatrix * mvPosition;
+        //gl_Position = mvPosition;
+      }
+
+    </script>
+    <script language="javascript" src="script.js"></script>
 </html>

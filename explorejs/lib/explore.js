@@ -4126,9 +4126,7 @@ function ecf_to_heliocentric(pos_ecf, jday){
 }
 */
 
-	var corsURL = "http://cors.io/?u="
-	var celestrakTypeURL = "http://www.celestrak.com/NORAD/elements/"
-	var celestrakNORAD = "http://celestrak.com/cgi-bin/TLE.pl?CATNR="
+	
 
 	var categories = {
 		 newTLE : "tle-new.txt",
@@ -4171,21 +4169,34 @@ function ecf_to_heliocentric(pos_ecf, jday){
 		 military : "military.txt",
 		 radar : "radar.txt",
 		 cubesats : "cubesat.txt",
-		 other : "other.txt"
+		 other : "other.txt",
+		 classified:"inttles.txt"
 	}
 	//classified:
 	//var classified = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
 
 	var xmlhttp = new XMLHttpRequest();
 
-	xpl.getTLE = function(query, satellites, callback){
-		var url;
+	xpl.getTLE = function(query, satellites, callback, pathToData){
+		var path = ''
+		var corsURL = "http://cors.io/?u="
+		var celestrakTypeURL = "http://www.celestrak.com/NORAD/elements/"
+		var celestrakNORAD = "http://celestrak.com/cgi-bin/TLE.pl?CATNR="
+		var url
+		
+		if(query == 'classified') {
+			celestrakTypeURL='' 
+			corsURL=""
+			typeof pathToData == 'undefined' ? path='../../lib/data/':{}
+		}
+
 		if(query in categories){
-			url = corsURL + celestrakTypeURL + categories[query]
+			url = path+corsURL + celestrakTypeURL + categories[query]
 		}else{
 			console.log("not a valid query")
 			return 0;
 		}
+
 		xmlhttp.open("GET", url, true);
 		xmlhttp.onreadystatechange = function() {
 			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -4210,6 +4221,15 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	getTLE("stations", stations, function(){
 	console.log(stations)
 	})*/
+
+	xpl.batchTLEUpdate = function (tle_data) {
+	    for (var key in tle_data) {
+	        if (tle_data.hasOwnProperty(key)) {
+	            var obj = tle_data[key];
+	            obj.update();
+	        }
+	    }
+	}
 
 	//TEXTURES
 	//http://www.solarsystemscope.com/nexus/

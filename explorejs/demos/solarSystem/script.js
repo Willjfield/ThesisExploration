@@ -1,14 +1,14 @@
-var tleLine1 = "1 25544U 98067A   16072.60311259  .00012306  00000-0  19343-3 0  9998"
-var tleLine2 = "2 25544  51.6438 179.7093 0001431 279.1916 222.9068 15.54042739989958"
-var tlObj = new xpl.tle(tleLine1,tleLine2);
-// var tlObj
-// var satellites = []
-// var xyz = new THREE.Vector3()
+// var tleLine1 = "1 25544U 98067A   16072.60311259  .00012306  00000-0  19343-3 0  9998"
+// var tleLine2 = "2 25544  51.6438 179.7093 0001431 279.1916 222.9068 15.54042739989958"
+// var tlObj = new xpl.tle(tleLine1,tleLine2);
+var tlObj
+var satellites = []
+var xyz = new THREE.Vector3()
 
-// xpl.getTLE('stations', satellites, function(){
-// 	console.log(satellites[0])
-// 	tlObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
-// })
+xpl.getTLE('stations', satellites, function(){
+	console.log(satellites[0])
+	tlObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
+})
 
 var dial
 
