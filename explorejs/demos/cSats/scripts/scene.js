@@ -157,6 +157,9 @@ function animate() {
     	scene.remove(collisionArr[0]);
 	collisionArr.shift();
     }
+
+    var date = xpl.dateFromJday(xpl.now+t+sumT)
+    document.getElementById('curDate').innerHTML='Current Date at Meridian: '+date.day+'/'+date.month+'/'+date.year
 }
 
 function render() { 

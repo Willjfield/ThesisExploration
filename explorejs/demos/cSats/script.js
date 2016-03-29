@@ -137,16 +137,18 @@ function loadImage( path ) {
 }
 
 function animate() {
-    
+    var date = xpl.dateFromJday(xpl.now+timeOffset+sumT)
+    document.getElementById('curDate').innerHTML=date.day+'/'+date.month+'/'+date.year+'<br>'+date.hour+':'+date.minute
+
     if(typeof dial != 'undefined'){
         dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
     }
     setTimeout(function() {
         var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
-        lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset)+.2)
+        lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
         requestAnimationFrame( animate );
 	   changeRot = 0.00000243*speedupFactor;
-        xpl.batchTLEUpdate(tle_data, timeOffset)
+        xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
 	   earthMaterial.uniforms.sunDirection.value = lightDir 
      	earthMaterial.uniforms.texOffset.value -= changeRot/10;	
 	createSats();
@@ -259,12 +261,13 @@ function createSats(){
 }
 var dial
 document.getElementById('timeSelector').addEventListener("change", function() {
-    sumT = timeOffset
+    sumT+=timeOffset
+    timeOffset = 0
     dial.set('value',0)
 });
 
 var logValue = function(e){
-        timeOffset = sumT+(e.newVal/14400)
+        timeOffset = (e.newVal/14400)
 }
 
 YUI().use('dial', function(Y) {

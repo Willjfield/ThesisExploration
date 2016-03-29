@@ -134,7 +134,7 @@ scene.add(earthCenter)
 
 
 var obs = {latitude:0,longitude:0,elevation:0}
-var moonPosition = xpl.MoonPos(xpl.now+t, obs)
+var moonPosition = xpl.MoonPos(xpl.now+t+sumT, obs)
 moonMesh.position.x = xpl.kmtoau(moonPosition[9])
 
 loader.load( "../../lib/data/images/Moon.jpg", function (image) {
@@ -194,7 +194,7 @@ var render = function () {
 	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
 	earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
 
-	moonPosition = xpl.MoonPos(xpl.now+t, obs)
+	moonPosition = xpl.MoonPos(xpl.now+t+sumT, obs)
 	moonMesh.position.x = xpl.kmtoau(moonPosition[9])
 	if(focusedPlanet<9){
 		controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
@@ -205,11 +205,11 @@ var render = function () {
     controls.update()
 	xpl.updateTime()
 	
-	t+=step;
+	// t+=step;
 
 	if(typeof tlObj!='undefined')
 	{
-		tlObj.update(t);
+		tlObj.update(t+sumT);
 		xyz = tlObj.position_ecf;
 	}
     
@@ -231,10 +231,10 @@ var render = function () {
 	requestAnimationFrame( render );
 	
    	for(var p in drawPlanets){
-		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t);
+		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t+sumT);
 		//launch of voyager 1
         //var curPosition = xpl.SolarSystem(xpl.planets[p],2443391.500000+t);
-		var curRotation = xpl.planets[p].rotationAt(xpl.now+t)
+		var curRotation = xpl.planets[p].rotationAt(xpl.now+t+sumT)
 		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,-curPosition[1]*solScale)
@@ -324,12 +324,13 @@ document.getElementById("planetSelect").addEventListener("mouseup",function(even
 })
 
 document.getElementById('timeSelector').addEventListener("change", function() {
-    sumT = t
+    sumT+=t
+    t = 0
     dial.set('value',0)
 });
 
 var logValue = function(e){
-		t = sumT+(e.newVal/14400)
+        t = (e.newVal/14400)
 }
 
 YUI().use('dial', function(Y) {
