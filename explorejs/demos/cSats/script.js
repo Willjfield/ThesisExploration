@@ -31,6 +31,7 @@ var myThreePosition, myViewPosition
 var my_geodetic, myposition 
 var linesArray = []
 var viewGeometry, viewMaterial
+var rotateGeo = 0//(xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
 
 var tourStage = 4
 var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
@@ -139,10 +140,10 @@ function init() {
         //myposition = xpl.ecf_to_eci(myposition, xpl.now)
         myThreePosition = new THREE.Vector3(myposition.x*.0156,myposition.z*.0156,myposition.y*-.0156)
         
-        var rotateGeo = (xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
+        
         myViewPosition=new THREE.Vector3()
         myViewPosition.copy(myThreePosition)
-        myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
+        //myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
         myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))
         
         
@@ -152,7 +153,7 @@ function init() {
         meshObs = new THREE.Mesh( geometryObs, materialObs);
         meshObs.position.set(myThreePosition.x,myThreePosition.y,myThreePosition.z)
         earth.add( meshObs );
-        earth.rotateZ((xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180)
+        //earth.rotateZ((xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180)
 
         renderer = new THREE.WebGLRenderer({ antialias: true, autoClear: true });
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -167,7 +168,7 @@ function init() {
          camera.position.x = this.x
         })
         //tweenStart.start()
-        camera.position.set( 0, 0, 500 );
+        camera.position.set( 0, 0, 1500 );
         window.addEventListener( 'resize', onWindowResize, false );
 }
 
@@ -191,10 +192,10 @@ function animate(time) {
     myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
         //myposition = xpl.ecf_to_eci(myposition, xpl.now)
     myThreePosition = new THREE.Vector3(myposition.x*.0156,myposition.z*.0156,myposition.y*-.0156)
-   var rotateGeo = (xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
+   //var rotateGeo = (xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
         myViewPosition=new THREE.Vector3()
         myViewPosition.copy(myThreePosition)
-        myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
+        //myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
         myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))
         
 
@@ -209,7 +210,7 @@ function animate(time) {
     if(typeof dial != 'undefined'){
         dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
     }
-    // setTimeout(function() {
+
         var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
         lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
         requestAnimationFrame( animate );
@@ -219,7 +220,7 @@ function animate(time) {
      	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
         for(var sat in tle_data){
             var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
-            if(lookAngles.elevation>15){
+            if(lookAngles.elevation>0){
                 tle_data[sat].visible = true
             }else{
                 tle_data[sat].visible = false
@@ -228,7 +229,7 @@ function animate(time) {
             //visibileSatsLookAngles.push(lookAngles)
         }
 	createSats();
-    //}, 1000/30);
+
 
 	controls.update();
 
@@ -277,6 +278,7 @@ function createSats(){
                                                 vertex.x = tle_data[i].position_eci.x*.0156;
                                                 vertex.y = tle_data[i].position_eci.z*.0156;
                                                 vertex.z = tle_data[i].position_eci.y*-.0156;
+                                                vertex.applyAxisAngle( new THREE.Vector3(1,0,0),rotateGeo)
 
                                                 geoP.vertices.push( vertex );
 
