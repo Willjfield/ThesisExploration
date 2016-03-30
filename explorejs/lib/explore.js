@@ -333,6 +333,9 @@ Add moons
 	var DEG2RAD = Math.PI/180.0;
 	var RAD2DEG = 180.0/Math.PI;
 
+	xpl.DEG2RAD = DEG2RAD
+	xpl.RAD2DEG = RAD2DEG
+
 	//////////DEFINITION OF MATH FUNCTIONS/////////
 	function rev(angle) 	{return angle-Math.floor(angle/360.0)*360.0;}		// 0<=a<360
 	function rev2(angle)	{var a = rev(angle); return (a>=180 ? a-360.0 : a);}	// -180<=a<180

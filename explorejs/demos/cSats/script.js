@@ -31,14 +31,21 @@ var myThreePosition
 var linesArray = []
 var viewGeometry, viewMaterial
 
-var coords = { x: 0, y: 0 };
-var tween = new TWEEN.Tween(coords)
-    .to({ x: 100, y: 100 }, 10000)
-    .onUpdate(function() {
-        console.log(this.x, this.y);
-    })
-    .start();
+var tourStage = 0
+var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
+var tourDollies = []
+var tourRotations = []
 
+var tweenStart = new TWEEN.Tween(tourPositions[0])
+    .to(tourPositions[1], 5000)
+    .easing(TWEEN.Easing.Sinusoidal.InOut)
+    
+
+var tweenEnd = new TWEEN.Tween(tourPositions[1])
+    .to(tourPositions[2], 5000)
+    .easing(TWEEN.Easing.Sinusoidal.InOut)
+
+tweenStart.chain(tweenEnd)
 
 xpl.getTLE('classified', satellites, function(){
     
@@ -68,7 +75,7 @@ function init() {
         document.body.appendChild(container);
 
         camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight,.01, 6000 );
-        camera.position.set( 0, 0, 400 );
+        camera.position.set( 0, 0, 1500 );
 
         controls = new THREE.OrbitControls( camera );
                                 controls.damping = 0.2;
@@ -76,7 +83,6 @@ function init() {
                                 controls.maxDistance = 2700;
                                 controls.minPolarAngle = 0; // radians
                                 controls.maxPolarAngle = Infinity;
-
                                 controls.addEventListener( 'change',render);
 			
 
@@ -146,6 +152,14 @@ function init() {
 
         createSats()
 
+        tweenStart.onUpdate(function() {
+         camera.position.x = this.x
+        })
+        tweenEnd.onUpdate(function() {
+         camera.position.x = this.x
+        })
+        //tweenStart.start()
+        camera.position.set( 0, 0, 1500 );
         window.addEventListener( 'resize', onWindowResize, false );
 }
 
@@ -164,7 +178,7 @@ function loadImage( path ) {
 }
 
 function animate(time) {
-    
+    tour()
     xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
 
     skybox.rotation.z = ((xpl.now+timeOffset+sumT)%1)*2*Math.PI
@@ -216,6 +230,8 @@ function animate(time) {
 	collisionArr.shift();
     }
     scene.remove( viewLine );
+
+    TWEEN.update()
 }
 
 function render() { 
@@ -279,10 +295,30 @@ function createSats(){
              });
 
             viewLine = new THREE.Line( viewGeometry, viewMaterial );
-            if(viewGeometry.vertices.length>0){
+            if(viewGeometry.vertices.length>0 && tourStage>0){
                 scene.add( viewLine );
             }
             
+}
+
+function tour(){
+    switch(tourStage){
+        case 0:
+            controls.rotateLeft(.01)
+        break
+        case 1:
+            if(Math.abs(controls.getAzimuthalAngle()-((obs.longitude+90-(xpl.curEarthOblique(xpl.now+timeOffset+sumT)))*xpl.DEG2RAD))>.1){
+                controls.rotateLeft(.1)
+            }
+            if(Math.abs(controls.getPolarAngle()-(obs.latitude*xpl.DEG2RAD))>.1){
+                controls.rotateUp(.1)
+            }
+            controls.target = myThreePosition
+        break
+        case 2:
+
+        break
+    }
 }
 var dial
 document.getElementById('timeSelector').addEventListener("change", function() {
