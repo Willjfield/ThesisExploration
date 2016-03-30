@@ -27,11 +27,12 @@ var sumT = 0
 var earthAxis = new THREE.Vector3(0,1,0)
 
 var viewLine
-var myThreePosition
+var myThreePosition, myViewPosition
+var my_geodetic, myposition 
 var linesArray = []
 var viewGeometry, viewMaterial
 
-var tourStage = 0
+var tourStage = 4
 var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
 var tourDollies = []
 var tourRotations = []
@@ -101,7 +102,7 @@ function init() {
         scene.add( skybox );
 
         //Earth
-        var earthGeo = new THREE.SphereGeometry(100,48,48);
+        var earthGeo = new THREE.SphereGeometry(99.5,48,48);
 
         earthMaterial = new THREE.ShaderMaterial( {
             uniforms: {
@@ -127,24 +128,31 @@ function init() {
         
         scene.add(earth);
         lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset)+.2)
-        earth.rotateZ((xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180)
+        
         // Lights
         scene.add( new THREE.AmbientLight( 1 * 0x202020 ) );
 
         pointLight = new THREE.PointLight( 0xffffff, .2 );
         scene.add( pointLight );
-        var my_geodetic = new xpl.createGeodetic(obs.longitude,obs.latitude, obs.height);
-        var myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
+        my_geodetic = new xpl.createGeodetic(obs.longitude,obs.latitude, obs.height);
+        myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
+        //myposition = xpl.ecf_to_eci(myposition, xpl.now)
         myThreePosition = new THREE.Vector3(myposition.x*.0156,myposition.z*.0156,myposition.y*-.0156)
+        
         var rotateGeo = (xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
-        myThreePosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
+        myViewPosition=new THREE.Vector3()
+        myViewPosition.copy(myThreePosition)
+        myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
+        myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))
+        
         
         var geometryObs= new THREE.SphereGeometry( 1, 48, 48 );
         var materialObs = new THREE.MeshBasicMaterial( {  color: 0xff0000} );
 
         meshObs = new THREE.Mesh( geometryObs, materialObs);
         meshObs.position.set(myThreePosition.x,myThreePosition.y,myThreePosition.z)
-        scene.add( meshObs );
+        earth.add( meshObs );
+        earth.rotateZ((xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180)
 
         renderer = new THREE.WebGLRenderer({ antialias: true, autoClear: true });
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -159,7 +167,7 @@ function init() {
          camera.position.x = this.x
         })
         //tweenStart.start()
-        camera.position.set( 0, 0, 1500 );
+        camera.position.set( 0, 0, 500 );
         window.addEventListener( 'resize', onWindowResize, false );
 }
 
@@ -179,8 +187,19 @@ function loadImage( path ) {
 
 function animate(time) {
     tour()
-    xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
+    xpl.updateTime()
+    myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
+        //myposition = xpl.ecf_to_eci(myposition, xpl.now)
+    myThreePosition = new THREE.Vector3(myposition.x*.0156,myposition.z*.0156,myposition.y*-.0156)
+   var rotateGeo = (xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
+        myViewPosition=new THREE.Vector3()
+        myViewPosition.copy(myThreePosition)
+        myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
+        myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))
+        
 
+    xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
+    earth.rotation.y = ((xpl.now+timeOffset+sumT)%(xpl.planets[2].dayLength/23.9344))*2*Math.PI
     skybox.rotation.z = ((xpl.now+timeOffset+sumT)%1)*2*Math.PI
     var date = xpl.dateFromJday(xpl.now+timeOffset+sumT)
     var minute = date.minute
@@ -255,15 +274,15 @@ function createSats(){
 
                                                 var vertex = new THREE.Vector3();
 
-                                                vertex.x = tle_data[i].position_ecf.x*.0156;
-                                                vertex.y = tle_data[i].position_ecf.z*.0156;
-                                                vertex.z = tle_data[i].position_ecf.y*-.0156;
+                                                vertex.x = tle_data[i].position_eci.x*.0156;
+                                                vertex.y = tle_data[i].position_eci.z*.0156;
+                                                vertex.z = tle_data[i].position_eci.y*-.0156;
 
                                                 geoP.vertices.push( vertex );
 
                                                 if(tle_data[i].visible){
                                                         viewGeometry.vertices.push(
-                                                            new THREE.Vector3(myThreePosition.x,myThreePosition.y,myThreePosition.z),
+                                                            new THREE.Vector3(myViewPosition.x,myViewPosition.y,myViewPosition.z),
                                                             new THREE.Vector3(vertex.x,vertex.y,vertex.z)
                                                         )
                                                 }
@@ -307,10 +326,12 @@ function tour(){
             controls.rotateLeft(.01)
         break
         case 1:
-            if(Math.abs(controls.getAzimuthalAngle()-((obs.longitude+90-(xpl.curEarthOblique(xpl.now+timeOffset+sumT)))*xpl.DEG2RAD))>.1){
-                controls.rotateLeft(.1)
+            var distanceFromLongitude = Math.abs(controls.getAzimuthalAngle()-((obs.longitude+90-(xpl.curEarthOblique(xpl.now+timeOffset+sumT)))*xpl.DEG2RAD))
+            if(distanceFromLongitude>.1){
+                controls.rotateLeft(.1*distanceFromLongitude)
             }
-            if(Math.abs(controls.getPolarAngle()-(obs.latitude*xpl.DEG2RAD))>.1){
+            var distanceFromLatitude = Math.abs(controls.getPolarAngle()-(obs.latitude*xpl.DEG2RAD))
+            if(distanceFromLatitude>.1){
                 controls.rotateUp(.1)
             }
             controls.target = myThreePosition

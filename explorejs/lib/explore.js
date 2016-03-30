@@ -407,10 +407,10 @@ Add moons
 	}
 
 	planet.prototype.rotationAt = function(jday){	
-		var _jday
-		typeof "jday" == undefined ? _jday = xpl.now : _jday=jday
-		this.currentPlanetRotation = ((_jday)%(this.dayLength/23.9344))*2*Math.PI-0.166667
-		return this.currentPlanetRotation
+		// var _jday
+		// typeof "jday" == undefined ? _jday = xpl.now : _jday=jday
+		var currentPlanetRotation = ((jday)%(this.dayLength/23.9344))*2*Math.PI//-0.166667
+		return currentPlanetRotation
 	}
 	//http://nssdc.gsfc.nasa.gov/planetary/planetfact.html
 	xpl.sol = {
@@ -3838,7 +3838,9 @@ function eci_to_ecf (eci_coords, gmst){
     var Z =  eci_coords["z"];
     return { x : X, y : Y, z : Z };
 }
-
+xpl.ecf_to_eci = function(ecf_coords, gmst){
+	return ecf_to_eci(ecf_coords, gmst)
+}
 function ecf_to_eci (ecf_coords, gmst){
     // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
     //
