@@ -385,7 +385,7 @@ Add moons
 
 	// The planet object
 
-	function planet(name,num,N,i,w,a,e,M,radius,oblique,dayLength,yearLength,color) {
+	function planet(name,num,N,i,w,a,e,M,radius,oblique,dayLength,yearLength,color,rgbColor) {
 		this.name=name;
 		this.num=num;
 		this.N=N; 	// longitude of ascending node
@@ -401,6 +401,7 @@ Add moons
 		this.yearLength = yearLength;//length of 1 sidereal year in Earth days
 		this.texColor = color;//hex color to approximate surface
 		this.currentPlanetRotation = 0
+		this.rgbColor = rgbColor
 		/*
 		this.webShader = webShader;
 		*/
@@ -416,7 +417,8 @@ Add moons
 	xpl.sol = {
 		radius: 696300,
 		dayLength: 587.28,
-		texColor:0xffff44
+		texColor:0xffff44,
+		rgbColor:{r:255,g:255,b:68}
 	}
 
 	xpl.mercury = new planet("Mercury",0,
@@ -430,7 +432,8 @@ Add moons
 	   0.01,
 	   4222.6,
 	   87.969,
-	   0xffffff
+	   0xffffff,
+	   {r:255,g:255,b:255}
 	   );
 
 	xpl.venus = new planet("Venus",1,
@@ -444,7 +447,8 @@ Add moons
 	   177.4,
 	   2802,
 	   224.701,
-	   0xff9933
+	   0xff9933,
+	   {r:255,g:153,b:51}
 	   );
 
     var eObl = xpl.curEarthOblique(xpl.now)
@@ -459,7 +463,8 @@ Add moons
 	   eObl,
 	   23.9344,
 	   365.256,
-	   0x00ff99
+	   0x00ff99,
+	   {r:0,g:255,b:153}
 	   );
 
 	xpl.mars = new planet("Mars",3,
@@ -473,7 +478,8 @@ Add moons
 	   25.2,
 	   24.7,
 	   686.98,
-	   0xff0000
+	   0xff0000,
+	   {r:255,g:0,b:0}
 	   );
 
 	xpl.jupiter = new planet("Jupiter",4,
@@ -487,7 +493,8 @@ Add moons
 	   3.1,
 	   9.9,
 	   4332.589,
-	   0xff4d88
+	   0xff4d88,
+	   {r:255,g:77,b:136}
 	   );
 
 	xpl.saturn = new planet("Saturn",5,
@@ -501,7 +508,8 @@ Add moons
 		26.7,
 		10.7,
 		10759.22,
-		0x00ff00
+		0xa0ff00,
+	   	{r:160,g:255,b:0}
 		);
 
 	xpl.uranus = new planet("Uranus",6,
@@ -515,7 +523,8 @@ Add moons
 		97.8,
 		17.2,
 		30685.4,
-		0x0055ff
+		0x0055ff,
+	   	{r:0,g:85,b:255}
 		);
 
 	xpl.neptune = new planet("Neptune",7,
@@ -529,7 +538,8 @@ Add moons
 		28.3,
 		16.1,
 		60189,
-		0x730099
+		0x730099,
+	   	{r:115,g:0,b:153}
 		);
 
 	// elements from Paul Schlyter
