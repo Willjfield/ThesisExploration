@@ -31,6 +31,14 @@ var myThreePosition
 var linesArray = []
 var viewGeometry, viewMaterial
 
+var coords = { x: 0, y: 0 };
+var tween = new TWEEN.Tween(coords)
+    .to({ x: 100, y: 100 }, 10000)
+    .onUpdate(function() {
+        console.log(this.x, this.y);
+    })
+    .start();
+
 
 xpl.getTLE('classified', satellites, function(){
     
@@ -53,16 +61,7 @@ function map (val, in_min, in_max, out_min, out_max) {
 }
 
 function init() {
-
-        for(var sat in tle_data){
-            var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
-            if(lookAngles.elevation>15){
-                tle_data[sat].visible = true
-            }
-            //lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
-            //visibileSatsLookAngles.push(lookAngles)
-        }
-                    
+                      
         roty = 0;
 
         container = document.createElement('div');
@@ -77,19 +76,11 @@ function init() {
                                 controls.maxDistance = 2700;
                                 controls.minPolarAngle = 0; // radians
                                 controls.maxPolarAngle = Infinity;
+
                                 controls.addEventListener( 'change',render);
 			
 
         scene = new THREE.Scene();
-
-        viewMaterial = new THREE.LineBasicMaterial({
-            color: 0x00aa00
-        });
-
-        viewGeometry = new THREE.Geometry();
-
-        viewLine = new THREE.Line( viewGeometry, viewMaterial );
-        scene.add( viewLine );
 
         // Grid
         var size = 500, step = 100;
@@ -112,10 +103,10 @@ function init() {
         		resolution: { type: "v2", value: new THREE.Vector2() },
         		texOffset: {type: "f", value: 0.2},
         		sunDirection: { type: "v3", value: lightDir},
-                dayTexture: { type: "t", value: new THREE.ImageUtils.loadTexture( "textures/bluemarble_map_4096.jpg" ) },
-                nightTexture: { type: "t", value: new THREE.ImageUtils.loadTexture( "textures/Earth_night_4096.jpg" ) },
-        		normalTexture: { type: "t", value: new THREE.ImageUtils.loadTexture( "textures/earthbump_4096.jpg") },
-        		cloudTexture: { type: "t", value: new THREE.ImageUtils.loadTexture("textures/earth_clouds.jpg")}
+                dayTexture: { type: "t", value: new THREE.ImageUtils.loadTexture( "textures/bluemarble_map_4096_comp.jpg" ) },
+                nightTexture: { type: "t", value: new THREE.ImageUtils.loadTexture( "textures/Earth_night_4096_comp.jpg" ) },
+        		normalTexture: { type: "t", value: new THREE.ImageUtils.loadTexture( "textures/earthbump_4096_comp.jpg") },
+        		cloudTexture: { type: "t", value: new THREE.ImageUtils.loadTexture("textures/earth_clouds_comp.jpg")}
             },
             attributes: {
                 vertexOpacity: { type: 'f', value: [] }
@@ -153,18 +144,6 @@ function init() {
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild( renderer.domElement );
 
-        // var debugCanvas = document.createElement( 'canvas' );
-        // debugCanvas.width = 512;
-        // debugCanvas.height = 512;
-        // debugCanvas.style.position = 'absolute';
-        // debugCanvas.style.top = '0px';
-        // debugCanvas.style.left = '0px';
-
-        // container.appendChild( debugCanvas );
-
-        // debugContext = debugCanvas.getContext( '2d' );
-        // debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
-        // debugContext.strokeStyle = '#000000';
         createSats()
 
         window.addEventListener( 'resize', onWindowResize, false );
@@ -184,8 +163,8 @@ function loadImage( path ) {
     return texture;
 }
 
-function animate() {
-
+function animate(time) {
+    
     xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
 
     skybox.rotation.z = ((xpl.now+timeOffset+sumT)%1)*2*Math.PI
@@ -197,15 +176,26 @@ function animate() {
     if(typeof dial != 'undefined'){
         dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
     }
-    setTimeout(function() {
+    // setTimeout(function() {
         var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
         lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
         requestAnimationFrame( animate );
+        TWEEN.update(time);
         xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
 	   earthMaterial.uniforms.sunDirection.value = lightDir 
      	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
+        for(var sat in tle_data){
+            var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
+            if(lookAngles.elevation>15){
+                tle_data[sat].visible = true
+            }else{
+                tle_data[sat].visible = false
+            }
+            //lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
+            //visibileSatsLookAngles.push(lookAngles)
+        }
 	createSats();
-    }, 1000/30);
+    //}, 1000/30);
 
 	controls.update();
 
@@ -225,10 +215,7 @@ function animate() {
     	scene.remove(collisionArr[0]);
 	collisionArr.shift();
     }
-    // for(var line in linesArray){
-    //     scene.remove(linesArray[line]);
-    //     linesArray = new Array()
-    // } 
+    scene.remove( viewLine );
 }
 
 function render() { 
@@ -242,17 +229,11 @@ function render() {
     renderer.render( scene, camera );
 }
 
-
-
 function createSats(){ 
 
                 geoP= new THREE.Geometry({ verticesNeedUpdate: true});
                 geoC= new THREE.Geometry({ verticesNeedUpdate: true});
-                viewGeometry = new THREE.Geometry({ verticesNeedUpdate: true});
-
-        
-
-                // var satVelocity = [];
+                var viewGeometry = new THREE.Geometry({ verticesNeedUpdate: true});
 
                 for ( i = 0; i < tle_data.length; i ++ ) {
 
@@ -264,37 +245,14 @@ function createSats(){
 
                                                 geoP.vertices.push( vertex );
 
-                                                // var velocity = new THREE.Vector3();
-
-                                                // velocity.x = tle_data[i].velocity_eci.x;
-                                                // velocity.y = tle_data[i].velocity_eci.z;
-                                                // velocity.z= tle_data[i].velocity_eci.y;
-
-
-                                                // satVelocity.push(velocity);
                                                 if(tle_data[i].visible){
-                                                        viewLine.geometry.vertices.push(
+                                                        viewGeometry.vertices.push(
                                                             new THREE.Vector3(myThreePosition.x,myThreePosition.y,myThreePosition.z),
                                                             new THREE.Vector3(vertex.x,vertex.y,vertex.z)
                                                         )
                                                 }
                 }
 
-                // for (var i=0; i<geoP.vertices.length; i++) {
-                //     for (var j=0; j<geoP.vertices.length; j++) {
-                //         if (i!=j) {
-                //             if (geoP.vertices[i].distanceTo(geoP.vertices[j]) < 3 && satVelocity[i].distanceTo(satVelocity[j])>.5) {
-                //                 var vertex = new THREE.Vector3();
-
-                //                 vertex.x = geoP.vertices[i].x;
-                //                 vertex.y = geoP.vertices[i].y;
-                //                 vertex.z = geoP.vertices[i].z;
-
-                //                 geoC.vertices.push( vertex );
-                //             }
-                //         }
-                //     }
-                // }
 	                   materialP = new THREE.PointCloudMaterial( { size: 3, sizeAttenuation: false, transparent: true, alpha: .5 } );
                         materialP.color.setHSL( 1.0, 0.0, 1 );
 				
@@ -316,9 +274,15 @@ function createSats(){
 				scene.add(particleHeadArr[p])
 			}
 
-            //viewLine = new THREE.Line( viewGeometry, viewMaterial );
-            scene.add( viewLine );
-                                                           
+            viewMaterial = new THREE.LineBasicMaterial({
+            color: 0x00aa00
+             });
+
+            viewLine = new THREE.Line( viewGeometry, viewMaterial );
+            if(viewGeometry.vertices.length>0){
+                scene.add( viewLine );
+            }
+            
 }
 var dial
 document.getElementById('timeSelector').addEventListener("change", function() {
@@ -352,4 +316,5 @@ YUI().use('dial', function(Y) {
             dial.set('value',0)
         }, false)
 });
+
 

@@ -7,7 +7,7 @@
     box-sizing: border-box;
 }
 */
-body { margin: 0 auto; font: 100%/1.375em 'Roboto', sans-serif; }
+body { margin: 0 auto; font: 100%/1.375em 'Roboto', sans-serif; overflow:hidden;}
 
 a { text-decoration: none; }
 
@@ -77,7 +77,7 @@ a { text-decoration: none; }
 }
 
 a{
-  color:white;
+  color:grey;
 }
 
 .arrows{

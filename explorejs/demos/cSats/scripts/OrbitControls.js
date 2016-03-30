@@ -370,6 +370,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+
+
 	function getAutoRotationAngle() {
 
 		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
@@ -418,8 +420,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function onMouseMove( event ) {
 
+	function onMouseMove( event ) {
 		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
