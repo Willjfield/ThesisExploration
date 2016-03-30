@@ -13,6 +13,8 @@ var trailLength = 300
 var selectedPlanets = []
 var planetTextures
 
+var tutStage = 0
+
 function preload(){
 	var thisYear = xpl.dateFromJday(xpl.now,-5).year
 	
@@ -47,9 +49,11 @@ function setup(){
 	for(var p=0;p<xpl.planets.length;p++){
 		allPlanets.push(new drawPlanet(xpl.planets[p]))
 	}
+	manageTutorial()
 }
 
 function draw(){
+	
 	imageMode(CORNER)
 	image(spaceBackground,0,0,width,height)
 	imageMode(CENTER)
@@ -70,6 +74,49 @@ function draw(){
 	}
 
 	manageSlider()
+}
+
+function manageTutorial(){
+	var tutDiv = document.getElementById("tutorial")
+
+	switch(tutStage){
+		case 0:
+			tutDiv.innerHTML = "Welcome! To begin, make sure your sound is on.<br><br>Now click on any planet."
+		break;
+
+		case 1:
+			tutDiv.innerHTML = "Great! Now, click on any other planet to connect the two together."
+		break;
+
+		case 2:
+			tutDiv.innerHTML = "The pitch of the tone you hear is determined by how far apart the planets are from each other."+
+			"<br><br>Click on the <font color='green'>green</font> arrows at the bottom to fast forward time."+
+			"<br><br>Click on the <font color='red'>red</font> arrows at the bottom to rewind time."+
+			"<br><br>Click on the play button to play real-time."
+		break;
+
+		case 3:
+		// var node = document.createElement("BUTTON");  
+		// var t = document.createTextNode("close");
+		// node.appendChild(t); 
+		
+		// var textnode = document.createTextNode("close");         // Create a text node
+		// node.appendChild(textnode);                              // Append the text to <li>
+		
+
+			tutDiv.innerHTML = "Listen to how the tones change as the planets revolve around the Sun."+
+								"<br><br>You can shift-click on a planet to disconnect all of its connections."+
+								"<br><br>CLOSE"
+			// tutDiv.appendChild(node);
+			tutDiv.addEventListener("click",closeDiv)
+		break;
+	}
+}
+
+function closeDiv(){
+	tutStage = 4
+	console.log("hide")
+	document.getElementById('tutorial').remove()
 }
 
 function manageSlider(){
@@ -290,10 +337,13 @@ function mouseWheel(event) {
 }
 
 function mousePressed(){
+	var hitTarget = false
 	if(mouseX<0||mouseX>width||mouseY<0||mouseY>height){return 0}
 		for(var p in allPlanets){		
 			if(abs(mouseX-(width/2)+(allPlanets[p].position[0]*zoom))<15){
 				if(abs(mouseY-(height/2)-(allPlanets[p].position[1]*zoom))<15){
+					hitTarget = true
+					tutStage == 0 ? tutStage++ : {}
 					if (keyIsPressed === true) {
 						if(keyCode==SHIFT){
 							for(var op in allPlanets){
@@ -315,13 +365,20 @@ function mousePressed(){
 				selectedPlanets.push(allPlanets[p])
 				selectedPlanets[0].isSelected = true
 				if(selectedPlanets.length>1){
+					tutStage == 1 ? tutStage++ : {}
 					selectedPlanets[0].connections.push(new connection(selectedPlanets[0],selectedPlanets[1]))					
 					selectedPlanets[0].isSelected = false
 					selectedPlanets = []
 				}
-			}
+			}		
 		}
 	}
+	if(!hitTarget && selectedPlanets.length>0){
+		selectedPlanets[0].isSelected = false
+		selectedPlanets = []
+	}
+	manageTutorial()
+
 }
 
 function windowResized() {
@@ -333,6 +390,9 @@ function windowResized() {
 
 
 document.getElementById("fastForward").addEventListener('click',function(){
+	document.getElementById("rewind").innerHTML = "<div id='speed-1' class='speedRW'></div><div id='speed-2' class='speedRW'></div>"
+	tutStage == 2 ? tutStage++ : {}
+	manageTutorial()
 	console.log("set speed "+speed)
 	speed++
 	speed < 0 ? speed = 0 : {}
@@ -347,6 +407,9 @@ document.getElementById("fastForward").addEventListener('click',function(){
 })
 
 document.getElementById("rewind").addEventListener('click',function(){
+	document.getElementById("fastForward").innerHTML = "<div id='speed1' class='speedFF'></div><div id='speed2' class='speedFF'></div>"
+	tutStage == 2 ? tutStage++ : {}
+	manageTutorial()
 	console.log("set speed "+speed)
 	speed--
 	speed > 0 ? speed = 0 : {}
@@ -371,3 +434,4 @@ document.getElementById("resetTime").addEventListener("click",function(event){
 	console.log("reset")
 	tOffset = 0
 })
+

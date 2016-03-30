@@ -128,10 +128,10 @@ canvas{
   z-index: 999;
   transition: top 0.2s ease;
   position:absolute;
-  top:-190px;
+  top:-195px;
   padding-top:15px;
-  width:20%;
-  height:220px;
+  width:250px;
+  height:225px;
   background:rgba(0,0,0,.2);
   color:white;
   font-family: Helvetica;
@@ -140,4 +140,19 @@ canvas{
 .info:hover{
   background:rgba(0,0,0,.7);
   top:0px;
+}
+
+#tutorial{
+  font-weight: lighter;
+  z-index: 999;
+  transition: top 0.2s ease;
+  position:absolute;
+  top:10%;
+  left:25%;
+  padding:15px;
+  width:50%;
+  background:rgba(0,0,0,.2);
+  color:white;
+  font-family: Helvetica;
+  text-align: center;
 }
