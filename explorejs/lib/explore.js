@@ -4043,7 +4043,8 @@ xpl.createGeodetic = function(_longitude,_latitude,_height){
 	this.height = _height;
 }
 
-xpl.tle = function(line1, line2) {
+xpl.tle = function(line1, line2, name) {
+	typeof name == 'undefined' ? this.name='' : this.name=name
     this.line1 = line1;
     this.line2 = line2;
 

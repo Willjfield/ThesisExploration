@@ -18,13 +18,13 @@ a { text-decoration: none; }
   text-align: right;
   font-family:Verdana, Geneva, sans-serif;
   /*padding: 15px 15px;*/
-  box-shadow:0px 0px 10px black;
+  /*box-shadow:0px 0px 10px black;*/
   width: 350px;
   /*height: 350px;*/
-  background-color: #ffffff;
+  background-color: #fff;
   border: none;
-  opacity: 0.8;
-  filter: alpha(opacity=80); /* For IE8 and earlier */
+  opacity: 0.7;
+  filter: alpha(opacity=70); /* For IE8 and earlier */
   margin: 0;
   position: absolute;
   top: 50%;
@@ -78,6 +78,31 @@ a { text-decoration: none; }
 
 a{
   color:grey;
+}
+
+.btn{
+  display:inline-block;
+  position: absolute;
+  background:white;
+  color:black;
+  border: 1px solid black;
+  text-align: center;
+  padding:5px;
+  width:35%;
+  bottom:5px;
+  cursor:pointer;
+}
+
+.btn:hover{
+  background:#d0d0d0;
+}
+
+#close{
+  left:5px;
+}
+
+#tour0{
+  right:5px;
 }
 
 .arrows{

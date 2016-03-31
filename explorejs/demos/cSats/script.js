@@ -41,22 +41,23 @@ var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
 var tourDollies = []
 var tourRotations = []
 
-var tweenStart = new TWEEN.Tween(tourPositions[0])
-    .to(tourPositions[1], 5000)
-    .easing(TWEEN.Easing.Sinusoidal.InOut)
+// var tweenStart = new TWEEN.Tween(tourPositions[0])
+//     .to(tourPositions[1], 5000)
+//     .easing(TWEEN.Easing.Sinusoidal.InOut)
     
 
-var tweenEnd = new TWEEN.Tween(tourPositions[1])
-    .to(tourPositions[2], 5000)
-    .easing(TWEEN.Easing.Sinusoidal.InOut)
+// var tweenEnd = new TWEEN.Tween(tourPositions[1])
+//     .to(tourPositions[2], 5000)
+//     .easing(TWEEN.Easing.Sinusoidal.InOut)
 
-tweenStart.chain(tweenEnd)
+// tweenStart.chain(tweenEnd)
 
 xpl.getTLE('classified', satellites, function(){
     
     for(var sat in satellites){
-       tle_data.push(new xpl.tle(satellites[sat].line1,satellites[sat].line2))
+       tle_data.push(new xpl.tle(satellites[sat].line1,satellites[sat].line2,satellites[sat].id))
        tle_data[sat].update()
+       tle_data[sat].mission=tle_data[sat].name.replace(/[0-9]/g, '')
     }
 
     navigator.geolocation.getCurrentPosition(function(location){
@@ -150,7 +151,7 @@ function init() {
         myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))
         
         
-        var geometryObs= new THREE.SphereGeometry( 1, 48, 48 );
+        var geometryObs= new THREE.SphereGeometry( .5, 48, 48 );
         var materialObs = new THREE.MeshBasicMaterial( {  color: 0xff0000} );
 
         meshObs = new THREE.Mesh( geometryObs, materialObs);
@@ -164,12 +165,12 @@ function init() {
 
         createSats()
 
-        tweenStart.onUpdate(function() {
-         camera.position.x = this.x
-        })
-        tweenEnd.onUpdate(function() {
-         camera.position.x = this.x
-        })
+        // tweenStart.onUpdate(function() {
+        //  camera.position.x = this.x
+        // })
+        // tweenEnd.onUpdate(function() {
+        //  camera.position.x = this.x
+        // })
         //tweenStart.start()
         camera.position.set( 0, 0, 300 );
         window.addEventListener( 'resize', onWindowResize, false );
@@ -219,7 +220,7 @@ function animate(time) {
         var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
         lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
         requestAnimationFrame( animate );
-        TWEEN.update(time);
+        // TWEEN.update(time);
         xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
 	   earthMaterial.uniforms.sunDirection.value = lightDir 
      	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
@@ -227,6 +228,7 @@ function animate(time) {
             var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
             if(lookAngles.elevation>15){
                 tle_data[sat].visible = true
+
             }else{
                 tle_data[sat].visible = false
             }
@@ -255,7 +257,7 @@ function animate(time) {
     }
     scene.remove( viewLine );
 
-    TWEEN.update()
+    // TWEEN.update()
 }
 
 function render() { 
@@ -320,18 +322,29 @@ function createSats(){
              });
 
             viewLine = new THREE.Line( viewGeometry, viewMaterial );
-            if(viewGeometry.vertices.length>0 && tourStage>0){
+            if(viewGeometry.vertices.length>0 && tourStage>2){
                 scene.add( viewLine );
             }
             
 }
-
+var multiplier = 1
 function tour(){
     switch(tourStage){
         case 0:
             controls.rotateLeft(.01)
         break
+
         case 1:
+            document.getElementById("tour0Text").style.visibility = 'hidden'
+            controls.rotateLeft(.01)
+            
+            if(camera.position.distanceTo(new THREE.Vector3())<1500){
+                controls.dollyOut(1+(.01*multiplier))
+                multiplier*=.999
+            }        
+        break
+
+        case 2:
                 var viewerNormalized = new THREE.Vector3()
                 var cameraNormalized = new THREE.Vector3()
 
@@ -366,9 +379,35 @@ function tour(){
                     controls.target.y-=diffY*.1
                     controls.target.z-=diffZ*.1
                 }
+
+                if( camera.position.length()>121){
+                    camera.position.multiplyScalar(.99)
+                }
+                if(camera.position.length()<119){
+                    camera.position.multiplyScalar(1.01)
+                }
+        break
+
+        case 3:
+            if(camera.position.length()>1502){
+                        camera.position.multiplyScalar(.98)
+                    }
+            if(camera.position.length()<1500){
+                camera.position.multiplyScalar(1.02)
+            }
         break
     }
 }
+
+document.getElementById("close").addEventListener("click",function(){
+    this.parentNode.style.visibility = 'hidden'
+    tourStage = 999
+})
+
+document.getElementById("tour0").addEventListener("mouseup",function(){
+    tourStage++
+})
+
 var dial
 document.getElementById('timeSelector').addEventListener("change", function() {
     sumT+=timeOffset
@@ -401,5 +440,7 @@ YUI().use('dial', function(Y) {
             dial.set('value',0)
         }, false)
 });
+
+
 
 document.body.addEventListener("keypress", function(){++tourStage});
