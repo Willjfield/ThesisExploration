@@ -272,6 +272,8 @@ function render() {
 }
 
 function createSats(){ 
+                highlightGeo=new THREE.SphereGeometry(5,12,12)
+                highlightMat=new THREE.MeshBasicMaterial({  color: 0xff0000})
 
                 geoP= new THREE.Geometry({ verticesNeedUpdate: true});
                 geoC= new THREE.Geometry({ verticesNeedUpdate: true});
@@ -287,6 +289,12 @@ function createSats(){
                                                 vertex.applyAxisAngle( new THREE.Vector3(1,0,0),rotateGeo)
 
                                                 geoP.vertices.push( vertex );
+
+                                                if(tle_data[i].mission=='Rhyolite'){
+                                                    highlightMesh = new THREE.Mesh(highlightGeo,highlightMat)
+                                                    highlightMesh.position.copy(vertex)
+                                                    scene.add(highlightMesh)
+                                                }
 
                                                 if(tle_data[i].visible){
                                                         viewGeometry.vertices.push(
