@@ -32,8 +32,10 @@ var my_geodetic, myposition
 var linesArray = []
 var viewGeometry, viewMaterial
 var rotateGeo = 0//(xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
+var longRotation
+var myLong
 
-var tourStage = 4
+var tourStage = 0
 var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
 var tourDollies = []
 var tourRotations = []
@@ -168,7 +170,7 @@ function init() {
          camera.position.x = this.x
         })
         //tweenStart.start()
-        camera.position.set( 0, 0, 1500 );
+        camera.position.set( 0, 0, 300 );
         window.addEventListener( 'resize', onWindowResize, false );
 }
 
@@ -187,6 +189,7 @@ function loadImage( path ) {
 }
 
 function animate(time) {
+     myLong = map(obs.longitude,-180,180,0,360)
     tour()
     xpl.updateTime()
     myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
@@ -200,7 +203,8 @@ function animate(time) {
         
 
     xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
-    earth.rotation.y = ((xpl.now+timeOffset+sumT)%(xpl.planets[2].dayLength/23.9344))*2*Math.PI
+    longRotation = ((xpl.now+timeOffset+sumT)%(xpl.planets[2].dayLength/23.9344))*2*Math.PI
+    earth.rotation.y = longRotation
     skybox.rotation.z = ((xpl.now+timeOffset+sumT)%1)*2*Math.PI
     var date = xpl.dateFromJday(xpl.now+timeOffset+sumT)
     var minute = date.minute
@@ -229,7 +233,6 @@ function animate(time) {
             //visibileSatsLookAngles.push(lookAngles)
         }
 	createSats();
-
 
 	controls.update();
 
@@ -328,17 +331,30 @@ function tour(){
             controls.rotateLeft(.01)
         break
         case 1:
-            var distanceFromLongitude = Math.abs(controls.getAzimuthalAngle()-((obs.longitude+90-(xpl.curEarthOblique(xpl.now+timeOffset+sumT)))*xpl.DEG2RAD))
-            if(distanceFromLongitude>.1){
-                controls.rotateLeft(.1*distanceFromLongitude)
-            }
-            var distanceFromLatitude = Math.abs(controls.getPolarAngle()-(obs.latitude*xpl.DEG2RAD))
-            if(distanceFromLatitude>.1){
-                controls.rotateUp(.1)
-            }
-            controls.target = myThreePosition
-        break
-        case 2:
+
+            if( controls.target.distanceTo(myViewPosition)>.1){
+                var diffX = controls.target.x-myViewPosition.x
+                var diffY = controls.target.y-myViewPosition.y
+                var diffZ = controls.target.z-myViewPosition.z
+
+                controls.target.x-=diffX*.1
+                controls.target.y-=diffY*.1
+                controls.target.z-=diffZ*.1
+            }//else{
+                ///LONGITUDE IS FLIPPED 180 IF JDAY>=.5!!!!!
+                myLong = map(obs.longitude,-180,180,0,360)
+                var relativeObserver = (obs.longitude*xpl.DEG2RAD)+(earth.rotation.y%Math.PI)
+                var relativeCamera = (controls.getAzimuthalAngle()+(Math.PI/2))%Math.PI
+                var distanceFromLongitude = Math.abs(relativeObserver-relativeCamera)
+                if(distanceFromLongitude>.01){
+                    controls.rotateLeft(.1*distanceFromLongitude)
+                }
+
+                var distanceFromLatitude = Math.abs(controls.getPolarAngle()-(obs.latitude*xpl.DEG2RAD))
+                if(distanceFromLatitude>.01){
+                    controls.rotateUp(.05*distanceFromLatitude)
+                }
+            //}
 
         break
     }
@@ -376,4 +392,4 @@ YUI().use('dial', function(Y) {
         }, false)
 });
 
-
+document.body.addEventListener("keypress", function(){++tourStage});
