@@ -34,6 +34,7 @@ var viewGeometry, viewMaterial
 var rotateGeo = 0//(xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
 var longRotation
 var myLong
+var camRot
 
 var tourStage = 0
 var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
@@ -224,7 +225,7 @@ function animate(time) {
      	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
         for(var sat in tle_data){
             var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
-            if(lookAngles.elevation>0){
+            if(lookAngles.elevation>15){
                 tle_data[sat].visible = true
             }else{
                 tle_data[sat].visible = false
@@ -331,31 +332,40 @@ function tour(){
             controls.rotateLeft(.01)
         break
         case 1:
+                var viewerNormalized = new THREE.Vector3()
+                var cameraNormalized = new THREE.Vector3()
 
-            if( controls.target.distanceTo(myViewPosition)>.1){
-                var diffX = controls.target.x-myViewPosition.x
-                var diffY = controls.target.y-myViewPosition.y
-                var diffZ = controls.target.z-myViewPosition.z
+                viewerNormalized.copy(myViewPosition)
+                cameraNormalized.copy(camera.position)
 
-                controls.target.x-=diffX*.1
-                controls.target.y-=diffY*.1
-                controls.target.z-=diffZ*.1
-            }//else{
-                ///LONGITUDE IS FLIPPED 180 IF JDAY>=.5!!!!!
-                myLong = map(obs.longitude,-180,180,0,360)
-                var relativeObserver = (obs.longitude*xpl.DEG2RAD)+(earth.rotation.y%Math.PI)
-                var relativeCamera = (controls.getAzimuthalAngle()+(Math.PI/2))%Math.PI
-                var distanceFromLongitude = Math.abs(relativeObserver-relativeCamera)
-                if(distanceFromLongitude>.01){
-                    controls.rotateLeft(.1*distanceFromLongitude)
+                viewerNormalizedLong = new THREE.Vector2(viewerNormalized.x,viewerNormalized.z)
+                cameraNormalizedLong = new THREE.Vector2(cameraNormalized.x,cameraNormalized.z)
+                
+                viewerNormalizedLong.normalize()
+                cameraNormalizedLong.normalize()
+
+                viewerNormalizedLat = new THREE.Vector2(viewerNormalized.z,viewerNormalized.y)
+                cameraNormalizedLat = new THREE.Vector2(cameraNormalized.z,cameraNormalized.y)
+                
+                viewerNormalizedLat.normalize()
+                cameraNormalizedLat.normalize()
+
+                controls.rotateLeft(.1*(1-viewerNormalizedLong.dot(cameraNormalizedLong)))
+
+                var distanceFromLatitude = controls.getPolarAngle()-((obs.latitude+11.7)*xpl.DEG2RAD)
+                if(Math.abs(distanceFromLatitude)>.01){
+                   controls.rotateUp(.05*distanceFromLatitude)
                 }
 
-                var distanceFromLatitude = Math.abs(controls.getPolarAngle()-(obs.latitude*xpl.DEG2RAD))
-                if(distanceFromLatitude>.01){
-                    controls.rotateUp(.05*distanceFromLatitude)
-                }
-            //}
+                if( controls.target.distanceTo(myViewPosition)>.1){
+                    var diffX = controls.target.x-myViewPosition.x
+                    var diffY = controls.target.y-myViewPosition.y
+                    var diffZ = controls.target.z-myViewPosition.z
 
+                    controls.target.x-=diffX*.1
+                    controls.target.y-=diffY*.1
+                    controls.target.z-=diffZ*.1
+                }
         break
     }
 }

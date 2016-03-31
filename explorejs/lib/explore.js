@@ -3830,6 +3830,10 @@ function eci_to_geodetic (eci_coords, gmst) {
     return { longitude : longitude, latitude : latitude, height : height };
 }
 
+xpl.eci_to_ecf = function(eci_coords, gmst){
+	return eci_to_ecf (eci_coords, gmst)
+}
+
 function eci_to_ecf (eci_coords, gmst){
     // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
     //
