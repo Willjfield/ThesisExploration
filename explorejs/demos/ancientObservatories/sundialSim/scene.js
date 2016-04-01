@@ -101,20 +101,51 @@
 					if(p!=2){
 						var geometry = new THREE.SphereGeometry( 5,8,8 );
 						var material = new THREE.MeshBasicMaterial( { color: xpl.planets[p].texColor } );
+						var sphere = new THREE.Mesh( geometry, material );
+						sphere.position.set(0,0,-1500)
+
+						nullObj.add(sphere)
+						var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
+						nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
+						planetArray.push(nullObj)
+						scene.add( nullObj )
 					}else{
-						var geometry = new THREE.SphereGeometry( 25,8,8 );
-						var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+						var sunTexture = new THREE.Texture();
+						loader.load( '../../../../lib/data/images/Sun.jpg', function ( image ) {
+							sunTexture.image = image;
+							sunTexture.needsUpdate = true;
+							sunTexture.receiveShadow = true;
+							sunTexture.castShadow = true;
+						
+
+							var sunGeometry = new THREE.SphereGeometry( 25,8,8 );
+							var sunMaterial = new THREE.MeshLambertMaterial( { emissiveMap:sunTexture,emissive: 0xffffff, emissiveIntensity:2 } );
+
+							var lineGeometry = new THREE.Geometry()
+							var lineMaterial = new THREE.LineBasicMaterial({
+								color: 0xffff00
+							})
+
+							lineGeometry.vertices.push(
+								new THREE.Vector3( 0, 0, 0 ),
+								new THREE.Vector3( 0, 0, -1500 )
+							);
+
+							var line = new THREE.Line( lineGeometry, lineMaterial );
+
+							var sphere = new THREE.Mesh( sunGeometry, sunMaterial );
+							sphere.position.set(0,0,-1500)
+
+							nullObj.add(sphere)
+							nullObj.add(line)
+							nullObj.add( directionalLight )
+
+							var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
+							nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
+							planetArray.push(nullObj)
+							scene.add( nullObj )
+						});
 					}
-					var sphere = new THREE.Mesh( geometry, material );
-					sphere.position.set(0,0,-900)
-
-					nullObj.add(sphere)
-					p==2 ? nullObj.add( directionalLight ) : {}
-
-					var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
-					nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
-					planetArray.push(nullObj)
-					scene.add( nullObj )
 				}
 				}
 
@@ -137,16 +168,7 @@
 
 				var onError = function ( xhr ) {
 				};
-
-				/*For image texture
-				var texture = new THREE.Texture();
-				loader.load( texturePath, function ( image ) {
-					texture.image = image;
-					texture.needsUpdate = true;
-					texture.receiveShadow = true;
-					texture.castShadow = true;
-				} );
-				*/
+				
 				var loader = new THREE.OBJLoader( manager );
 				loader.load( modelPath, function ( object ) {
 					object.traverse( function ( child ) {
@@ -188,29 +210,34 @@
 				}
 
 				//DISPLAY DATE vs CALC DATE
-				var date = xpl.dateFromJday(xpl.now+timeOffset+sumT)
+				var date = xpl.dateFromJday(xpl.now+timeOffset+sumT+(timeZone/24))
 				
-				var dDay = date.day.toString()
-				dDay.length<2 ? dDay = "0"+dDay : {}
+				// var dDay = date.day.toString()
+				// dDay.length<2 ? dDay = "0"+dDay : {}
 
-				var dMo= date.month.toString()
-				dMo.length<2 ? dMo = "0"+dMo : {}
+				// var dMo= date.month.toString()
+				// dMo.length<2 ? dMo = "0"+dMo : {}
 
 				var dmin = date.minute.toString()
 				if(dmin.length<2) dmin = "0"+dmin
 				
-				var dhour = date.hour//.toString()
-				// dhour.length < 2 ? dhour = "0"+dhour :{}
-				var dspHour = (dhour+timeZone)
-				if(dspHour>23){dspHour=0}
-				if(dspHour<0){dspHour=24+dspHour}
+				// var dhour = date.hour//.toString()
+				// // dhour.length < 2 ? dhour = "0"+dhour :{}
+				// var dspHour = (dhour+timeZone)
+				// if(dspHour>23){dspHour=0}
+				// if(dspHour<0){dspHour=24+dspHour}
 
+				var dspHour = date.hour
+				dspHour.length < 2 ? dspHour = "0"+dspHour :{}
 				var dtz = Math.sign(timeZone)>-1 ? "+" : {}
 
 				var curJday = xpl.jday(date.year,date.month,date.day,date.hour,date.minute,date.sec)
 
-				document.getElementById('date').innerHTML = "Date: " + dMo + "/" + dDay + "/" +date.year+ " (at meridian)"+
-															"<br>Time: "+dspHour+":"+dmin +"(UTC"+dtz+timeZone+")";
+				document.getElementById('date').innerHTML = "Date: " + date.month + "/" + date.day + "/" +date.year+
+											"<br>Time: "+dspHour+":"+dmin +"(UTC"+dtz+timeZone+")";
+
+				// document.getElementById('date').innerHTML = "Date: " + dMo + "/" + dDay + "/" +date.year+ " (at meridian)"+
+				// 											"<br>Time: "+dspHour+":"+dmin +"(UTC"+dtz+timeZone+")";
 				document.getElementById('latlong').innerHTML ="Latitude: "+obsPos.latitude+
 																							"<br> Longitude: "+obsPos.longitude+
 																							"<br> Elevation(m): "+obsPos.elevation*1000+
