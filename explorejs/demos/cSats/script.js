@@ -293,7 +293,7 @@ function createSats(){
                                                 if(tle_data[i].mission=='Rhyolite'){
                                                     highlightMesh = new THREE.Mesh(highlightGeo,highlightMat)
                                                     highlightMesh.position.copy(vertex)
-                                                    scene.add(highlightMesh)
+                                                    //scene.add(highlightMesh)
                                                 }
 
                                                 if(tle_data[i].visible){
@@ -330,12 +330,14 @@ function createSats(){
              });
 
             viewLine = new THREE.Line( viewGeometry, viewMaterial );
-            if(viewGeometry.vertices.length>0 && tourStage>2){
+            if(viewGeometry.vertices.length>0 && tourStage>5){
                 scene.add( viewLine );
             }
             
 }
 var multiplier = 1
+var createDiv = true
+var tour1Text, element
 function tour(){
     switch(tourStage){
         case 0:
@@ -343,7 +345,30 @@ function tour(){
         break
 
         case 1:
-            document.getElementById("tour0Text").style.visibility = 'hidden'
+            if(createDiv){
+                document.getElementById("tour0Text").style.visibility = 'hidden'
+                tour1Text = document.createElement("tour1Text");
+                tour1Text.className = 'modal'
+                tour1Text.style.position = 'absolute'
+                tour1Text.style.right = '10px'
+                tour1Text.style.bottom = '150px'
+                tour1Text.style.width = '350px'
+                tour1Text.style.height = '150px'
+                tour1Text.innerHTML = "<p id='textp'>We know who launched many of the satellites, and we can track them,<br>but we do not really know what they are doing.</p>"
+                element = document.createElement("next1");
+                element.className = "btn"
+                element.style.right = '5px'
+
+                element.appendChild(document.createTextNode('next'));
+                tour1Text.appendChild(element);
+                element.addEventListener('click',function(){
+                    tourStage++
+                    createDiv = true
+                })
+                document.body.appendChild(tour1Text)
+                createDiv = false
+            }
+
             controls.rotateLeft(.01)
             
             if(camera.position.distanceTo(new THREE.Vector3())<1500){
@@ -353,6 +378,83 @@ function tour(){
         break
 
         case 2:
+            if(createDiv){
+                tour1Text.innerHTML = "<p id='textp'>Many of them were launched by the National Reconnaissance Office.</p>"
+
+                element = document.createElement("next1");
+                element.className = "btn"
+                element.style.right = '5px'
+
+                element.appendChild(document.createTextNode('next'));
+                tour1Text.appendChild(element);
+                element.addEventListener('click',function(){
+                    tourStage++
+                    createDiv = true
+                })
+                document.body.appendChild(tour1Text)
+                createDiv = false
+            }
+            controls.rotateLeft(.01)
+        break
+
+        case 3:
+            if(createDiv){
+                tour1Text.innerHTML = "<p id='textp'>Others were launched by various Russian and American military organizations.</p>"
+
+                element = document.createElement("next1");
+                element.className = "btn"
+                element.style.right = '5px'
+
+                element.appendChild(document.createTextNode('next'));
+                tour1Text.appendChild(element);
+                element.addEventListener('click',function(){
+                    tourStage++
+                    createDiv = true
+                })
+                document.body.appendChild(tour1Text)
+                createDiv = false
+            }
+            controls.rotateLeft(.01)
+        break
+
+        case 4:
+            if(createDiv){
+                tour1Text.innerHTML = "<p id='textp'>And some are of completely unknown origin.</p>"
+
+                element = document.createElement("next1");
+                element.className = "btn"
+                element.style.right = '5px'
+
+                element.appendChild(document.createTextNode('next'));
+                tour1Text.appendChild(element);
+                element.addEventListener('click',function(){
+                    tourStage++
+                    createDiv = true
+                })
+                document.body.appendChild(tour1Text)
+                createDiv = false
+            }
+            controls.rotateLeft(.01)
+        break
+
+        case 5:
+            if(createDiv){
+                tour1Text.innerHTML = "<p id='textp'>This is your current location.</p>"
+
+                element = document.createElement("next1");
+                element.className = "btn"
+                element.style.right = '5px'
+
+                element.appendChild(document.createTextNode('next'));
+                tour1Text.appendChild(element);
+                element.addEventListener('click',function(){
+                    tourStage++
+                    createDiv = true
+                })
+                document.body.appendChild(tour1Text)
+                createDiv = false
+            }
+
                 var viewerNormalized = new THREE.Vector3()
                 var cameraNormalized = new THREE.Vector3()
 
@@ -388,20 +490,57 @@ function tour(){
                     controls.target.z-=diffZ*.1
                 }
 
-                if( camera.position.length()>121){
-                    camera.position.multiplyScalar(.99)
+                if( camera.position.length()>125){
+                    camera.position.multiplyScalar(.98)
                 }
-                if(camera.position.length()<119){
-                    camera.position.multiplyScalar(1.01)
+                if(camera.position.length()<115){
+                    camera.position.multiplyScalar(1.02)
                 }
         break
 
-        case 3:
+        case 6:
+            if(createDiv){
+                tour1Text.innerHTML = "<p id='textp'>The green lines show lines of site from you to any visible classified satellites in your area.</p>"
+
+                element = document.createElement("next1");
+                element.className = "btn"
+                element.style.right = '5px'
+
+                element.appendChild(document.createTextNode('next'));
+                tour1Text.appendChild(element);
+                element.addEventListener('click',function(){
+                    tourStage++
+                    createDiv = true
+                })
+                document.body.appendChild(tour1Text)
+                createDiv = false
+            } 
+
             if(camera.position.length()>1502){
                         camera.position.multiplyScalar(.98)
                     }
             if(camera.position.length()<1500){
                 camera.position.multiplyScalar(1.02)
+            }
+        break
+
+        case 7:
+            if(createDiv){
+                tour1Text.innerHTML = "<p id='textp'>Use the controls at the bottom of the screen<br>to adjust the time and toggle markers.</p>"
+
+                element = document.createElement("next1");
+                element.className = "btn"
+                element.style.right = '5px'
+
+                element.appendChild(document.createTextNode('close'));
+                tour1Text.appendChild(element);
+                element.addEventListener('click',function(){
+                    tourStage++
+                    createDiv = true
+                    tour1Text.style.visibility='hidden'
+                })
+                document.body.appendChild(tour1Text)
+                createDiv = false
             }
         break
     }
@@ -412,7 +551,7 @@ document.getElementById("close").addEventListener("click",function(){
     tourStage = 999
 })
 
-document.getElementById("tour0").addEventListener("mouseup",function(){
+document.getElementById("next0").addEventListener("mouseup",function(){
     tourStage++
 })
 
@@ -448,7 +587,5 @@ YUI().use('dial', function(Y) {
             dial.set('value',0)
         }, false)
 });
-
-
 
 document.body.addEventListener("keypress", function(){++tourStage});
