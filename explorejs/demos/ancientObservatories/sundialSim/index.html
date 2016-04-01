@@ -9,42 +9,37 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r74/three.min.js"></script>
 		<script src="OrbitControls.js"></script>
 		<script src="OBJLoader.js"></script>
+		        <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+
 		<!--<script src="explore.js"></script>-->
 		<!--<script type="text/javascript" src="../../explore/explore.js"></script>-->
 		<script src="../../../lib/explore.js"></script>
 	</head>
 
-	<body>
+	<body class="yui3-skin-sam">
 		<!-- <div id="sliderTitle"> Time Speed </div> -->
 		<h1 id="loading"> LOADING </h1>
 		<h1 id="loadAmount"></h1>
 		<div id = "info">
 			<p id="date"></p>
-<!-- 			<p id="dText">Date:</p>
-			<input type="text" class="tin" id="inmonth">
-			/
-			<input type="text" class="tin" id="inday">
-			/
-			<input type="text" class="tin" id="inyear"> -->
-
 			<p id="latlong"></p>
 		</div>
 		<aside id="controls">
-		    <div id="rewind">
-		    	Reverse
-			    <div id="speed-1" class="speedRW"></div>
-			    <div id="speed-2" class="speedRW"></div>
-			</div>
-			<div id="play">
-			</div>
-			<div id="fastForward">
-			    <div id="speed1" class="speedFF"></div>
-			    <div id="speed2" class="speedFF"></div>
-			</div>
-		    <h4 class="time">1 Second = 1 <span id="timescale">Second</span></h4>
-		    <!-- <input id="speedSlider" type="range"></input> -->
-		    <button id="resetTime">Reset to now</button>	
-		    <p id="credit"> Sundial Simulator <a href="willjfield.com">Will Field</a>, 2016.<br> Computational Photography and 3D Modeling for the Ancient World
+          <img src="Arrows.png" class="arrows">
+          <div id="demo"></div>     
+          <h4 class="time">Time Dial: 1 Spin = 1 
+            <select id="timeSelector">
+                  <option value="10">Minute</option>
+                  <option value="600" selected="selected">Hour</option>
+                  <option value="14400">Day</option>
+                  <option value="100800">Week</option>
+                  <option value="438000">Month</option>
+			      <option value="5256000">Year</option>
+			      <option value="52560000">Decade</option>
+			      <option value="525600000">Century</option>
+            </select>
+         	</h4>	
+		    <p id="credit"> Sundial Simulator <a href="willjfield.com">Will Field</a>, 2016.<br> Computational Photography and 3D Modeling for the Ancient World<br>
 			with Sebastian Heath, NYU<br>
 	        Photogrammetry by the <a href = "https://www.topoi.org/project/d-5-6/">Berlin Sundial Project</a>    			
 		</aside>

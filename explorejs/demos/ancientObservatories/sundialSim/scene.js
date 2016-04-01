@@ -17,31 +17,19 @@
 
 			var controls;
 
-			var speed, tOffset, date
-
+			var speed, timeOffset, date, sumT
+			var dial
 			var planetArray = []
-
-			//debug slider
-			var zGnomon = 0
-			var yGnomon = 0
 
 			init();
 			animate();
 
 			function init() {
 				speed = 0
-				tOffset = 0
-				//min hr day month year decade century
-				// document.getElementById("speedSlider").min = -7
-				// document.getElementById("speedSlider").max = 7
-				// document.getElementById("speedSlider").step = 1
-				// document.getElementById("speedSlider").value = 0
-
+				timeOffset = 0
+				sumT = 0
 
 				var date = xpl.dateFromJday(xpl.now,timeZone)
-				// document.getElementById('inday').value = date.day
-				// document.getElementById('inmonth').value = date.month
-				// document.getElementById('inyear').value = date.year
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -51,11 +39,9 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set(0,0,0);
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x224488, 1);
+				renderer = new THREE.WebGLRenderer({ alpha: true });
+				renderer.setClearColor( 0x000000, 0 );
 				renderer.shadowMap.enabled = true;
-				//renderer.shadowMapType = THREE.PCFSoftShadowMap;
-				//renderer.shadowMapSoft = true;
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -106,7 +92,6 @@
 				gnomonMesh = new THREE.Mesh( gnomonGeo, gnomonMat );
 				gnomonMesh.rotateX(Math.PI/2)
 				gnomonMesh.position.set(0,3.04,-1.48) 
-				//gnomonMesh.position.set(0,1.44,-.05+zGnomon)//vertical
 				gnomonMesh.castShadow = true
 				scene.add( gnomonMesh );
 
@@ -114,10 +99,10 @@
 					if(p<6){
 					var nullObj = new THREE.Object3D();
 					if(p!=2){
-						var geometry = new THREE.SphereGeometry( 10,8,8 );
+						var geometry = new THREE.SphereGeometry( 5,8,8 );
 						var material = new THREE.MeshBasicMaterial( { color: xpl.planets[p].texColor } );
 					}else{
-						var geometry = new THREE.SphereGeometry( 15,8,8 );
+						var geometry = new THREE.SphereGeometry( 25,8,8 );
 						var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 					}
 					var sphere = new THREE.Mesh( geometry, material );
@@ -126,7 +111,7 @@
 					nullObj.add(sphere)
 					p==2 ? nullObj.add( directionalLight ) : {}
 
-					var pAltAz = xpl.PlanetAlt(p,xpl.now+tOffset,obsPos)
+					var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
 					nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
 					planetArray.push(nullObj)
 					scene.add( nullObj )
@@ -196,48 +181,14 @@
 			}
 			function animate() {
 				xpl.updateTime()
-				//speed = parseFloat(document.getElementById("speedSlider").value)	
-				// speed = parseInt(document.getElementById("speedSlider").value)
 
-				var dir = speed > 0
-				dir *= 2
-				dir -= 1
-				//min hr day month year decade century
-				switch(Math.abs(speed)){
-					case 0:
-						step = 0
-						document.getElementById("timescale").innerHTML = 'Second'
-						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-					break;
-					case 1:
-						step = 0.00001157407 * dir// 1 min/sec
-						document.getElementById("timescale").innerHTML = 'Minute'
-						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-					break;
-					case 2:
-						step = 0.00069166666 * dir// 1 hr/sec
-						document.getElementById("timescale").innerHTML = 'Hour'
-						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-					break;
-					case 3:
-						step = 0.0166 * dir// 1 day/sec
-						document.getElementById("timescale").innerHTML = 'Day'
-						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-					break;
-					case 4:
-					 	step = 0.498 * dir// 1 month/sec
-					 	document.getElementById("timescale").innerHTML = 'Month'
-					 	speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-					break;
-					case 5:
-						step = 5.976 * dir// 1 yr/sec
-						document.getElementById("timescale").innerHTML = 'Year'
-						speed<0 ? document.getElementById("timescale").innerHTML+=' backwards' : {}
-					break;
+
+				if(typeof dial != 'undefined'){
+					dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
 				}
-				tOffset+=step
+
 				//DISPLAY DATE vs CALC DATE
-				var date = xpl.dateFromJday(xpl.now+tOffset)
+				var date = xpl.dateFromJday(xpl.now+timeOffset+sumT)
 				
 				var dDay = date.day.toString()
 				dDay.length<2 ? dDay = "0"+dDay : {}
@@ -255,27 +206,8 @@
 				if(dspHour<0){dspHour=24+dspHour}
 
 				var dtz = Math.sign(timeZone)>-1 ? "+" : {}
-				// if(date.hour+timeZone<0){
-				// 	dhour = 23+(date.hour)
-				// 	//dDay -= 1
-				// }
-				// if(date.hour+timeZone>23){ 
-				// 	dhour = 0
-				// 	//dDay += 1
-				// }
 
 				var curJday = xpl.jday(date.year,date.month,date.day,date.hour,date.minute,date.sec)
-
-				
-				//console.log("measured "+curJday)
-				//console.log(date)
-				//var inDay = parseFloat(document.getElementById('inday').value)>0 ? parseFloat(document.getElementById('inday').value) : 0
-				//var inMonth = parseFloat(document.getElementById('inmonth').value)>0 ? parseFloat(document.getElementById('inmonth').value) : 0
-				//var inYear = parseFloat(document.getElementById('inyear').value)>0 ? parseFloat(document.getElementById('inyear').value) : 0
-
-				//var tset = xpl.jday(inYear, inMonth, inDay, date.hour, date.minute, date.sec)
-				//var difTime = xpl.now+tOffset-tset+0.04166666651144624
-				//console.log(difTime)
 
 				document.getElementById('date').innerHTML = "Date: " + dMo + "/" + dDay + "/" +date.year+ " (at meridian)"+
 															"<br>Time: "+dspHour+":"+dmin +"(UTC"+dtz+timeZone+")";
@@ -284,12 +216,22 @@
 																							"<br> Elevation(m): "+obsPos.elevation*1000+
 																							"<br>Sundial from Villa Palombara Massimi, Rome"
 
-				for(var p in planetArray){
-						var pAltAz = xpl.PlanetAlt(p,xpl.now+tOffset,obsPos)
+				for(var p =0;p<planetArray.length;p++){
+						var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
 						planetArray[p].rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
+
 				}
-				//console.log("actual "+(xpl.now+tOffset))
-				//console.log(xpl.PlanetAlt(2,xpl.now+tOffset,obsPos)[1],xpl.PlanetAlt(2,xpl.now+tOffset,obsPos)[0])
+				var sunAlt = xpl.PlanetAlt(2,xpl.now+timeOffset+sumT,obsPos)[0]
+				console.log(sunAlt)
+				if(sunAlt>0){
+					document.body.style.backgroundColor ='rgb(255,255,255)'
+					var dayColor = 'rgb('+parseInt(sunAlt*3)+','+parseInt(sunAlt*4)+','+parseInt(sunAlt*5)+')'
+					console.log(dayColor)
+					document.body.style.backgroundColor = dayColor
+				}else{
+					document.body.style.backgroundColor ='#000010'
+				}
+
 				requestAnimationFrame( animate );
 				render();
 			}
@@ -303,60 +245,34 @@
 				document.getElementById("speedSlider").value = 0
 			}
 
-			function gzMouseDown(){
-				zGnomon = parseFloat(document.getElementById("zGnomon").value)
-				gnomonMesh.position.z = -.55+zGnomon
-				console.log(gnomonMesh.position)
+			document.getElementById('timeSelector').addEventListener("change", function() {
+			    sumT+=timeOffset
+			    timeOffset = 0
+			    dial.set('value',0)
+			});
+
+			var logValue = function(e){
+			        timeOffset = (e.newVal/14400)
 			}
 
-			function gyMouseDown(){
-				yGnomon = parseFloat(document.getElementById("yGnomon").value)
-				gnomonMesh.position.y = 4.85-yGnomon
-				console.log(gnomonMesh.position)
-			}
-
-			document.getElementById("fastForward").addEventListener('click',function(){
-				speed++
-				speed < 0 ? speed = 0 : {}
-				if(speed<6){
-					//var highlightName = "speed"+speed
-
-					for(var s=0; s<speed; s++){
-						var name = "speed"+speed+1
-						document.getElementById("fastForward").innerHTML+="<div id="+name+" class='speedFF'></div>"
-						document.getElementById(name).style.borderColor = "transparent transparent transparent #0f0"
-						document.getElementById(name).style.left = (speed*20)+'px'
-					}
-				}
-			})
-
-			document.getElementById("rewind").addEventListener('click',function(){
-				speed--
-				speed > 0 ? speed = 0 : {}
-				if(speed>-6){
-					for(var s=0; s>speed; s--){
-						var name = "speed-"+speed
-						document.getElementById("rewind").innerHTML+="<div id="+name+" class='speedRW'></div>"
-						document.getElementById(name).style.borderColor = "transparent transparent transparent #f00"
-						document.getElementById(name).style.left = (speed*20)+'px'
-					}
-				}
-			})
-
-			document.getElementById("play").addEventListener('click',function(){
-				speed=0
-				document.getElementById("fastForward").innerHTML = "<div id='speed1' class='speedFF'></div><div id='speed2' class='speedFF'></div>"
-				document.getElementById("rewind").innerHTML = "<div id='speed-1' class='speedRW'></div><div id='speed-2' class='speedRW'></div>"
-			})
-
-			document.getElementById("resetTime").addEventListener("mouseup",function(event){
-				tOffset = 0
-			})
-			//FOR PLACING GNOMON
-			// document.getElementById("zGnomon").min = -2
-			// document.getElementById("zGnomon").max = 2
-			// document.getElementById("zGnomon").step = .0001
-			//
-			// document.getElementById("yGnomon").min = -2
-			// document.getElementById("yGnomon").max = 2
-			// document.getElementById("yGnomon").step = .0001
+			YUI().use('dial', function(Y) {
+			        dial = new Y.Dial({
+			            min:-100000000000,
+			            max:100000000000,
+			            stepsPerRevolution:10,
+			            value: 0,
+			            strings:{label:'',resetStr: 'Reset'},
+			            after : {
+			               valueChange: Y.bind(logValue, dial)
+			            }
+			        });
+			    dial.render("#demo");
+			    var labels = document.getElementsByClassName('yui3-dial-label')
+			    labels[0].style.visibility='hidden'
+			    var resetButton = document.getElementsByClassName('yui3-dial-center-button')
+			    resetButton[0].addEventListener('click',function(){
+			            sumT = 0
+			            timeOffset = 0
+			            dial.set('value',0)
+			        }, false)
+			});

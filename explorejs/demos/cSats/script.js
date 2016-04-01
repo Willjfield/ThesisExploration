@@ -500,7 +500,7 @@ function tour(){
 
         case 6:
             if(createDiv){
-                tour1Text.innerHTML = "<p id='textp'>The green lines show lines of site from you to any visible classified satellites in your area.</p>"
+                tour1Text.innerHTML = "<p id='textp'>The green lines show lines of site from you to any visible classified satellite from where you are.</p>"
 
                 element = document.createElement("next1");
                 element.className = "btn"
