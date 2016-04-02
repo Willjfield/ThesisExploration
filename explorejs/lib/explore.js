@@ -824,7 +824,7 @@ Add moons
 		return new Array(topo[0], topo[1], topo[2], ra, dec, sdat[4], 0, 1, 0,
 				sdat[3], -26.74);
 	}
-	///WHERE DOES THE MOON FIT INTO ALL THIS?
+	
 	xpl.MoonPos = function(jday,obs){
 		return MoonPos(jday,obs)
 	}

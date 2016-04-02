@@ -41,6 +41,10 @@ var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
 var tourDollies = []
 var tourRotations = []
 
+var NRO = false
+var Military = false
+var Unknown = false
+
 // var tweenStart = new TWEEN.Tween(tourPositions[0])
 //     .to(tourPositions[1], 5000)
 //     .easing(TWEEN.Easing.Sinusoidal.InOut)
@@ -232,8 +236,6 @@ function animate(time) {
             }else{
                 tle_data[sat].visible = false
             }
-            //lookAngles.name = satellites[sat].id.replace(/[0-9]/g, '')
-            //visibileSatsLookAngles.push(lookAngles)
         }
 	createSats();
 
@@ -290,10 +292,10 @@ function createSats(){
 
                                                 geoP.vertices.push( vertex );
 
-                                                if(tle_data[i].mission=='Rhyolite'){
+                                                if(tle_data[i].mission=='Rhyolite' && NRO == true){
                                                     highlightMesh = new THREE.Mesh(highlightGeo,highlightMat)
                                                     highlightMesh.position.copy(vertex)
-                                                    //scene.add(highlightMesh)
+                                                    scene.add(highlightMesh)
                                                 }
 
                                                 if(tle_data[i].visible){

@@ -25,6 +25,7 @@
 			animate();
 
 			function init() {
+				//console.log('sunrise '+xpl.sunrise(obsPos,-0.833))
 				speed = 0
 				timeOffset = 0
 				sumT = 0
@@ -37,7 +38,7 @@
 
 				scene = new THREE.Scene();
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set(0,0,0);
+				
 
 				renderer = new THREE.WebGLRenderer({ alpha: true });
 				renderer.setClearColor( 0x000000, 0 );
@@ -187,6 +188,7 @@
 				}, onProgress, onError );
 
 				window.addEventListener( 'resize', onWindowResize, false );
+				camera.position.set(-5,10,10);
 
 			}
 
@@ -251,7 +253,6 @@
 				if(sunAlt>0){
 					document.body.style.backgroundColor ='rgb(255,255,255)'
 					var dayColor = 'rgb('+parseInt(sunAlt*3)+','+parseInt(sunAlt*4)+','+parseInt(sunAlt*5)+')'
-					console.log(dayColor)
 					document.body.style.backgroundColor = dayColor
 				}else{
 					document.body.style.backgroundColor ='#000010'
