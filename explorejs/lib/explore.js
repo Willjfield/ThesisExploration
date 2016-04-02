@@ -810,7 +810,7 @@ Add moons
         return new Array(xs,ys,0,r,lonsun,0);
     }
 
-		function SunAlt(jday, obs) {
+	function SunAlt(jday, obs) {
 		// return alt, az, time angle, ra, dec, ecl. long. and lat=0, illum=1, 0,
 		// dist, brightness
 		var sdat = sunxyz(jday);

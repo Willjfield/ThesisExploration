@@ -95,60 +95,58 @@
 				gnomonMesh.castShadow = true
 				scene.add( gnomonMesh );
 
-				for(var p in xpl.planets){
-					if(p<6){
-					var nullObj = new THREE.Object3D();
-					if(p!=2){
-						var geometry = new THREE.SphereGeometry( 5,8,8 );
-						var material = new THREE.MeshBasicMaterial( { color: xpl.planets[p].texColor } );
-						var sphere = new THREE.Mesh( geometry, material );
-						sphere.position.set(0,0,-1500)
+				//Whole planet creation has to happen in callback function or else sun loads last
+				var sunTexture = new THREE.Texture();
+				loader.load( '../../../../lib/data/images/Sun.jpg', function ( image ) {
+					for(var p=0;p<6;p++){
+							var nullObj = new THREE.Object3D();
+							if(p!=2){
+								var geometry = new THREE.SphereGeometry( 5,8,8 );
+								var material = new THREE.MeshBasicMaterial( { color: xpl.planets[p].texColor } );
+								var sphere = new THREE.Mesh( geometry, material );
+								sphere.position.set(0,0,-1500)
 
-						nullObj.add(sphere)
-						var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
-						nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
+								nullObj.add(sphere)
+								var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
+								nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
+							}else{
+								
+									sunTexture.image = image;
+									sunTexture.needsUpdate = true;
+									sunTexture.receiveShadow = true;
+									sunTexture.castShadow = true;
+								
+
+									var sunGeometry = new THREE.SphereGeometry( 25,8,8 );
+									var sunMaterial = new THREE.MeshLambertMaterial( { emissiveMap:sunTexture,emissive: 0xffffff, emissiveIntensity:2 } );
+
+									var lineGeometry = new THREE.Geometry()
+									var lineMaterial = new THREE.LineBasicMaterial({
+										color: 0xffff00
+									})
+
+									lineGeometry.vertices.push(
+										new THREE.Vector3( 0, 0, 0 ),
+										new THREE.Vector3( 0, 0, -1500 )
+									);
+
+									var line = new THREE.Line( lineGeometry, lineMaterial );
+
+									var sphere = new THREE.Mesh( sunGeometry, sunMaterial );
+									sphere.position.set(0,0,-1500)
+
+									nullObj.add(sphere)
+									nullObj.add(line)
+									nullObj.add( directionalLight )
+									console.log()
+									var pAltAz = xpl.PlanetAlt(2,xpl.now+timeOffset+sumT,obsPos)
+
+									nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')	
+							}					
 						planetArray.push(nullObj)
 						scene.add( nullObj )
-					}else{
-						var sunTexture = new THREE.Texture();
-						loader.load( '../../../../lib/data/images/Sun.jpg', function ( image ) {
-							sunTexture.image = image;
-							sunTexture.needsUpdate = true;
-							sunTexture.receiveShadow = true;
-							sunTexture.castShadow = true;
-						
-
-							var sunGeometry = new THREE.SphereGeometry( 25,8,8 );
-							var sunMaterial = new THREE.MeshLambertMaterial( { emissiveMap:sunTexture,emissive: 0xffffff, emissiveIntensity:2 } );
-
-							var lineGeometry = new THREE.Geometry()
-							var lineMaterial = new THREE.LineBasicMaterial({
-								color: 0xffff00
-							})
-
-							lineGeometry.vertices.push(
-								new THREE.Vector3( 0, 0, 0 ),
-								new THREE.Vector3( 0, 0, -1500 )
-							);
-
-							var line = new THREE.Line( lineGeometry, lineMaterial );
-
-							var sphere = new THREE.Mesh( sunGeometry, sunMaterial );
-							sphere.position.set(0,0,-1500)
-
-							nullObj.add(sphere)
-							nullObj.add(line)
-							nullObj.add( directionalLight )
-
-							var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
-							nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
-							planetArray.push(nullObj)
-							scene.add( nullObj )
-						});
 					}
-				}
-				}
-
+				});
 				//when done, add the venusNull to the scene
 				// texture
 
@@ -246,10 +244,10 @@
 				for(var p =0;p<planetArray.length;p++){
 						var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
 						planetArray[p].rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')
-
 				}
+
 				var sunAlt = xpl.PlanetAlt(2,xpl.now+timeOffset+sumT,obsPos)[0]
-				console.log(sunAlt)
+				
 				if(sunAlt>0){
 					document.body.style.backgroundColor ='rgb(255,255,255)'
 					var dayColor = 'rgb('+parseInt(sunAlt*3)+','+parseInt(sunAlt*4)+','+parseInt(sunAlt*5)+')'
