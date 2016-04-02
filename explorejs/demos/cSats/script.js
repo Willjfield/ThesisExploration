@@ -42,8 +42,13 @@ var tourDollies = []
 var tourRotations = []
 
 var NRO = false
-var Military = false
+var USMilitary = false
+var OtherMilitary = false
 var Unknown = false
+
+var nro = []
+var military = []
+var unknown = []
 
 // var tweenStart = new TWEEN.Tween(tourPositions[0])
 //     .to(tourPositions[1], 5000)
@@ -78,6 +83,23 @@ function map (val, in_min, in_max, out_min, out_max) {
 }
 
 function init() {
+
+        for(var m in xpl.classifiedMissions){
+            if(m<6){
+                nro.push(xpl.classifiedMissions[m])
+            }
+
+            if(m>5 && m<25){
+                military.push(xpl.classifiedMissions[m])
+            }
+
+            if(m>24){
+                unknown.push(xpl.classifiedMissions[m])
+            }
+        }
+
+        highlightGeo=new THREE.SphereGeometry(5,4,4)
+        highlightMat=new THREE.MeshBasicMaterial({  color: 0xff0000})
                       
         roty = 0;
 
@@ -221,22 +243,23 @@ function animate(time) {
         dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
     }
 
-        var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
-        lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
-        requestAnimationFrame( animate );
-        // TWEEN.update(time);
-        xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
-	   earthMaterial.uniforms.sunDirection.value = lightDir 
-     	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
-        for(var sat in tle_data){
-            var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
-            if(lookAngles.elevation>15){
-                tle_data[sat].visible = true
+    var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
+    lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
+    requestAnimationFrame( animate );
+    // TWEEN.update(time);
+    xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
+   earthMaterial.uniforms.sunDirection.value = lightDir 
+ 	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
+    for(var sat in tle_data){
+        var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
+        if(lookAngles.elevation>15){
+            tle_data[sat].visible = true
 
-            }else{
-                tle_data[sat].visible = false
-            }
+        }else{
+            tle_data[sat].visible = false
         }
+    }
+
 	createSats();
 
 	controls.update();
@@ -259,6 +282,11 @@ function animate(time) {
     }
     scene.remove( viewLine );
 
+    for(var mesh in scene.children){
+        if(scene.children[mesh].name == "nro"){
+            scene.remove(scene.children[mesh])
+        }
+    }
     // TWEEN.update()
 }
 
@@ -274,8 +302,7 @@ function render() {
 }
 
 function createSats(){ 
-                highlightGeo=new THREE.SphereGeometry(5,12,12)
-                highlightMat=new THREE.MeshBasicMaterial({  color: 0xff0000})
+                
 
                 geoP= new THREE.Geometry({ verticesNeedUpdate: true});
                 geoC= new THREE.Geometry({ verticesNeedUpdate: true});
@@ -292,10 +319,13 @@ function createSats(){
 
                                                 geoP.vertices.push( vertex );
 
-                                                if(tle_data[i].mission=='Rhyolite' && NRO == true){
-                                                    highlightMesh = new THREE.Mesh(highlightGeo,highlightMat)
-                                                    highlightMesh.position.copy(vertex)
-                                                    scene.add(highlightMesh)
+                                                for(var mission in nro){
+                                                            if(tle_data[i].mission.includes(nro[mission])){
+                                                                highlightMesh = new THREE.Mesh(highlightGeo,highlightMat)
+                                                                highlightMesh.position.copy(vertex)
+                                                                highlightMesh.name = "nro"
+                                                                scene.add(highlightMesh)
+                                                            }
                                                 }
 
                                                 if(tle_data[i].visible){
@@ -397,6 +427,12 @@ function tour(){
                 createDiv = false
             }
             controls.rotateLeft(.01)
+
+            if(camera.position.distanceTo(new THREE.Vector3())<1500){
+                controls.dollyOut(1+(.01*multiplier))
+                multiplier*=.999
+            } 
+
         break
 
         case 3:
@@ -417,6 +453,11 @@ function tour(){
                 createDiv = false
             }
             controls.rotateLeft(.01)
+
+            if(camera.position.distanceTo(new THREE.Vector3())<1500){
+                controls.dollyOut(1+(.01*multiplier))
+                multiplier*=.999
+            } 
         break
 
         case 4:
@@ -437,6 +478,11 @@ function tour(){
                 createDiv = false
             }
             controls.rotateLeft(.01)
+
+            if(camera.position.distanceTo(new THREE.Vector3())<1500){
+                controls.dollyOut(1+(.01*multiplier))
+                multiplier*=.999
+            } 
         break
 
         case 5:

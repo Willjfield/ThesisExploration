@@ -4195,6 +4195,28 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	//classified:
 	//var classified = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
 
+	//classified categories:
+	var nro = ['Rhyolite','Vortex','Magnums','Mercury','Mentor','GeoLITE']
+	
+	var airforce = ['Canyon','DSP','Milstar','SBIRS','GSSAP']
+	var navy=['FleetSatCom']
+	var jointusmilitary=['DSCS','SDS','Trumpet','USA','Delta4','Mitex','WGS','MUOS','CLIO','ISON']
+	var soviet=['Ekran']
+	var jointothermilitaries=['Sicral','AEHF']
+
+	var unknown=['UFO','Unknown','UI168']
+	
+
+	var classifiedCategories = [airforce,nro,navy,jointusmilitary,soviet,unknown,jointothermilitaries]
+	xpl.classifiedMissions = ['Rhyolite','Vortex','Magnums','Mercury','Mentor','GeoLITE',
+							'Canyon','DSP','Milstar','SBIRS','GSSAP',
+							'FleetSatCom',
+							'DSCS','SDS','Trumpet','USA','Delta4','Mitex','WGS','MUOS','CLIO','ISON',
+							'Ekran',
+							'Sicral','AEHF',
+							'UFO','Unknown','UI168']
+	xpl.classifiedCategories = classifiedCategories
+
 	var xmlhttp = new XMLHttpRequest();
 
 	xpl.getTLE = function(query, satellites, callback, pathToData){
