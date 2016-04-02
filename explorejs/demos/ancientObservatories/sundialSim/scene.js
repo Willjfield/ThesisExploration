@@ -114,8 +114,8 @@
 								
 									sunTexture.image = image;
 									sunTexture.needsUpdate = true;
-									sunTexture.receiveShadow = true;
-									sunTexture.castShadow = true;
+									// sunTexture.receiveShadow = true;
+									// sunTexture.castShadow = true;
 								
 
 									var sunGeometry = new THREE.SphereGeometry( 25,8,8 );

@@ -4196,25 +4196,25 @@ function ecf_to_heliocentric(pos_ecf, jday){
 	//var classified = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
 
 	//classified categories:
-	var nro = ['Rhyolite','Vortex','Magnums','Mercury','Mentor','GeoLITE']
+	var nro = ['Rhyolite','Vortex','Magnum','Mercury','Mentor','GeoLITE']
 	
 	var airforce = ['Canyon','DSP','Milstar','SBIRS','GSSAP']
 	var navy=['FleetSatCom']
-	var jointusmilitary=['DSCS','SDS','Trumpet','USA','Delta4','Mitex','WGS','MUOS','CLIO','ISON']
+	var jointusmilitary=['DSCS','SDS','Trumpet','USA','Delta4Demo','Mitex','WGS','MUOS','CLIO','ISON']
 	var soviet=['Ekran']
 	var jointothermilitaries=['Sicral','AEHF']
 
-	var unknown=['UFO','Unknown','UI168']
+	var unknown=['UFO','Unknown','UI168','Unknwn']
 	
 
 	var classifiedCategories = [airforce,nro,navy,jointusmilitary,soviet,unknown,jointothermilitaries]
-	xpl.classifiedMissions = ['Rhyolite','Vortex','Magnums','Mercury','Mentor','GeoLITE',
+	xpl.classifiedMissions = ['Rhyolite','Vortex','Magnum','Mercury','Mentor','GeoLITE',
 							'Canyon','DSP','Milstar','SBIRS','GSSAP',
 							'FleetSatCom',
-							'DSCS','SDS','Trumpet','USA','Delta4','Mitex','WGS','MUOS','CLIO','ISON',
+							'DSCS','SDS','Trumpet','USA','Delta4Demo','Mitex','WGS','MUOS','CLIO','ISON',
 							'Ekran',
 							'Sicral','AEHF',
-							'UFO','Unknown','UI168']
+							'UFO','Unknown','UI168','Unknwn','96044','UI168']
 	xpl.classifiedCategories = classifiedCategories
 
 	var xmlhttp = new XMLHttpRequest();

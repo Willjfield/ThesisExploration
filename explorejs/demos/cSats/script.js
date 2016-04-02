@@ -41,14 +41,18 @@ var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
 var tourDollies = []
 var tourRotations = []
 
-var NRO = false
-var USMilitary = false
-var OtherMilitary = false
-var Unknown = false
+var showNRO = false
+var showMilitary = false
+var showUnknown = false
 
 var nro = []
 var military = []
 var unknown = []
+
+var mwTexture
+
+var initDate
+var timeZone
 
 // var tweenStart = new TWEEN.Tween(tourPositions[0])
 //     .to(tourPositions[1], 5000)
@@ -73,8 +77,44 @@ xpl.getTLE('classified', satellites, function(){
         obs.latitude = location.coords.latitude
         obs.longitude = location.coords.longitude
         obs.height = 0
-        init()
-        animate()
+        
+
+        var manager = new THREE.LoadingManager();
+                manager.onProgress = function ( item, loaded, total ) {
+                    // document.getElementById("loading").remove()
+                    // document.getElementById("loadAmount").remove()
+                    console.log( item, loaded, total );
+                };
+
+                var onProgress = function ( xhr ) {
+                    if ( xhr.lengthComputable ) {
+                        var percentComplete = xhr.loaded / xhr.total * 100;
+                        //document.getElementById("loadAmount").innerHTML = (Math.round(percentComplete, 2) + '%')
+                    }
+                };
+
+                var onError = function ( xhr ) {
+                };
+
+        var loader = new THREE.ImageLoader( manager );
+        mwTexture = new THREE.Texture();
+        loader.load( '../../lib/data/images/milkywaypan_brunier.jpg', function ( image ) {
+            mwTexture.image = image;
+            mwTexture.needsUpdate = true
+            var geometryBG = new THREE.SphereGeometry( 5000, 24, 24 );
+        
+            var materialBG = new THREE.MeshLambertMaterial( { map:mwTexture } );
+            // materialBG.emissiveMap=mwTexture
+            // materialBG.emissive=0xffffff
+            // materialBG.emissiveIntensity=20
+            skybox = new THREE.Mesh( geometryBG, materialBG);
+            skybox.material.side = THREE.DoubleSide;
+            skybox.rotateX(60*(Math.PI/180))
+
+            init()
+            animate()
+         })
+        
     }) 
 })
 
@@ -83,6 +123,10 @@ function map (val, in_min, in_max, out_min, out_max) {
 }
 
 function init() {
+
+        initDate = new Date()
+        timeZone = initDate.getTimezoneOffset()/60
+        console.log(timeZone)
 
         for(var m in xpl.classifiedMissions){
             if(m<6){
@@ -99,14 +143,17 @@ function init() {
         }
 
         highlightGeo=new THREE.SphereGeometry(5,4,4)
-        highlightMat=new THREE.MeshBasicMaterial({  color: 0xff0000})
+
+        highlightNROMat=new THREE.MeshBasicMaterial({  color: 0xff00ff})
+        highlightMilMat=new THREE.MeshBasicMaterial({  color: 0x20ff20})
+        highlightUnMat=new THREE.MeshBasicMaterial({  color: 0x0080ff})
                       
         roty = 0;
 
         container = document.createElement('div');
         document.body.appendChild(container);
 
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight,.01, 6000 );
+        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight,.1, 6000 );
         camera.position.set( 0, 0, 1500 );
 
         controls = new THREE.OrbitControls( camera );
@@ -124,14 +171,9 @@ function init() {
         var size = 500, step = 100;
 
        //Background
-        var geometryBG = new THREE.SphereGeometry( 5000, 48, 48 );
-        var materialBG = new THREE.MeshLambertMaterial( {  map: THREE.ImageUtils.loadTexture( '../../lib/data/images/milkywaypan_brunier.jpg' ), color: 0xffffff, emmisive: 0xffffff} );
-
-        skybox = new THREE.Mesh( geometryBG, materialBG);
-        skybox.material.side = THREE.DoubleSide;
-        skybox.rotateX(60*(Math.PI/180))
+        
         scene.add( skybox );
-
+        
         //Earth
         var earthGeo = new THREE.SphereGeometry(99.5,48,48);
 
@@ -227,17 +269,18 @@ function animate(time) {
         myViewPosition=new THREE.Vector3()
         myViewPosition.copy(myThreePosition)
         //myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
-        myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))
-        
+        myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))       
 
     xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
     longRotation = ((xpl.now+timeOffset+sumT)%(xpl.planets[2].dayLength/23.9344))*2*Math.PI
     earth.rotation.y = longRotation
     skybox.rotation.z = ((xpl.now+timeOffset+sumT)%1)*2*Math.PI
-    var date = xpl.dateFromJday(xpl.now+timeOffset+sumT)
+
+
+    var date = xpl.dateFromJday(xpl.now+timeOffset+sumT-(timeZone/24))
     var minute = date.minute
     date.minute<10 ? minute = '0'+date.minute.toString() : {}
-    document.getElementById('curDate').innerHTML=date.day+'/'+date.month+'/'+date.year+'<br>'+date.hour+':'+minute + " UTC"
+    document.getElementById('curDate').innerHTML="Date: "+date.day+'/'+date.month+'/'+date.year+'<br>'+"Local Time: "+date.hour+':'+minute
 
     if(typeof dial != 'undefined'){
         dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
@@ -254,7 +297,6 @@ function animate(time) {
         var lookAngles = tle_data[sat].getLookAnglesFrom(obs.longitude,obs.latitude,0)
         if(lookAngles.elevation>15){
             tle_data[sat].visible = true
-
         }else{
             tle_data[sat].visible = false
         }
@@ -283,7 +325,7 @@ function animate(time) {
     scene.remove( viewLine );
 
     for(var mesh in scene.children){
-        if(scene.children[mesh].name == "nro"){
+        if(scene.children[mesh].name == "nro" || scene.children[mesh].name == "military" || scene.children[mesh].name == "unknown"){
             scene.remove(scene.children[mesh])
         }
     }
@@ -300,16 +342,16 @@ function render() {
     skybox.position.copy(camera.position)
     renderer.render( scene, camera );
 }
-
-function createSats(){ 
+ function createSats(){
                 
-
                 geoP= new THREE.Geometry({ verticesNeedUpdate: true});
                 geoC= new THREE.Geometry({ verticesNeedUpdate: true});
                 var viewGeometry = new THREE.Geometry({ verticesNeedUpdate: true});
 
+                
+                
                 for ( i = 0; i < tle_data.length; i ++ ) {
-
+                    
                                                 var vertex = new THREE.Vector3();
 
                                                 vertex.x = tle_data[i].position_eci.x*.0156;
@@ -318,14 +360,41 @@ function createSats(){
                                                 vertex.applyAxisAngle( new THREE.Vector3(1,0,0),rotateGeo)
 
                                                 geoP.vertices.push( vertex );
-
-                                                for(var mission in nro){
-                                                            if(tle_data[i].mission.includes(nro[mission])){
-                                                                highlightMesh = new THREE.Mesh(highlightGeo,highlightMat)
-                                                                highlightMesh.position.copy(vertex)
-                                                                highlightMesh.name = "nro"
-                                                                scene.add(highlightMesh)
-                                                            }
+                                                
+                                                if(showNRO){
+                                                    for(var mission in nro){
+                                                                if(tle_data[i].mission.includes(nro[mission])){
+                                                                    highlightMesh = new THREE.Mesh(highlightGeo,highlightNROMat)
+                                                                    highlightMesh.position.copy(vertex)
+                                                                    highlightMesh.name = "nro"
+                                                                    scene.add(highlightMesh)
+                                                                    
+                                                                }
+                                                    }
+                                                }
+                                                
+                                                if(showMilitary){
+                                                    for(var mission in military){
+                                                                if(tle_data[i].mission.includes(military[mission])||tle_data[i].name.includes(military[mission])){
+                                                                    highlightMesh = new THREE.Mesh(highlightGeo,highlightMilMat)
+                                                                    highlightMesh.position.copy(vertex)
+                                                                    highlightMesh.name = "military"
+                                                                    scene.add(highlightMesh)
+                                                                    
+                                                                }
+                                                    }
+                                                }
+                                                
+                                                if(showUnknown){
+                                                    for(var mission in unknown){
+                                                                if(tle_data[i].mission.includes(unknown[mission])||tle_data[i].name.includes(unknown[mission])){
+                                                                    highlightMesh = new THREE.Mesh(highlightGeo,highlightUnMat)
+                                                                    highlightMesh.position.copy(vertex)
+                                                                    highlightMesh.name = "unknown"
+                                                                    scene.add(highlightMesh)
+                                                                    
+                                                                }
+                                                    }
                                                 }
 
                                                 if(tle_data[i].visible){
@@ -336,8 +405,9 @@ function createSats(){
                                                 }
                 }
 
-	                   materialP = new THREE.PointCloudMaterial( { size: 3, sizeAttenuation: false, transparent: true, alpha: .5 } );
-                        materialP.color.setHSL( 1.0, 0.0, 1 );
+	                   materialP = new THREE.PointCloudMaterial( { color: 0xffff00, size: 3, sizeAttenuation: false, transparent: true, alpha: .5 } );
+                        //materialP.color.setHSL( 1.0, 1.0, 1 );
+                        // materialP.color = 0xffff00
 				
                         materialT = new THREE.PointCloudMaterial( { size: 1, sizeAttenuation: false, transparent: true, alpha: .5 } );
                        materialT.color.setHSL(.6,1,.6); 	
@@ -365,11 +435,12 @@ function createSats(){
             if(viewGeometry.vertices.length>0 && tourStage>5){
                 scene.add( viewLine );
             }
-            
 }
+
 var multiplier = 1
 var createDiv = true
-var tour1Text, element
+var tour1Text, element, elementBack
+
 function tour(){
     switch(tourStage){
         case 0:
@@ -397,9 +468,12 @@ function tour(){
                     tourStage++
                     createDiv = true
                 })
+
                 document.body.appendChild(tour1Text)
                 createDiv = false
             }
+
+
 
             controls.rotateLeft(.01)
             
@@ -411,8 +485,9 @@ function tour(){
 
         case 2:
             if(createDiv){
-                tour1Text.innerHTML = "<p id='textp'>Many of them were launched by the National Reconnaissance Office.</p>"
-
+                tour1Text.innerHTML = "<p id='textp'>Many of them were launched by the National Reconnaissance Office. <br>(Marked in <b><span id='purpleText'>Purple</span></b>)</p>"
+                document.getElementById("purpleText").style.color = '#ff00ff'
+                showNRO = true
                 element = document.createElement("next1");
                 element.className = "btn"
                 element.style.right = '5px'
@@ -423,6 +498,19 @@ function tour(){
                     tourStage++
                     createDiv = true
                 })
+
+                elementBack = document.createElement("back1");
+                elementBack.className = "btn"
+                elementBack.style.left = '5px'
+
+                elementBack.appendChild(document.createTextNode('back'));
+                tour1Text.appendChild(elementBack);
+                elementBack.addEventListener('click',function(){
+                    tour1Text.parentNode.removeChild(tour1Text)
+                    tourStage--
+                    createDiv = true
+                })
+
                 document.body.appendChild(tour1Text)
                 createDiv = false
             }
@@ -437,8 +525,10 @@ function tour(){
 
         case 3:
             if(createDiv){
-                tour1Text.innerHTML = "<p id='textp'>Others were launched by various Russian and American military organizations.</p>"
 
+                tour1Text.innerHTML = "<p id='textp'>Others were launched by various militaries.<br>(Marked in <b><span id='greenText'>Green</span></b>)</p>"
+                document.getElementById("greenText").style.color = '#20ff20'
+                showMilitary = true
                 element = document.createElement("next1");
                 element.className = "btn"
                 element.style.right = '5px'
@@ -449,6 +539,19 @@ function tour(){
                     tourStage++
                     createDiv = true
                 })
+
+                elementBack = document.createElement("back1");
+                elementBack.className = "btn"
+                elementBack.style.left = '5px'
+
+                elementBack.appendChild(document.createTextNode('back'));
+                tour1Text.appendChild(elementBack);
+                elementBack.addEventListener('click',function(){
+                    createDiv = true
+                    tourStage--  
+                })
+               
+
                 document.body.appendChild(tour1Text)
                 createDiv = false
             }
@@ -462,8 +565,9 @@ function tour(){
 
         case 4:
             if(createDiv){
-                tour1Text.innerHTML = "<p id='textp'>And some are of completely unknown origin.</p>"
-
+                tour1Text.innerHTML = "<p id='textp'>And some are of completely unknown origin.<br>(Marked in <b><span id='blueText'>Blue</span></b>)</p>"
+                document.getElementById("blueText").style.color = '#0080ff'
+                showUnknown = true
                 element = document.createElement("next1");
                 element.className = "btn"
                 element.style.right = '5px'
@@ -474,6 +578,18 @@ function tour(){
                     tourStage++
                     createDiv = true
                 })
+
+                elementBack = document.createElement("back1");
+                elementBack.className = "btn"
+                elementBack.style.left = '5px'
+
+                elementBack.appendChild(document.createTextNode('back'));
+                tour1Text.appendChild(elementBack);
+                elementBack.addEventListener('click',function(){           
+                    createDiv = true
+                    tourStage--
+                })
+
                 document.body.appendChild(tour1Text)
                 createDiv = false
             }
@@ -499,6 +615,18 @@ function tour(){
                     tourStage++
                     createDiv = true
                 })
+
+                elementBack = document.createElement("back1");
+                elementBack.className = "btn"
+                elementBack.style.left = '5px'
+
+                elementBack.appendChild(document.createTextNode('back'));
+                tour1Text.appendChild(elementBack);
+                elementBack.addEventListener('click',function(){           
+                    createDiv = true
+                    tourStage--
+                })
+
                 document.body.appendChild(tour1Text)
                 createDiv = false
             }
@@ -548,7 +676,7 @@ function tour(){
 
         case 6:
             if(createDiv){
-                tour1Text.innerHTML = "<p id='textp'>The green lines show lines of site from you to any visible classified satellite from where you are.</p>"
+                tour1Text.innerHTML = "<p id='textp'>The green lines show lines of sight from you to each classified satellite currently visible in your location.</p>"
 
                 element = document.createElement("next1");
                 element.className = "btn"
@@ -560,6 +688,18 @@ function tour(){
                     tourStage++
                     createDiv = true
                 })
+
+                elementBack = document.createElement("back1");
+                elementBack.className = "btn"
+                elementBack.style.left = '5px'
+
+                elementBack.appendChild(document.createTextNode('back'));
+                tour1Text.appendChild(elementBack);
+                elementBack.addEventListener('click',function(){
+                    createDiv = true
+                    tourStage--
+                })
+
                 document.body.appendChild(tour1Text)
                 createDiv = false
             } 
@@ -574,7 +714,7 @@ function tour(){
 
         case 7:
             if(createDiv){
-                tour1Text.innerHTML = "<p id='textp'>Use the controls at the bottom of the screen<br>to adjust the time and toggle markers.</p>"
+                tour1Text.innerHTML = "<p id='textp'>Use the controls at the bottom of the screen to adjust the time and toggle markers.</p>"
 
                 element = document.createElement("next1");
                 element.className = "btn"
@@ -587,6 +727,18 @@ function tour(){
                     createDiv = true
                     tour1Text.style.visibility='hidden'
                 })
+
+                elementBack = document.createElement("back1");
+                elementBack.className = "btn"
+                elementBack.style.left = '5px'
+
+                elementBack.appendChild(document.createTextNode('back'));
+                tour1Text.appendChild(elementBack);
+                elementBack.addEventListener('click',function(){
+                    createDiv = true
+                    tourStage--
+                })
+
                 document.body.appendChild(tour1Text)
                 createDiv = false
             }
