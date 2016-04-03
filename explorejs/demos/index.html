@@ -3,7 +3,6 @@
 		<link rel="stylesheet" type="text/css" href="../style.css">
 		<script src="https://use.typekit.net/pwk6ibv.js"></script>
 		<script>try{Typekit.load({ async: true });}catch(e){}</script>
-
 	</head>
 	<body>
 		<ul>
@@ -16,16 +15,86 @@
 			<li><a href="../">-About-</a></li>
 			<li><a href="../credits">Credits</a></li>
 		</ul>
+		<div id="showPresentation"></div>
 		<table class="demos">
 			<tr>
-				<td class="demobox"><a href="./cSats" target="_blank" class="demolink"><img src="thumbs/csats.jpg" class="demothumb">Classified Satellites</a></td>
-				<td class="demobox"><a href="./ancientObservatories/sundialSim" target="_blank"><img src="thumbs/sunsim.jpg" class="demothumb">Sundial Simulator</a></td>
-				<td class="demobox"><a href="./musicalPlanets" target="_blank"> <img src="thumbs/musicalplanets.jpg" class="demothumb">Space Sounds</a></td>
+				<td class="demobox">
+						<img src="thumbs/csats.jpg" class="demothumb">Classified Satellites
+						<div class="openBelow" id="csatThis">
+							Open here
+						</div>
+						<a href="./cSats" id="csatNew" target="_blank" class="demolink">
+							<div class="openNew">							
+								Open in new tab
+							</div>
+						</a>
+					</td>
+
+				<td class="demobox">
+					<img src="thumbs/sunsim.jpg" class="demothumb">Sundial Simulator
+					<div class="openBelow" id="sunThis">
+						Open here
+					</div>
+					<a href="./ancientObservatories/sundialSim" target="_blank">
+						<div class="openNew" id="sunNew">							
+							Open in new tab
+						</div>
+					</a>
+				</td>
 			</tr>
-			<tr>
-				<td class="demobox"><a href="./trouvelot" target="_blank"><img src="thumbs/historicalplanets.jpg" class="demothumb">Historic Solar System</a></td>
-				<td class="demobox"><a href="./solarSystem" target="_blank"><img src="thumbs/realism.jpg" class="demothumb">Realism</a></td>
+			<tr>	
+				<td class="demobox">
+					<img src="thumbs/musicalplanets.jpg" class="demothumb">Space Sounds
+					<div class="openBelow" id="musicThis">
+						Open here
+					</div>
+					<a href="./musicalPlanets" target="_blank">
+						<div class="openNew" id="musicNew">							
+							Open in new tab
+						</div>
+					</a>
+				</td>
+			
+				<!-- <td class="demobox"><a href="./trouvelot" target="_blank"><img src="thumbs/historicalplanets.jpg" class="demothumb">Historic Solar System</a></td> -->
+				<td class="demobox">
+					<img src="thumbs/realism.jpg" class="demothumb">Realism
+					<div class="openBelow" id="realThis">
+						Open here
+					</div>
+					<a href="./solarSystem" target="_blank">
+						<div class="openNew" id="realNew">							
+							Open in new tab
+						</div>
+					</a>
+				</td>
 			</tr>
 		</table>
+		<script type="text/javascript">
+		function createBox(pathToiFrame){
+			var presentation = document.createElement('div')
+			presentation.className = 'demoPresentDiv'
+
+			var frame = document.createElement('iframe')
+			frame.className = 'demoBelow'
+			frame.src = pathToiFrame
+
+			var closeBox = document.createElement('div')
+			closeBox.id = 'closeBox'
+			closeBox.appendChild(document.createTextNode('x'))
+			closeBox.addEventListener("click",function(){
+				document.getElementById("showPresentation").removeChild(presentation)
+				console.log("close")
+			})
+
+			presentation.appendChild(frame)
+			presentation.appendChild(closeBox)
+			document.getElementById("showPresentation").appendChild(presentation)	
+		}
+		document.getElementById("csatThis").addEventListener("click",function(){createBox('./cSats')})
+		document.getElementById("sunThis").addEventListener("click",function(){createBox('./ancientObservatories/sundialSim')})
+		document.getElementById("musicThis").addEventListener("click",function(){createBox('./musicalPlanets')})
+		document.getElementById("realThis").addEventListener("click",function(){createBox('./solarSystem')})
+		</script>
 	</body>
+
 </html>

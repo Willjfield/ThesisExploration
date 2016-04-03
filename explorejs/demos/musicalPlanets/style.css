@@ -156,3 +156,9 @@ canvas{
   font-family: Helvetica;
   text-align: center;
 }
+
+#close{
+  width:100px;
+  border:1px solid white;
+  cursor: pointer;
+}

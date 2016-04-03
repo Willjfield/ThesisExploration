@@ -75,7 +75,8 @@ function draw(){
 
 	manageSlider()
 }
-
+var close
+var createDiv = true
 function manageTutorial(){
 	var tutDiv = document.getElementById("tutorial")
 
@@ -96,19 +97,23 @@ function manageTutorial(){
 		break;
 
 		case 3:
-		// var node = document.createElement("BUTTON");  
-		// var t = document.createTextNode("close");
-		// node.appendChild(t); 
 		
-		// var textnode = document.createTextNode("close");         // Create a text node
-		// node.appendChild(textnode);                              // Append the text to <li>
-		
-
+		if(createDiv){
 			tutDiv.innerHTML = "Listen to how the tones change as the planets revolve around the Sun."+
 								"<br><br>You can shift-click on a planet to disconnect all of its connections."+
-								"<br><br>CLOSE"
+								"<br><br>"
+
+			close = document.createElement('div')
+			close.id = 'close'
+			close.appendChild(document.createTextNode('close'))
+
+			tutDiv.appendChild(close)
+
+			close.addEventListener("click",closeDiv)
+			createDiv = false
+		}
 			// tutDiv.appendChild(node);
-			tutDiv.addEventListener("click",closeDiv)
+			
 		break;
 	}
 }
