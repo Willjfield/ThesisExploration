@@ -11,10 +11,82 @@
   background-color:transparent;
 }
 
+#intro{
+  z-index: 999;
+  position: absolute;
+  width:80%;
+  left:50%;
+  bottom:200px;
+  text-align: center;
+  font-weight: lighter;
+  font-size: 20px;
+  font-family: "kepler-std-semicondensed",sans-serif;
+  transform:translate(-50%,0%);
+  background: rgba(0,0,0,.75);
+  padding: 10px;
+  visibility: hidden;
+}
+
+#moreInfo{
+  z-index: 999;
+  background:rgba(64,64,64,.5);
+  /*border: .5px solid grey;*/
+  text-align: center;
+  visibility: hidden;
+  cursor: pointer;
+  position: absolute;
+  bottom:0px;
+  padding: 5px;
+  padding-left: 50px;
+  padding-right: 50px;
+  left:12.5%;
+}
+
+#nightTime{
+  z-index: 999;
+  position: absolute;
+  width:80%;
+  left:50%;
+  top:100px;
+  text-align: center;
+  font-weight: lighter;
+  font-size: 20px;
+  font-family: "kepler-std-semicondensed",sans-serif;
+  transform:translate(-50%,0%);
+  background: rgba(0,0,0,.75);
+  padding: 10px;
+}
+
+.btn{
+  display:inline-block;
+  /*position: absolute;*/
+  background:rgb(64,64,64);
+  color:white;
+  border: 1px solid black;
+  text-align: center;
+  width:100px;
+  bottom:5px;
+  cursor:pointer;
+}
+
+.btn:hover{
+  background:#a0a0a0;
+}
+
+#close{
+  right:5px;
+}
+
+a{
+  text-decoration: none;
+  color:#aaa;
+}
+
 #info{
   position: absolute;
+  z-index: 999;
   width: 100%;
-  top:10px;
+  top:5px;
   height:100px;
 }
 
@@ -89,9 +161,10 @@
   text-align: center;
 }
 #latlong{
-  display: inline;
+  display: inline-block;
   position: absolute;
   right: 5px;
+  top:-15px;
   text-align: right;
 }
 
@@ -136,7 +209,7 @@ canvas{
 
 #controls{
   font-weight: lighter;
-  z-index: 999;
+  z-index: 998;
   transition: background 0.2s ease;
   position:absolute;
   bottom:0px;
@@ -156,9 +229,9 @@ canvas{
   transform: translate(-50.5px,0px);
 }
 
-#controls:hover{
+/*#controls:hover{
   background:rgba(0,0,0,.7);
-}
+}*/
 
 .arrows{
   width:160px;
