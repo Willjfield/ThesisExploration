@@ -81,19 +81,9 @@ xpl.getTLE('classified', satellites, function(){
 
         var manager = new THREE.LoadingManager();
                 manager.onProgress = function ( item, loaded, total ) {
-                    // document.getElementById("loading").remove()
+                    document.getElementById("loading").remove()
                     // document.getElementById("loadAmount").remove()
-                    console.log( item, loaded, total );
-                };
-
-                var onProgress = function ( xhr ) {
-                    if ( xhr.lengthComputable ) {
-                        var percentComplete = xhr.loaded / xhr.total * 100;
-                        //document.getElementById("loadAmount").innerHTML = (Math.round(percentComplete, 2) + '%')
-                    }
-                };
-
-                var onError = function ( xhr ) {
+                    //console.log( item, loaded, total );
                 };
 
         var loader = new THREE.ImageLoader( manager );
@@ -104,9 +94,6 @@ xpl.getTLE('classified', satellites, function(){
             var geometryBG = new THREE.SphereGeometry( 5000, 24, 24 );
         
             var materialBG = new THREE.MeshLambertMaterial( { map:mwTexture } );
-            // materialBG.emissiveMap=mwTexture
-            // materialBG.emissive=0xffffff
-            // materialBG.emissiveIntensity=20
             skybox = new THREE.Mesh( geometryBG, materialBG);
             skybox.material.side = THREE.DoubleSide;
             skybox.rotateX(60*(Math.PI/180))
@@ -126,7 +113,6 @@ function init() {
 
         initDate = new Date()
         timeZone = initDate.getTimezoneOffset()/60
-        console.log(timeZone)
 
         for(var m in xpl.classifiedMissions){
             if(m<6){
@@ -259,7 +245,13 @@ function loadImage( path ) {
 }
 
 function animate(time) {
-     myLong = map(obs.longitude,-180,180,0,360)
+    if(tourStage>100){
+        // ? showNRO = true : showNRO = false
+        document.getElementById('nroHighlight').checked ? showNRO = true : showNRO = false
+        document.getElementById('milHighlight').checked ? showMilitary = true : showMilitary = false
+        document.getElementById('unHighlight').checked ? showUnknown = true : showUnknown = false
+    }
+    myLong = map(obs.longitude,-180,180,0,360)
     tour()
     xpl.updateTime()
     myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
@@ -347,9 +339,7 @@ function render() {
                 geoP= new THREE.Geometry({ verticesNeedUpdate: true});
                 geoC= new THREE.Geometry({ verticesNeedUpdate: true});
                 var viewGeometry = new THREE.Geometry({ verticesNeedUpdate: true});
-
-                
-                
+ 
                 for ( i = 0; i < tle_data.length; i ++ ) {
                     
                                                 var vertex = new THREE.Vector3();
@@ -405,9 +395,7 @@ function render() {
                                                 }
                 }
 
-	                   materialP = new THREE.PointCloudMaterial( { color: 0xffff00, size: 3, sizeAttenuation: false, transparent: true, alpha: .5 } );
-                        //materialP.color.setHSL( 1.0, 1.0, 1 );
-                        // materialP.color = 0xffff00
+	                   materialP = new THREE.PointCloudMaterial( { color: 0xaaaaaa, size: 3, sizeAttenuation: false, transparent: true, alpha: .5 } );
 				
                         materialT = new THREE.PointCloudMaterial( { size: 1, sizeAttenuation: false, transparent: true, alpha: .5 } );
                        materialT.color.setHSL(.6,1,.6); 	
@@ -432,7 +420,7 @@ function render() {
              });
 
             viewLine = new THREE.Line( viewGeometry, viewMaterial );
-            if(viewGeometry.vertices.length>0 && tourStage>5){
+            if((viewGeometry.vertices.length>0 && tourStage>5 && tourStage<10) || document.getElementById('linesOfSight').checked){
                 scene.add( viewLine );
             }
 }
@@ -444,14 +432,16 @@ var tour1Text, element, elementBack
 function tour(){
     switch(tourStage){
         case 0:
+            document.getElementById("tour0Text").style.visibility = 'visible'
             controls.rotateLeft(.01)
         break
 
         case 1:
             if(createDiv){
                 document.getElementById("tour0Text").style.visibility = 'hidden'
-                tour1Text = document.createElement("tour1Text");
+                tour1Text = document.createElement("div");
                 tour1Text.className = 'modal'
+                tour1Text.id = 'tourStart'
                 tour1Text.style.position = 'absolute'
                 tour1Text.style.right = '10px'
                 tour1Text.style.bottom = '150px'
@@ -467,6 +457,18 @@ function tour(){
                 element.addEventListener('click',function(){
                     tourStage++
                     createDiv = true
+                })
+
+                elementBack = document.createElement("back1");
+                elementBack.className = "btn"
+                elementBack.style.left = '5px'
+
+                elementBack.appendChild(document.createTextNode('back'));
+                tour1Text.appendChild(elementBack);
+                elementBack.addEventListener('click',function(){           
+                    createDiv = true
+                    document.body.removeChild(document.getElementById('tourStart'))
+                    tourStage--
                 })
 
                 document.body.appendChild(tour1Text)
@@ -525,7 +527,6 @@ function tour(){
 
         case 3:
             if(createDiv){
-
                 tour1Text.innerHTML = "<p id='textp'>Others were launched by various militaries.<br>(Marked in <b><span id='greenText'>Green</span></b>)</p>"
                 document.getElementById("greenText").style.color = '#20ff20'
                 showMilitary = true
@@ -723,8 +724,9 @@ function tour(){
                 element.appendChild(document.createTextNode('close'));
                 tour1Text.appendChild(element);
                 element.addEventListener('click',function(){
-                    tourStage++
+                    tourStage=999
                     createDiv = true
+                    controls.target = new THREE.Vector3()
                     tour1Text.style.visibility='hidden'
                 })
 
@@ -749,6 +751,7 @@ function tour(){
 document.getElementById("close").addEventListener("click",function(){
     this.parentNode.style.visibility = 'hidden'
     tourStage = 999
+    controls.target = new THREE.Vector3()
 })
 
 document.getElementById("next0").addEventListener("mouseup",function(){
@@ -787,5 +790,5 @@ YUI().use('dial', function(Y) {
             dial.set('value',0)
         }, false)
 });
+document.getElementById("takeTour").addEventListener("click",function(){tourStage=0})
 
-document.body.addEventListener("keypress", function(){++tourStage});
