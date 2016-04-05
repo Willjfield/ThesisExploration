@@ -57,6 +57,9 @@ var controls = new THREE.OrbitControls(camera);
 				controls.rotateSpeed = 1
 				controls.panSpeed = 1
 
+var initDate = new Date()
+var timeZone = parseInt(initDate.getTimezoneOffset()/60)*-1
+
                 var light = new THREE.PointLight( 0xffffff, 1.5, 0 );
 light.position.set( 0, 0, 0 );
 scene.add( light );
@@ -210,8 +213,20 @@ var render = function () {
 		dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
 	}
 
-	var date = xpl.dateFromJday(xpl.now+t+sumT)
-	document.getElementById('curDate').innerHTML='Current Date at Meridian: '+date.day+'/'+date.month+'/'+date.year
+	var date = xpl.dateFromJday(xpl.now+t+sumT+(timeZone/24))
+
+	var dmin = date.minute.toString()
+	if(dmin.length<2) dmin = "0"+dmin
+
+	var dspHour = date.hour
+	dspHour.length < 2 ? dspHour = "0"+dspHour :{}
+	var dtz = Math.sign(timeZone)>-1 ? "+" : {}
+
+	var curJday = xpl.jday(date.year,date.month,date.day,date.hour,date.minute,date.sec)
+
+	document.getElementById('curDate').innerHTML = "Date: " + date.month + "/" + date.day + "/" +date.year+
+								"<br>Time: "+dspHour+":"+dmin +"(UTC "+timeZone+")";
+
 
 
 	earthCenter.position.copy(drawPlanets[2].position)
@@ -337,7 +352,7 @@ function onWindowResize(){
     renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
-document.getElementById("planetSelect").addEventListener("mouseup",function(event){
+document.getElementById("planetSelector").addEventListener("change",function(event){
 	planetSelected=parseInt(planetSelector.options[planetSelector.selectedIndex].value)
 	focusedPlanet = planetSelected
 	console.log(focusedPlanet)
