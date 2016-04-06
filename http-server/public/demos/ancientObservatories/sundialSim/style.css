@@ -19,12 +19,16 @@
   bottom:200px;
   text-align: center;
   font-weight: lighter;
-  font-size: 20px;
+  font-size: 24px;
   font-family: "kepler-std-semicondensed",sans-serif;
   transform:translate(-50%,0%);
   background: rgba(0,0,0,.75);
   padding: 10px;
   visibility: hidden;
+}
+
+.label{
+  display:none;
 }
 
 #moreInfo{
@@ -50,7 +54,7 @@
   top:100px;
   text-align: center;
   font-weight: lighter;
-  font-size: 20px;
+  font-size: 28px;
   font-family: "kepler-std-semicondensed",sans-serif;
   transform:translate(-50%,0%);
   background: rgba(0,0,0,.75);
@@ -166,6 +170,8 @@ a{
   right: 5px;
   top:-15px;
   text-align: right;
+  background-color: rgba(0, 0, 0, .5);
+  padding:5px;
 }
 
 #sliderTitle{
@@ -189,6 +195,7 @@ body{
   background: rgb(0,0,10);
   color: white;
   font-family : monospace;
+  font-size:20px;
   overflow: hidden;
   margin: 0 auto;
 }
@@ -204,7 +211,8 @@ canvas{
   position: absolute;
   margin-top:0px;
   left: 0px;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, .5);
+  padding:5px;
 }
 
 #controls{

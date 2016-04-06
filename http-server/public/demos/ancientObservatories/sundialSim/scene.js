@@ -24,6 +24,9 @@ var planetArray = []
 init();
 animate();
 
+var summerPosition = new THREE.Vector3(0,1.8,-2.019)
+var winterPosition = new THREE.Vector3(0,0,-.6699)
+
 function init() {
 	//console.log('sunrise '+xpl.sunrise(obsPos,-0.833))
 	speed = 0
@@ -175,6 +178,9 @@ function init() {
 			planetArray.push(nullObj)
 			scene.add( nullObj )
 		}
+		
+		addLabel("Summer Solstice (June 21st)", summerPosition)
+		addLabel("Winter Solstice (Dec. 21st)", winterPosition)
 	});
 	//when done, add the venusNull to the scene
 	// texture
@@ -232,6 +238,8 @@ function onWindowResize() {
 }
 
 function animate() {
+	updateLabels("Summer Solstice (June 21st)",summerPosition)
+	updateLabels("Winter Solstice (Dec. 21st)",winterPosition)
 	xpl.updateTime()
 
 	if(typeof dial != 'undefined'){
@@ -269,7 +277,7 @@ function animate() {
 	document.getElementById('latlong').innerHTML ="Latitude: "+obsPos.latitude+
 																				"<br> Longitude: "+obsPos.longitude+
 																				"<br> Elevation(m): "+obsPos.elevation*1000+
-																				"<br>Sundial from Villa Palombara Massimi, Rome"
+																				"<br>Villa Palombara Massimi, Rome"
 
 	for(var p =0;p<planetArray.length;p++){
 			var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
@@ -299,6 +307,73 @@ function animate() {
 function render() {
 	controls.update();
 	renderer.render( scene, camera );
+}
+
+function addLabel(name, label_position){
+	//var size = 256;
+	var canvas = document.createElement('canvas')
+
+	canvas.className='label'
+	console.log(canvas)
+	document.body.appendChild(canvas)
+	var ctx = canvas.getContext('2d');
+	canvas.width = 256
+	canvas.height = 128
+	ctx.font = '12pt Arial';
+	ctx.fontWeight = 'bolder'
+	// ctx.fillStyle = 'white';
+	// ctx.fillRect(0, 0, canvas.width, canvas.height);
+	// ctx.fillStyle = 'black';
+	// ctx.fillRect(5, 5, canvas.width-10, canvas.height-10);
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle="rgba(0, 0, 200, 0)";
+    ctx.fill();
+	ctx.fillStyle = 'white';
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+
+	var stexture = new THREE.Texture(canvas);
+	stexture.needsUpdate = true;
+
+	var parentObj = new THREE.Object3D()
+
+	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, alphaMap:stexture, transparent: true});
+	var sgeometry = new THREE.PlaneGeometry( 1, .5 );
+	var smesh = new THREE.Mesh( sgeometry, smaterial );
+
+	var pointer = new THREE.Geometry()
+	pointer.vertices.push(new THREE.Vector3(0,0,0),new THREE.Vector3(0,1.75,0))
+	var pointerLine = new THREE.LineBasicMaterial({
+		color: 0xffffff});
+	var line = new THREE.Line(pointer,pointerLine );
+	line.name=name+"_labelLine"
+	line.position.copy(label_position)
+	line.geometry.verticesNeedUpdate = true
+	
+	scene.add(line)
+	parentObj.add(smesh)
+
+	parentObj.name=name+"_label"
+	parentObj.position.copy(label_position)
+	parentObj.position.y+=2
+
+	scene.add( parentObj );
+}
+
+function updateLabels(name, position){
+	for(var child in scene.children){
+			if(scene.children[child].name==name+"_labelLine"){
+				scene.children[child].position.copy(position)
+			}
+			if(scene.children[child].name==name+"_label"){
+				scene.children[child].lookAt(camera.position)
+				var labelScale = scene.children[child].position.distanceTo(camera.position)*.3
+				scene.children[child].scale.set(labelScale,labelScale,labelScale)
+				scene.children[child].position.copy(position)
+				scene.children[child].position.y+=2
+			}
+		}
 }
 
 function mouseUp(){
