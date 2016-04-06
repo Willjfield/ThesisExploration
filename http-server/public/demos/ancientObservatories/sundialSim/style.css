@@ -78,7 +78,7 @@
 }
 
 #close{
-  right:5px;
+  right:50px;
 }
 
 a{
@@ -199,6 +199,7 @@ body{
   overflow: hidden;
   margin: 0 auto;
 }
+
 canvas{
     position: absolute;
     top: 0px;

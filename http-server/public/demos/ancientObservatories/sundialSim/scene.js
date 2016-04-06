@@ -21,6 +21,8 @@ var speed, timeOffset, date, sumT
 var dial
 var planetArray = []
 
+var tutStage = 0
+
 init();
 animate();
 
@@ -106,7 +108,6 @@ function init() {
 	var sunTexture = new THREE.Texture();
 	loader.load( '../../../../lib/data/images/Sun.jpg', function ( image ) {
 		
-		
 		var groundGridMat = new THREE.LineBasicMaterial({color:0xffffff})
 		
 		var size = 500
@@ -146,8 +147,7 @@ function init() {
 						sunTexture.image = image;
 						sunTexture.needsUpdate = true;
 						// sunTexture.receiveShadow = true;
-						// sunTexture.castShadow = true;
-					
+						// sunTexture.castShadow = true;					
 
 						var sunGeometry = new THREE.SphereGeometry( 25,8,8 );
 						var sunMaterial = new THREE.MeshLambertMaterial( { emissiveMap:sunTexture,emissive: 0xffffff, emissiveIntensity:2 } );
@@ -178,9 +178,8 @@ function init() {
 			planetArray.push(nullObj)
 			scene.add( nullObj )
 		}
+
 		
-		addLabel("Summer Solstice (June 21st)", summerPosition)
-		addLabel("Winter Solstice (Dec. 21st)", winterPosition)
 	});
 	//when done, add the venusNull to the scene
 	// texture
@@ -236,10 +235,19 @@ function onWindowResize() {
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
 }
-
+var addSolstices = true
 function animate() {
+	if(tutStage>3 && addSolstices){
+		addLabel("Summer Solstice (June 21st)", summerPosition)
+		addLabel("Winter Solstice (Dec. 21st)", winterPosition)	
+		addSolstices = false
+	}
+
 	updateLabels("Summer Solstice (June 21st)",summerPosition)
 	updateLabels("Winter Solstice (Dec. 21st)",winterPosition)
+
+	tutorial()
+
 	xpl.updateTime()
 
 	if(typeof dial != 'undefined'){
@@ -309,8 +317,11 @@ function render() {
 	renderer.render( scene, camera );
 }
 
-function addLabel(name, label_position){
+function addLabel(name, label_position, parent, lScale){
 	//var size = 256;
+	typeof parent == 'undefined' ? parent = scene : {}
+	typeof lScale == 'undefined' ? lScale = 1 : {}
+
 	var canvas = document.createElement('canvas')
 
 	canvas.className='label'
@@ -326,7 +337,7 @@ function addLabel(name, label_position){
 	// ctx.fillStyle = 'black';
 	// ctx.fillRect(5, 5, canvas.width-10, canvas.height-10);
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle="rgba(0, 0, 200, 0)";
+    ctx.fillStyle="rgba(0, 0, 0, 0)";
     ctx.fill();
 	ctx.fillStyle = 'white';
 	ctx.textAlign = "center";
@@ -341,6 +352,7 @@ function addLabel(name, label_position){
 	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, alphaMap:stexture, transparent: true});
 	var sgeometry = new THREE.PlaneGeometry( 1, .5 );
 	var smesh = new THREE.Mesh( sgeometry, smaterial );
+	smesh.scale.set(lScale,lScale,lScale)
 
 	var pointer = new THREE.Geometry()
 	pointer.vertices.push(new THREE.Vector3(0,0,0),new THREE.Vector3(0,1.75,0))
@@ -351,14 +363,14 @@ function addLabel(name, label_position){
 	line.position.copy(label_position)
 	line.geometry.verticesNeedUpdate = true
 	
-	scene.add(line)
+	parent.add(line)
 	parentObj.add(smesh)
 
 	parentObj.name=name+"_label"
 	parentObj.position.copy(label_position)
 	parentObj.position.y+=2
 
-	scene.add( parentObj );
+	parent.add( parentObj );
 }
 
 function updateLabels(name, position){
@@ -398,6 +410,70 @@ document.getElementById("moreInfo").addEventListener("click",function(){
 
 var logValue = function(e){
         timeOffset = (e.newVal/14400)
+}
+
+var create = true
+var sphereCut
+function tutorial(){
+	switch(tutStage){
+		case 0:		
+		if(create){
+			document.getElementById("next").addEventListener("click",function(){
+				tutStage++
+				create = true
+			})
+			create=false
+		}
+		break
+
+		case 1:
+		if(create){
+			document.getElementById("infoText").innerHTML = "This sundial was made by cutting a spherical shape out of stone."
+			document.getElementById("next").innerHTML = "Next"
+			// document.getElementById("next").addEventListener("click",function(){
+			// 	create = true
+			// 	tutStage++
+			// })
+			var sphereCutGeo = new THREE.SphereGeometry(2.2,24,24)
+			var sphereCutMat = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide, transparent: true, opacity:.25} );
+			sphereCut = new THREE.Mesh(sphereCutGeo,sphereCutMat)
+			sphereCut.position.y=3
+			scene.add(sphereCut)
+			create=false
+		}
+		break
+
+		case 2:
+		if(create){
+			document.getElementById("infoText").innerHTML = "The lines on the face of the dial are made by calculating earth's axis relative to the observer's latitude."
+			// document.getElementById("next").innerHTML = "Next"
+			// document.getElementById("next").addEventListener("click",function(){
+			// 	create = true
+			// 	tutStage++
+			// })
+			var earthPlaneGeo = new THREE.PlaneGeometry(5,5,1)
+			var earthPlaneMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:.8, side: THREE.DoubleSide})
+			var earthPlaneMesh = new THREE.Mesh(earthPlaneGeo,earthPlaneMat)
+
+			earthPlaneMesh.rotateX(Math.PI/2)
+			addLabel("Plane of Earth Equator", new THREE.Vector3(2,0,2), sphereCut, 5)
+			
+			sphereCut.add(earthPlaneMesh)
+			// earthPlaneMesh.position.copy(sphereCut.position)
+			
+			create=false
+		}
+		updateLabels("Plane of Earth Equator", sphereCut.position)
+		if(sphereCut.rotation.x>-0.82120571){sphereCut.rotateX(-.01)}
+		break
+
+		case 3:
+			if(create){
+				document.getElementById("intro").style.visibility = 'hidden'
+				scene.remove(sphereCut)
+			}
+		break
+	}
 }
 
 YUI().use('dial', function(Y) {
