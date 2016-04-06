@@ -16,7 +16,7 @@ xmlhttp.open("GET", url, true);
 xmlhttp.onreadystatechange = function() {
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 	    var tleresponse = JSON.parse(xmlhttp.responseText);
-	    console.log(tleresponse)
+	    //console.log(tleresponse)
 	    // tleresponse = tleresponse.split('\n');
 	    // tleresponse.splice(tleresponse.length-1)
 	    for(var s = 0; s<tleresponse.length;s+=3){
@@ -37,14 +37,21 @@ xmlhttp.send(null);
 var dial
 
 var scene = new THREE.Scene();
+
 var camera = new THREE.PerspectiveCamera( 65, window.innerWidth/window.innerHeight, 0.000001, 1000 );
 camera.position.set(0,0,100)
 
 var focusedPlanet = 2
 
 var renderer = new THREE.WebGLRenderer();
+
+
 renderer.setSize( window.innerWidth, window.innerHeight );
+
 document.body.appendChild( renderer.domElement );
+
+
+
 
 var controls = new THREE.OrbitControls(camera);
 				controls.enableDamping = true;
@@ -139,6 +146,58 @@ loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
     scene.add(mwMesh)
 })
 
+function addLabel(planet){
+	//var size = 256;
+	var canvas = document.createElement('canvas')
+
+	canvas.className='label'
+	console.log(canvas)
+	document.body.appendChild(canvas)
+	var ctx = canvas.getContext('2d');
+	canvas.width = 256
+	canvas.height = 128
+	ctx.font = '48pt Arial';
+	ctx.fontWeight = 'bolder'
+	// ctx.fillStyle = 'white';
+	// ctx.fillRect(0, 0, canvas.width, canvas.height);
+	// ctx.fillStyle = 'black';
+	// ctx.fillRect(5, 5, canvas.width-10, canvas.height-10);
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle="rgba(0, 0, 200, 0)";
+    ctx.fill();
+	ctx.fillStyle = 'white';
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(planet.name, canvas.width / 2, canvas.height / 2);
+
+	var stexture = new THREE.Texture(canvas);
+	stexture.needsUpdate = true;
+
+	var parentObj = new THREE.Object3D()
+
+	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, alphaMap:stexture, transparent: true});
+	var sgeometry = new THREE.PlaneGeometry( .05, .025 );
+	var smesh = new THREE.Mesh( sgeometry, smaterial );
+
+	var pointer = new THREE.Geometry()
+	pointer.vertices.push(new THREE.Vector3(0,0,0),new THREE.Vector3(0,.06,0))
+	var pointerLine = new THREE.LineBasicMaterial({
+		color: 0xffffff});
+	var line = new THREE.Line(pointer,pointerLine );
+	line.name=planet.name+"_labelLine"
+	line.position.copy(planet.position)
+	line.geometry.verticesNeedUpdate = true
+	
+	scene.add(line)
+	parentObj.add(smesh)
+
+	parentObj.name=planet.name+"_label"
+	parentObj.position.copy(planet.position)
+	parentObj.position.y+=.075
+
+	scene.add( parentObj );
+}
+
 drawPlanets.forEach(function(planet, index){
 	var texturePath = "../../lib/data/images/"
 		texturePath += planet.name + ".jpg"
@@ -149,6 +208,7 @@ drawPlanets.forEach(function(planet, index){
 				ptexture.needsUpdate = true;
 				drawPlanets[index].material.map = ptexture
 				scene.add(drawPlanets[index])
+				addLabel(drawPlanets[index])
 				})		
 });
 
@@ -207,6 +267,8 @@ controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].pos
 var planetSelector = document.getElementById("planetSelector")
 var planetSelected = 3
 var speed=0
+
+var makeLabels=true
 var render = function () {
 
 	if(typeof dial != 'undefined'){
@@ -270,6 +332,7 @@ var render = function () {
 	requestAnimationFrame( render );
 	
    	for(var p in drawPlanets){
+   		//changeCanvas(drawPlanets[p].name)
 		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t+sumT);
 		//launch of voyager 1
         //var curPosition = xpl.SolarSystem(xpl.planets[p],2443391.500000+t);
@@ -277,10 +340,25 @@ var render = function () {
 		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
 		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,-curPosition[1]*solScale)
-	
-		if(camera.position.distanceTo(drawPlanets[p].position)>.05){
-			drawPlanets[p].add(wireFrameMeshes[p])
+
+		for(var child in scene.children){
+			if(scene.children[child].name==drawPlanets[p].name+"_labelLine"){
+				scene.children[child].position.copy(drawPlanets[p].position)
+				//console.log(scene.children[child].position)
+				//scene.children[child].position.z*=-1
+			}
+			if(scene.children[child].name==drawPlanets[p].name+"_label"){
+				scene.children[child].lookAt(camera.position)
+				var labelScale = scene.children[child].position.distanceTo(camera.position)*2
+				scene.children[child].scale.set(labelScale,labelScale,labelScale)
+				scene.children[child].position.copy(drawPlanets[p].position)
+				scene.children[child].position.y+=.075
+			}
 		}
+	
+		// if(camera.position.distanceTo(drawPlanets[p].position)>.05){
+		// 	drawPlanets[p].add(wireFrameMeshes[p])
+		// }
 	}
 
 	if(document.getElementById("moveWithPlanet").checked){
@@ -291,9 +369,10 @@ var render = function () {
 		camera.position.z+=dist
 	}
 	renderer.render(scene, camera);
-	for(var p in wireFrameMeshes){
-		scene.remove(scene.add(wireFrameMeshes[p]))
-	}
+
+	// for(var p in wireFrameMeshes){
+	// 	scene.remove(scene.add(wireFrameMeshes[p]))
+	// }
 };
 
 var voyager1Positions = []
@@ -393,5 +472,9 @@ YUI().use('dial', function(Y) {
 			dial.set('value',0)
 		}, false)
 });
+
+
+
+
 
 render();

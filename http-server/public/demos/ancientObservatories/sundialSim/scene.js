@@ -239,22 +239,21 @@ function animate() {
 	}
 
 	//DISPLAY DATE vs CALC DATE
-	var date = xpl.dateFromJday(xpl.now+timeOffset+sumT+(timeZone/24))
-	
-	// var dDay = date.day.toString()
+		// var dDay = date.day.toString()
 	// dDay.length<2 ? dDay = "0"+dDay : {}
 
 	// var dMo= date.month.toString()
 	// dMo.length<2 ? dMo = "0"+dMo : {}
 
-	var dmin = date.minute.toString()
-	if(dmin.length<2) dmin = "0"+dmin
-	
-	// var dhour = date.hour//.toString()
+		// var dhour = date.hour//.toString()
 	// // dhour.length < 2 ? dhour = "0"+dhour :{}
 	// var dspHour = (dhour+timeZone)
 	// if(dspHour>23){dspHour=0}
 	// if(dspHour<0){dspHour=24+dspHour}
+	var date = xpl.dateFromJday(xpl.now+timeOffset+sumT+(timeZone/24))
+
+	var dmin = date.minute.toString()
+	if(dmin.length<2) dmin = "0"+dmin
 
 	var dspHour = date.hour
 	dspHour.length < 2 ? dspHour = "0"+dspHour :{}
