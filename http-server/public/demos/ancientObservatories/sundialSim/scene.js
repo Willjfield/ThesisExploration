@@ -23,6 +23,7 @@ var planetArray = []
 
 var tutStage = 0
 
+var line
 init();
 animate();
 
@@ -133,6 +134,7 @@ function init() {
 		
 		for(var p=0;p<6;p++){
 				var nullObj = new THREE.Object3D();
+				nullObj.name = xpl.planets[p].name
 				if(p!=2){
 					var geometry = new THREE.SphereGeometry( 5,8,8 );
 					var material = new THREE.MeshBasicMaterial( { color: xpl.planets[p].texColor } );
@@ -159,18 +161,28 @@ function init() {
 
 						lineGeometry.vertices.push(
 							new THREE.Vector3( 0, 0, 0 ),
-							new THREE.Vector3( 0, 0, -1500 )
+							new THREE.Vector3( 0, 0, -1500 ),
+							new THREE.Vector3( 0, 3, 0 ),
+							new THREE.Vector3( 0, 3, -1500 ),
+							new THREE.Vector3( 0, -3, -1500 ),
+							new THREE.Vector3( 0, -3, 0 ),
+							new THREE.Vector3( 0, -3, -1500 ),
+							new THREE.Vector3( 3, 0, 0 ),
+							new THREE.Vector3( 3, 0, -1500 ),
+							new THREE.Vector3( -3, 0, -1500 ),
+							new THREE.Vector3( -3, 0, 0 ),
+							new THREE.Vector3( -3, 0, -1500 )
 						);
 
-						var line = new THREE.Line( lineGeometry, lineMaterial );
+						line = new THREE.Line( lineGeometry, lineMaterial );
 
 						var sphere = new THREE.Mesh( sunGeometry, sunMaterial );
 						sphere.position.set(0,0,-1500)
 
 						nullObj.add(sphere)
-						nullObj.add(line)
+						//nullObj.add(line)
 						nullObj.add( directionalLight )
-						console.log()
+
 						var pAltAz = xpl.PlanetAlt(2,xpl.now+timeOffset+sumT,obsPos)
 
 						nullObj.rotation.set(pAltAz[0]*(Math.PI/180),-pAltAz[1]*(Math.PI/180),0,'YXZ')	
@@ -222,7 +234,7 @@ function init() {
 	}, onProgress, onError );
 
 	window.addEventListener( 'resize', onWindowResize, false );
-	camera.position.set(-5,10,10);
+	camera.position.set(5,15,5);
 
 }
 
@@ -235,16 +247,19 @@ function onWindowResize() {
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
 }
-var addSolstices = true
+var addSolstices = false
+var showSoltices = false
 function animate() {
-	if(tutStage>3 && addSolstices){
+	if(addSolstices){
 		addLabel("Summer Solstice (June 21st)", summerPosition)
 		addLabel("Winter Solstice (Dec. 21st)", winterPosition)	
 		addSolstices = false
 	}
 
-	updateLabels("Summer Solstice (June 21st)",summerPosition)
-	updateLabels("Winter Solstice (Dec. 21st)",winterPosition)
+	if(showSoltices){
+		updateLabels("Summer Solstice (June 21st)",summerPosition)
+		updateLabels("Winter Solstice (Dec. 21st)",winterPosition)
+	}
 
 	tutorial()
 
@@ -266,7 +281,7 @@ function animate() {
 	// var dspHour = (dhour+timeZone)
 	// if(dspHour>23){dspHour=0}
 	// if(dspHour<0){dspHour=24+dspHour}
-	var date = xpl.dateFromJday(xpl.now+timeOffset+sumT+(timeZone/24))
+	var date = xpl.dateFromJday(xpl.now+timeOffset+sumT+(timeZone/12))
 
 	var dmin = date.minute.toString()
 	if(dmin.length<2) dmin = "0"+dmin
@@ -349,7 +364,7 @@ function addLabel(name, label_position, parent, lScale){
 
 	var parentObj = new THREE.Object3D()
 
-	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, alphaMap:stexture, transparent: true});
+	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, depthTest: false,alphaMap:stexture, transparent: true});
 	var sgeometry = new THREE.PlaneGeometry( 1, .5 );
 	var smesh = new THREE.Mesh( sgeometry, smaterial );
 	smesh.scale.set(lScale,lScale,lScale)
@@ -373,17 +388,18 @@ function addLabel(name, label_position, parent, lScale){
 	parent.add( parentObj );
 }
 
-function updateLabels(name, position){
-	for(var child in scene.children){
-			if(scene.children[child].name==name+"_labelLine"){
-				scene.children[child].position.copy(position)
+function updateLabels(name, position, parent){
+	typeof parent == 'undefined' ? parent = scene : {}
+	for(var child in parent.children){
+			if(parent.children[child].name==name+"_labelLine"){
+				parent.children[child].position.copy(position)
 			}
-			if(scene.children[child].name==name+"_label"){
-				scene.children[child].lookAt(camera.position)
-				var labelScale = scene.children[child].position.distanceTo(camera.position)*.3
-				scene.children[child].scale.set(labelScale,labelScale,labelScale)
-				scene.children[child].position.copy(position)
-				scene.children[child].position.y+=2
+			if(parent.children[child].name==name+"_label"){
+				parent.children[child].lookAt(camera.position)
+				var labelScale = parent.children[child].position.distanceTo(camera.position)*.3
+				parent.children[child].scale.set(labelScale,labelScale,labelScale)
+				parent.children[child].position.copy(position)
+				parent.children[child].position.y+=2
 			}
 		}
 }
@@ -413,10 +429,12 @@ var logValue = function(e){
 }
 
 var create = true
-var sphereCut
+var sphereCut, globeMesh, earthPlaneMesh
+var upOp = true
 function tutorial(){
 	switch(tutStage){
-		case 0:		
+		case 0:
+				
 		if(create){
 			document.getElementById("next").addEventListener("click",function(){
 				tutStage++
@@ -428,49 +446,94 @@ function tutorial(){
 
 		case 1:
 		if(create){
+			controls.autoRotate = true
 			document.getElementById("infoText").innerHTML = "This sundial was made by cutting a spherical shape out of stone."
 			document.getElementById("next").innerHTML = "Next"
-			// document.getElementById("next").addEventListener("click",function(){
-			// 	create = true
-			// 	tutStage++
-			// })
 			var sphereCutGeo = new THREE.SphereGeometry(2.2,24,24)
-			var sphereCutMat = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide, transparent: true, opacity:.25} );
+			var sphereCutMat = new THREE.MeshBasicMaterial( { depthTest: false,color: 0xffffff, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide, transparent: true, opacity:.25} );
 			sphereCut = new THREE.Mesh(sphereCutGeo,sphereCutMat)
 			sphereCut.position.y=3
 			scene.add(sphereCut)
 			create=false
 		}
+		if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
 		break
 
 		case 2:
 		if(create){
 			document.getElementById("infoText").innerHTML = "The lines on the face of the dial are made by calculating earth's axis relative to the observer's latitude."
-			// document.getElementById("next").innerHTML = "Next"
-			// document.getElementById("next").addEventListener("click",function(){
-			// 	create = true
-			// 	tutStage++
-			// })
-			var earthPlaneGeo = new THREE.PlaneGeometry(5,5,1)
-			var earthPlaneMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:.8, side: THREE.DoubleSide})
-			var earthPlaneMesh = new THREE.Mesh(earthPlaneGeo,earthPlaneMat)
-
+			var earthPlaneGeo = new THREE.PlaneGeometry(10,10,1)
+			var earthPlaneMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0, side: THREE.DoubleSide})
+			earthPlaneMesh = new THREE.Mesh(earthPlaneGeo,earthPlaneMat)
 			earthPlaneMesh.rotateX(Math.PI/2)
-			addLabel("Plane of Earth Equator", new THREE.Vector3(2,0,2), sphereCut, 5)
+			var loader = new THREE.TextureLoader()
+			loader.load(
+			'../../../lib/data/images/Earth.jpg',
+			function ( texture ) {
+				var globeGeo = new THREE.SphereGeometry(2.2,24,24)
+				var globeMat = new THREE.MeshBasicMaterial({map:texture,transparent:true, opacity:0})
+				globeMesh = new THREE.Mesh(globeGeo,globeMat)
+				sphereCut.add(globeMesh)
+			})
+			
+			addLabel("Plane of Earth Equator", new THREE.Vector3(.1,0,2.45), sphereCut, 5)
 			
 			sphereCut.add(earthPlaneMesh)
-			// earthPlaneMesh.position.copy(sphereCut.position)
+			
 			
 			create=false
 		}
-		updateLabels("Plane of Earth Equator", sphereCut.position)
-		if(sphereCut.rotation.x>-0.82120571){sphereCut.rotateX(-.01)}
+		//if(sphereCut.material.opacity > 0){sphereCut.material.opacity-=.01}
+		if(typeof globeMesh != 'undefined' && globeMesh.material.opacity<1 && upOp){globeMesh.material.opacity+=.01}
+		if(typeof earthPlaneMesh != 'undefined' && earthPlaneMesh.material.opacity<.4 && upOp){earthPlaneMesh.material.opacity+=.01}
+
+		if(sphereCut.rotation.x>((90-obsPos.latitude)*xpl.DEG2RAD)*-1){
+			sphereCut.rotateX(-.01*(sphereCut.rotation.x-((90-obsPos.latitude)*xpl.DEG2RAD)*-1))
+			sphereCut.children[1].rotation.x=(Math.PI/4)	
+		}
+		sphereCut.children[1].rotation.y = controls.getAzimuthalAngle()
+
 		break
 
 		case 3:
+			sphereCut.children[1].rotation.y = controls.getAzimuthalAngle()
+			if(typeof globeMesh != 'undefined' && globeMesh.material.opacity>0 && upOp){globeMesh.material.opacity-=.01}
+			if(typeof sphereCut != 'undefined' && sphereCut.material.opacity>0 && upOp){sphereCut.material.opacity-=.01}
+			
+			if(create){
+				document.getElementById("infoText").innerHTML = "This makes the direction of sunlight directly perpendicular to the middle marking line of the dial on the equinoxes."
+				for(var p in scene.children){
+					if(scene.children[p].name=="Earth"){
+						scene.children[p].add(line)
+					}
+				}
+				
+				create = false
+			}
+			
+		break
+
+		case 4:
+			if(create){
+				document.getElementById("infoText").innerHTML = "The solstice lines can then be made at 23.4 degrees above and below the equator line – the angle that Earth tilts between seasons."
+				showSoltices = true
+				addSolstices = true
+				scene.remove(sphereCut)
+
+				for(var p in scene.children){
+					if(scene.children[p].name=="Earth"){
+							scene.children[p].remove(line)
+						}
+				}
+
+				create = false
+			}
+		break
+
+		case 5:
 			if(create){
 				document.getElementById("intro").style.visibility = 'hidden'
-				scene.remove(sphereCut)
+				controls.autoRotate = false
 			}
 		break
 	}
