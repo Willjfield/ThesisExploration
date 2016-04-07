@@ -5,20 +5,12 @@ var tlObj
 var satellites = []
 var xyz = new THREE.Vector3()
 
-// xpl.getTLE('stations', satellites, function(){
-// 	console.log(satellites[0])
-// 	tlObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
-// })
-
 var url = '../../lib/data/ISS.json'
 var xmlhttp = new XMLHttpRequest();
 xmlhttp.open("GET", url, true);
 xmlhttp.onreadystatechange = function() {
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 	    var tleresponse = JSON.parse(xmlhttp.responseText);
-	    //console.log(tleresponse)
-	    // tleresponse = tleresponse.split('\n');
-	    // tleresponse.splice(tleresponse.length-1)
 	    for(var s = 0; s<tleresponse.length;s+=3){
 	    		satellites.push({
 	    			id: tleresponse[s].TLE_LINE0,
@@ -27,7 +19,7 @@ xmlhttp.onreadystatechange = function() {
 	    		})
 
 	        }
-	        console.log(satellites[0])
+	        //console.log(satellites[0])
 	        tlObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
     }
 }
@@ -50,9 +42,6 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 
 document.body.appendChild( renderer.domElement );
 
-
-
-
 var controls = new THREE.OrbitControls(camera);
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
@@ -67,7 +56,7 @@ var controls = new THREE.OrbitControls(camera);
 var initDate = new Date()
 var timeZone = parseInt(initDate.getTimezoneOffset()/60)*-1
 
-                var light = new THREE.PointLight( 0xffffff, 1.5, 0 );
+var light = new THREE.PointLight( 0xffffff, 1.5, 0 );
 light.position.set( 0, 0, 0 );
 scene.add( light );
 
@@ -81,12 +70,6 @@ var drawPlanets = []
 var solScale = 1;
 xpl.setScale(solScale)
 var planScale = 250000;
-
-//SUN
-var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.sol.radius)*solScale,16,16 );
-var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-var sphere = new THREE.Mesh( geometry, material );
-scene.add( sphere );
 
 //PLANETS
 var manager = new THREE.LoadingManager();
@@ -108,6 +91,19 @@ var manager = new THREE.LoadingManager();
 
 var loader = new THREE.ImageLoader( manager );
 
+//SUN
+var sunTexture = new THREE.Texture();
+	loader.load( '../../lib/data/images/Sun.jpg', function ( image ) {
+	sunTexture.image = image;
+	sunTexture.needsUpdate = true;				
+
+	var sunGeometry = new THREE.SphereGeometry(xpl.kmtoau(xpl.sol.radius)*solScale,32,32);
+	var sunMaterial = new THREE.MeshLambertMaterial( { emissiveMap:sunTexture,emissive: 0xffffff, emissiveIntensity:2 } );
+	var material = new THREE.MeshLambertMaterial( { map:image } );
+	var sphere = new THREE.Mesh( sunGeometry, sunMaterial );
+	scene.add( sphere );
+})
+
 var wireFrameMeshes=[]
 function makePlanets(){
 	for(var p in xpl.planets){	
@@ -122,8 +118,6 @@ function makePlanets(){
 
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
-			///ROTATE SPHERE OR TEXTURE 180?
-			//sphere.rotateX((-xpl.planets[p].oblique*Math.PI/180)+Math.PI)
 			sphere.rotateX(-xpl.planets[p].oblique*Math.PI/180)
 			sphere.name = xpl.planets[p].name
 			drawPlanets.push(sphere);
@@ -151,17 +145,13 @@ function addLabel(planet){
 	var canvas = document.createElement('canvas')
 
 	canvas.className='label'
-	console.log(canvas)
+	//console.log(canvas)
 	document.body.appendChild(canvas)
 	var ctx = canvas.getContext('2d');
 	canvas.width = 256
 	canvas.height = 128
 	ctx.font = '48pt Arial';
 	ctx.fontWeight = 'bolder'
-	// ctx.fillStyle = 'white';
-	// ctx.fillRect(0, 0, canvas.width, canvas.height);
-	// ctx.fillStyle = 'black';
-	// ctx.fillRect(5, 5, canvas.width-10, canvas.height-10);
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle="rgba(0, 0, 200, 0)";
     ctx.fill();
@@ -240,8 +230,39 @@ var ISSMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 var ISSeciMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 var ISS_ecf = new THREE.Mesh(ISSGeo,ISSMat);
 var ISS_eci = new THREE.Mesh(ISSGeo,ISSeciMat)
-	scene.add(ISS_eci)
-	drawPlanets[2].add(ISS_ecf)
+	//scene.add(ISS_eci)
+	//drawPlanets[2].add(ISS_ecf)
+
+var loader = new THREE.OBJLoader( manager );
+var modelPath = '../../lib/data/3D/ISS'
+
+var mtlLoader = new THREE.MTLLoader();
+mtlLoader.load( modelPath+'.mtl', function( materials ) {
+	materials.preload();
+	loader.load( modelPath+'.obj', function ( object ) {
+		var objLoader = new THREE.OBJLoader();
+		//loader.setMaterials( materials );
+
+		object.traverse( function ( child ) {
+		if ( child instanceof THREE.Mesh ) {
+			//console.log(materials.materials)
+			child.materials = materials.materials//new THREE.MeshLambertMaterial( {/*map: texture*/color:0x888888, needsUpdate: true, side:THREE.DoubleSide} );
+			child.geometry.computeVertexNormals();
+			child.castShadow = true
+			child.receiveShadow = true
+		}
+		} );
+
+		object.scale.set(.00001,.00001,.00001)
+		// object.rotateX(-Math.PI/2)
+		// object.position.y=3
+		drawPlanets[2].add(object)
+
+	});
+
+}, onProgress, onError );
+
+
 
 	///TEST EARTH AXES
 	/*
@@ -269,6 +290,10 @@ var planetSelected = 3
 var speed=0
 
 var makeLabels=true
+
+var ISSPropMat = new THREE.LineBasicMaterial({
+	color: 0x00ff00});
+
 var render = function () {
 
 	if(typeof dial != 'undefined'){
@@ -289,8 +314,6 @@ var render = function () {
 	document.getElementById('curDate').innerHTML = "Date: " + date.month + "/" + date.day + "/" +date.year+
 								"<br>Time: "+dspHour+":"+dmin +"(UTC "+timeZone+")";
 
-
-
 	earthCenter.position.copy(drawPlanets[2].position)
 	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
 	earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
@@ -305,17 +328,35 @@ var render = function () {
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
     controls.update()
 	xpl.updateTime()
-	
-	// t+=step;
 
-	if(typeof tlObj!='undefined')
-	{
+	if(typeof tlObj!='undefined'){
 		tlObj.update(t+sumT);
 		xyz = tlObj.position_ecf;
+
+		var ISSPropGeo = new THREE.Geometry();
+		ISSPropGeo.verticesNeedUpdate = true
+		var ISSPropLine = new THREE.Line(ISSPropGeo,ISSPropMat );
+		ISSPropLine.geometry.verticesNeedUpdate = true
+		//var curObj = clone(tlObj)
+		var curObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
+		//console.log(curObj)
+		for(var propT = 0;propT<0.0625;propT+=.0025){
+			curObj.update(t+sumT+propT)
+			curxyz = curObj.position_ecf
+			var curPosition = [xpl.kmtoau(curxyz.x)*solScale,xpl.kmtoau(curxyz.z)*solScale,xpl.kmtoau(-curxyz.y)*solScale]
+			ISSPropGeo.vertices.push(
+				new THREE.Vector3( curPosition[0], curPosition[1], curPosition[2] )
+			);
+		}
+		drawPlanets[2].add(ISSPropLine)
 	}
     
 	var ISSPosition = [xpl.kmtoau(xyz.x)*solScale,xpl.kmtoau(xyz.z)*solScale,xpl.kmtoau(-xyz.y)*solScale]
-	ISS_ecf.position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
+	if(drawPlanets[2].children.length>0){
+		drawPlanets[2].children[0].position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
+	}
+
+
 	// var iss_helio = xpl.ecf_to_heliocentric(ISS_ecf.position,xpl.now+t)
 	// ISS_eci.position.set(iss_helio.x,iss_helio.z,iss_helio.y)
 
@@ -355,21 +396,30 @@ var render = function () {
 				scene.children[child].position.y+=.075
 			}
 		}
-	
-		// if(camera.position.distanceTo(drawPlanets[p].position)>.05){
-		// 	drawPlanets[p].add(wireFrameMeshes[p])
-		// }
 	}
 
 	if(document.getElementById("moveWithPlanet").checked){
-		camera.position.copy(drawPlanets[focusedPlanet].position)
 		var dist
 		focusedPlanet>3 ? dist = .002 : dist = .0001
-		camera.position.x+=dist
-		camera.position.z+=dist
+		document.getElementById("movewcam").style.color = "white"
+		if(focusedPlanet!=9){
+			if(camera.position.distanceTo(drawPlanets[focusedPlanet].position)>dist){
+				document.getElementById("movewcam").style.color = "#ff0000"
+				controls.dollyIn(1.1)
+			}
+		}else{
+			dist = .01
+			if(camera.position.distanceTo(new THREE.Vector3())>dist){
+				document.getElementById("movewcam").style.color = "#ff0000"
+				controls.dollyIn(1.1)
+			}
+		}
+
+		// camera.position.copy(drawPlanets[focusedPlanet].position)
+
 	}
 	renderer.render(scene, camera);
-
+	drawPlanets[2].remove(ISSPropLine)
 	// for(var p in wireFrameMeshes){
 	// 	scene.remove(scene.add(wireFrameMeshes[p]))
 	// }
@@ -434,11 +484,10 @@ function onWindowResize(){
 document.getElementById("planetSelector").addEventListener("change",function(event){
 	planetSelected=parseInt(planetSelector.options[planetSelector.selectedIndex].value)
 	focusedPlanet = planetSelected
-	console.log(focusedPlanet)
-	var dist
-	focusedPlanet>3 ? dist = .001 : dist = .0001
-	camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-dist)
-
+	// var dist
+	// focusedPlanet>3 ? dist = .001 : dist = .0001
+	// camera.position.set(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z-dist)
+	document.getElementById("moveWithPlanet").checked = true
 })
 
 document.getElementById('timeSelector').addEventListener("change", function() {

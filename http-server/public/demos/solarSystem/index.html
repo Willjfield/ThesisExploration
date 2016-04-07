@@ -6,7 +6,9 @@
 	</head>
 	<body class="yui3-skin-sam">	
 		<script src="../../lib/explore.js"></script>
+		<script src="OBJLoader.js"></script>
 		<script src="OrbitControls.js"></script>
+		<script src="MTLLoader.js"></script>
 		<script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
 		<!-- <canvas id="earth" class="label"></canvas> -->
 		  <aside id="controls">
@@ -22,7 +24,7 @@
 			      <option value="7">Neptune</option>
 			    </select>
 			    <br>
-			    Move camera with planet <input id="moveWithPlanet" type="checkbox"> 
+			    <span id="movewcam">Move camera with planet </span><input id="moveWithPlanet" type="checkbox"> 
 			    <br>
 			    	<img src="Arrows.png" class="arrows">
 					<div id="demo"></div>

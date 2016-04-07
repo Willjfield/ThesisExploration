@@ -23,7 +23,7 @@ var planetArray = []
 
 var tutStage = 0
 
-var line
+var line, lineMaterial
 init();
 animate();
 
@@ -32,6 +32,7 @@ var winterPosition = new THREE.Vector3(.05,0,-.6699)
 
 var showAllLabels = false
 var updateAllLabels = false
+var showLines = false
 
 function init() {
 	//console.log('sunrise '+xpl.sunrise(obsPos,-0.833))
@@ -159,8 +160,8 @@ function init() {
 						var sunMaterial = new THREE.MeshLambertMaterial( { emissiveMap:sunTexture,emissive: 0xffffff, emissiveIntensity:2 } );
 
 						var lineGeometry = new THREE.Geometry()
-						var lineMaterial = new THREE.LineBasicMaterial({
-							color: 0xffff00
+						lineMaterial = new THREE.LineBasicMaterial({
+							color: 0xffff00,transparent:true,opacity:.5, needsUpdate:true
 						})
 
 						lineGeometry.vertices.push(
@@ -184,7 +185,7 @@ function init() {
 						sphere.position.set(0,0,-1500)
 
 						nullObj.add(sphere)
-						//nullObj.add(line)
+						nullObj.add(line)
 						nullObj.add( directionalLight )
 
 						var pAltAz = xpl.PlanetAlt(2,xpl.now+timeOffset+sumT,obsPos)
@@ -280,18 +281,37 @@ function animate() {
 		updateLabels("Fall/Spring Equinox",equinoxPosition)
 	}
 
-	if(showAllLabels){
-		addLabel("Summer Solstice (June 21st)", summerPosition,scene,1)
-		addLabel("Winter Solstice (Dec. 21st)", winterPosition,scene,1)
-		addLabel("Fall/Spring Equinox",equinoxPosition, scene, 1)
-		showAllLabels = false
-	}
+	// if(showAllLabels){
+	// 	addLabel("Summer Solstice (June 21st)", summerPosition,scene,1)
+	// 	addLabel("Winter Solstice (Dec. 21st)", winterPosition,scene,1)
+	// 	addLabel("Fall/Spring Equinox",equinoxPosition, scene, 1)
+	// 	showAllLabels = false
+	// }
 
-	if(updateAllLabels){
-		updateLabels("Summer Solstice (June 21st)", summerPosition)
-		updateLabels("Winter Solstice (Dec. 21st)", winterPosition)
-		updateLabels("Fall/Spring Equinox",equinoxPosition)
-	}
+	// if(updateAllLabels){
+	// 	updateLabels("Summer Solstice (June 21st)", summerPosition)
+	// 	updateLabels("Winter Solstice (Dec. 21st)", winterPosition)
+	// 	updateLabels("Fall/Spring Equinox",equinoxPosition)
+	// }
+
+	// if(showLines){
+	// 	for(var p in scene.children){
+	// 		if(scene.children[p].name=="Earth"){
+	// 			scene.children[p].add(line)
+	// 		}
+	// 	}
+	// 	showLines = false
+	// }
+
+	// if(!showLines){
+	// 	for(var p in scene.children){
+	// 		if(scene.children[p].name=="Earth"){
+	// 			scene.children[p].remove(line)
+	// 		}
+	// 	}
+	// }
+		
+
 
 	tutorial()
 
@@ -364,6 +384,7 @@ function render() {
 	renderer.render( scene, camera );
 }
 
+
 function addLabel(name, label_position, parent, lScale){
 	//var size = 256;
 	typeof parent == 'undefined' ? parent = scene : {}
@@ -396,7 +417,7 @@ function addLabel(name, label_position, parent, lScale){
 
 	var parentObj = new THREE.Object3D()
 
-	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, depthTest: false,alphaMap:stexture, transparent: true});
+	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, needsUpdate: true, depthTest: false,alphaMap:stexture, transparent: true, opacity: 1});
 	var sgeometry = new THREE.PlaneGeometry( 1, .5 );
 	var smesh = new THREE.Mesh( sgeometry, smaterial );
 	smesh.scale.set(lScale,lScale,lScale)
@@ -404,8 +425,9 @@ function addLabel(name, label_position, parent, lScale){
 	var pointer = new THREE.Geometry()
 	pointer.vertices.push(new THREE.Vector3(0,0,0),new THREE.Vector3(0,1.75,0))
 	var pointerLine = new THREE.LineBasicMaterial({
-		color: 0xffffff});
+		color: 0xffffff,transparent: true, needsUpdate: true, opacity: 1});
 	var line = new THREE.Line(pointer,pointerLine );
+
 	line.name=name+"_labelLine"
 	line.position.copy(label_position)
 	line.geometry.verticesNeedUpdate = true
@@ -420,19 +442,25 @@ function addLabel(name, label_position, parent, lScale){
 	parent.add( parentObj );
 }
 
-function updateLabels(name, position, parent){
+function updateLabels(name, position, parent, visible){
+	typeof visible == 'undefined' ? visible = true : visible = false
 	typeof parent == 'undefined' ? parent = scene : {}
-	for(var child in parent.children){
-			if(parent.children[child].name==name+"_labelLine"){
-				parent.children[child].position.copy(position)
+	if(visible){
+
+		for(var child in parent.children){
+				if(parent.children[child].name==name+"_labelLine"){
+					parent.children[child].position.copy(position)
+				}
+				if(parent.children[child].name==name+"_label"){
+					parent.children[child].lookAt(camera.position)
+					var labelScale = parent.children[child].position.distanceTo(camera.position)*.3
+					parent.children[child].scale.set(labelScale,labelScale,labelScale)
+					parent.children[child].position.copy(position)
+					parent.children[child].position.y+=2
+				}
 			}
-			if(parent.children[child].name==name+"_label"){
-				parent.children[child].lookAt(camera.position)
-				var labelScale = parent.children[child].position.distanceTo(camera.position)*.3
-				parent.children[child].scale.set(labelScale,labelScale,labelScale)
-				parent.children[child].position.copy(position)
-				parent.children[child].position.y+=2
-			}
+		}else{
+			
 		}
 }
 
@@ -449,6 +477,7 @@ document.getElementById('timeSelector').addEventListener("change", function() {
 document.getElementById("close").addEventListener("click",function(){
 	document.getElementById("intro").style.visibility = 'hidden'
 	document.getElementById("moreInfo").style.visibility = 'visible'
+	if(sphereCut){scene.remove(sphereCut)}
 	controls.autoRotate = false
 	create = true
 	tutStage = 0
@@ -468,15 +497,17 @@ var logValue = function(e){
 var create = true
 var sphereCut, globeMesh, earthPlaneMesh
 var upOp = true
+
+document.getElementById("next").addEventListener("click",function(){
+					++tutStage
+					create = true
+				})
+
 function tutorial(){
 	switch(tutStage){
 		case 0:
 			if(create){
 				document.getElementById("infoText").innerHTML = "<p id='infoText'><a href='http://www.ancient-astronomy.org/en/2013/05/03/antike-sonnenuhren/'>The Berlin Sundial Project </a>has 3D scanned and archived dozens of sundials from ancient Greece and Rome. The sundial presented here was found in the Villa Palombra Massimi in Rome and dates to the first century BCE. <br><br>Use the mouse to navigate the scene and use the time dial to change the time and date.<br><br></p>"
-				document.getElementById("next").addEventListener("click",function(){
-					tutStage++
-					create = true
-				})
 				create=false
 			}
 		break
@@ -520,7 +551,7 @@ function tutorial(){
 				sphereCut.add(earthPlaneMesh)			
 				create=false
 			}
-			//if(sphereCut.material.opacity > 0){sphereCut.material.opacity-=.01}
+
 			if(typeof globeMesh != 'undefined' && globeMesh.material.opacity<1 && upOp){globeMesh.material.opacity+=.01}
 			if(typeof earthPlaneMesh != 'undefined' && earthPlaneMesh.material.opacity<.4 && upOp){earthPlaneMesh.material.opacity+=.01}
 
@@ -543,8 +574,8 @@ function tutorial(){
 			if(typeof globeMesh != 'undefined' && globeMesh.material.opacity>0 && upOp){globeMesh.material.opacity-=.01}
 			if(typeof sphereCut != 'undefined' && sphereCut.material.opacity>0 && upOp){sphereCut.material.opacity-=.01}
 
-			if(Math.abs(controls.getAzimuthalAngle())>.5){controls.rotateLeft(.1*(Math.abs(controls.getAzimuthalAngle())-.1))}
-			if(Math.abs(controls.getPolarAngle())>.1){controls.rotateUp(.1*(Math.abs(controls.getPolarAngle())))}
+			if(Math.abs(controls.getAzimuthalAngle())>.5){controls.rotateLeft(.01*(Math.abs(controls.getAzimuthalAngle())-.1))}
+			if(Math.abs(controls.getPolarAngle())>.1){controls.rotateUp(.01*(Math.abs(controls.getPolarAngle())))}
 			
 			if(camera.position.distanceTo(new THREE.Vector3(0,0,0))>4){controls.dollyIn(1+(.001*camera.position.distanceTo(new THREE.Vector3(0,0,0))))}
 			
@@ -572,7 +603,6 @@ function tutorial(){
 				showSoltices = true
 				addSolstices = true
 				scene.remove(sphereCut)
-
 				for(var p in scene.children){
 					if(scene.children[p].name=="Earth"){
 							scene.children[p].remove(line)
@@ -586,6 +616,7 @@ function tutorial(){
 		case 5:
 			if(create){
 				document.getElementById("intro").style.visibility = 'hidden'
+				document.getElementById("moreInfo").style.visibility = 'visible'
 				controls.autoRotate = false
 			}
 		break
@@ -593,9 +624,7 @@ function tutorial(){
 }
 
 document.body.addEventListener("keypress",function(){
-	console.log("keypress")
-	updateAllLabels = !updateAllLabels
-	showAllLabels = !showAllLabels
+	lineMaterial.opacity*=-1
 })
 
 YUI().use('dial', function(Y) {
