@@ -27,8 +27,8 @@ var line
 init();
 animate();
 
-var summerPosition = new THREE.Vector3(0,1.8,-2.019)
-var winterPosition = new THREE.Vector3(0,0,-.6699)
+var summerPosition = new THREE.Vector3(.05,1.8,-2.019)
+var winterPosition = new THREE.Vector3(.05,0,-.6699)
 
 function init() {
 	//console.log('sunrise '+xpl.sunrise(obsPos,-0.833))
@@ -61,6 +61,7 @@ function init() {
 	controls.minPolarAngle = 0; // radians
 	controls.maxPolarAngle = Math.PI*2
 	controls.maxDistance = 100
+	controls.target = new THREE.Vector3(0,1,-1.5)
 
 	 var ambient = new THREE.AmbientLight( 0x292939 );
 	 scene.add( ambient );
@@ -417,11 +418,15 @@ document.getElementById('timeSelector').addEventListener("change", function() {
 document.getElementById("close").addEventListener("click",function(){
 	document.getElementById("intro").style.visibility = 'hidden'
 	document.getElementById("moreInfo").style.visibility = 'visible'
+	controls.autoRotate = false
+	create = true
+	tutStage = 0
 })
 
 document.getElementById("moreInfo").addEventListener("click",function(){
 	document.getElementById("intro").style.visibility = 'visible'
 	document.getElementById("moreInfo").style.visibility = 'hidden'
+	tutStage = 0
 })
 
 var logValue = function(e){
@@ -436,6 +441,7 @@ function tutorial(){
 		case 0:
 				
 		if(create){
+			document.getElementById("infoText").innerHTML = "<p id='infoText'><a href='http://www.ancient-astronomy.org/en/2013/05/03/antike-sonnenuhren/'>The Berlin Sundial Project </a>has 3D scanned and archived dozens of sundials from ancient Greece and Rome. The sundial presented here was found in the Villa Palombra Massimi in Rome and dates to the first century BCE. <br><br>Use the mouse to navigate the scene and use the time dial to change the time and date.<br><br></p>"
 			document.getElementById("next").addEventListener("click",function(){
 				tutStage++
 				create = true
@@ -445,6 +451,7 @@ function tutorial(){
 		break
 
 		case 1:
+		if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
 		if(create){
 			controls.autoRotate = true
 			document.getElementById("infoText").innerHTML = "This sundial was made by cutting a spherical shape out of stone."
@@ -456,10 +463,10 @@ function tutorial(){
 			scene.add(sphereCut)
 			create=false
 		}
-		if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
 		break
 
 		case 2:
+		if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
 		if(create){
 			document.getElementById("infoText").innerHTML = "The lines on the face of the dial are made by calculating earth's axis relative to the observer's latitude."
 			var earthPlaneGeo = new THREE.PlaneGeometry(10,10,1)
@@ -476,7 +483,7 @@ function tutorial(){
 				sphereCut.add(globeMesh)
 			})
 			
-			addLabel("Plane of Earth Equator", new THREE.Vector3(.1,0,2.45), sphereCut, 5)
+			addLabel("Plane of Earth Equator", new THREE.Vector3(1,0,2.45), sphereCut, 5)
 			
 			sphereCut.add(earthPlaneMesh)
 			
@@ -496,24 +503,31 @@ function tutorial(){
 		break
 
 		case 3:
+			if(sphereCut.rotation.x>((90-obsPos.latitude)*xpl.DEG2RAD)*-1){
+				sphereCut.rotateX(-.01*(sphereCut.rotation.x-((90-obsPos.latitude)*xpl.DEG2RAD)*-1))
+				sphereCut.children[1].rotation.x=(Math.PI/4)	
+			}
 			sphereCut.children[1].rotation.y = controls.getAzimuthalAngle()
 			if(typeof globeMesh != 'undefined' && globeMesh.material.opacity>0 && upOp){globeMesh.material.opacity-=.01}
 			if(typeof sphereCut != 'undefined' && sphereCut.material.opacity>0 && upOp){sphereCut.material.opacity-=.01}
-			
+			if(Math.abs(controls.getAzimuthalAngle())>.1){controls.rotateLeft(.1*(Math.abs(controls.getAzimuthalAngle())-.1))}
+			if(camera.position.distanceTo(new THREE.Vector3(0,0,0))>3.5){controls.dollyIn(1+(.001*camera.position.distanceTo(new THREE.Vector3(0,0,0))))}
 			if(create){
+				controls.autoRotate = false
 				document.getElementById("infoText").innerHTML = "This makes the direction of sunlight directly perpendicular to the middle marking line of the dial on the equinoxes."
 				for(var p in scene.children){
 					if(scene.children[p].name=="Earth"){
 						scene.children[p].add(line)
 					}
 				}
-				
 				create = false
 			}
 			
 		break
 
 		case 4:
+			if(camera.position.distanceTo(new THREE.Vector3(0,0,0))<8){controls.dollyOut(1+(.1/camera.position.distanceTo(new THREE.Vector3(0,0,0))))}
+
 			if(create){
 				document.getElementById("infoText").innerHTML = "The solstice lines can then be made at 23.4 degrees above and below the equator line – the angle that Earth tilts between seasons."
 				showSoltices = true
