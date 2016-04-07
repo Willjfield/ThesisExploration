@@ -30,6 +30,9 @@ animate();
 var summerPosition = new THREE.Vector3(.05,1.8,-2.019)
 var winterPosition = new THREE.Vector3(.05,0,-.6699)
 
+var showAllLabels = false
+var updateAllLabels = false
+
 function init() {
 	//console.log('sunrise '+xpl.sunrise(obsPos,-0.833))
 	speed = 0
@@ -235,7 +238,7 @@ function init() {
 	}, onProgress, onError );
 
 	window.addEventListener( 'resize', onWindowResize, false );
-	camera.position.set(5,15,5);
+	camera.position.set(4,15,4);
 
 }
 
@@ -250,16 +253,44 @@ function onWindowResize() {
 }
 var addSolstices = false
 var showSoltices = false
+
+var addEquinoxes = false
+var showEquinoxes = false
+
+var equinoxPosition = new THREE.Vector3(0,0,-1.48)
+
 function animate() {
 	if(addSolstices){
-		addLabel("Summer Solstice (June 21st)", summerPosition)
-		addLabel("Winter Solstice (Dec. 21st)", winterPosition)	
+		addLabel("Summer Solstice (June 21st)", summerPosition,scene,1)
+		addLabel("Winter Solstice (Dec. 21st)", winterPosition,scene,1)	
 		addSolstices = false
 	}
 
 	if(showSoltices){
 		updateLabels("Summer Solstice (June 21st)",summerPosition)
 		updateLabels("Winter Solstice (Dec. 21st)",winterPosition)
+	}
+
+	if(addEquinoxes){
+		addLabel("Fall/Spring Equinox",equinoxPosition, scene, 1)
+		addEquinoxes = false
+	}
+
+	if(showEquinoxes){
+		updateLabels("Fall/Spring Equinox",equinoxPosition)
+	}
+
+	if(showAllLabels){
+		addLabel("Summer Solstice (June 21st)", summerPosition,scene,1)
+		addLabel("Winter Solstice (Dec. 21st)", winterPosition,scene,1)
+		addLabel("Fall/Spring Equinox",equinoxPosition, scene, 1)
+		showAllLabels = false
+	}
+
+	if(updateAllLabels){
+		updateLabels("Summer Solstice (June 21st)", summerPosition)
+		updateLabels("Winter Solstice (Dec. 21st)", winterPosition)
+		updateLabels("Fall/Spring Equinox",equinoxPosition)
 	}
 
 	tutorial()
@@ -341,7 +372,7 @@ function addLabel(name, label_position, parent, lScale){
 	var canvas = document.createElement('canvas')
 
 	canvas.className='label'
-	console.log(canvas)
+	//console.log(canvas)
 	document.body.appendChild(canvas)
 	var ctx = canvas.getContext('2d');
 	canvas.width = 256
@@ -424,9 +455,10 @@ document.getElementById("close").addEventListener("click",function(){
 })
 
 document.getElementById("moreInfo").addEventListener("click",function(){
+	create = true
+	tutStage = 0
 	document.getElementById("intro").style.visibility = 'visible'
 	document.getElementById("moreInfo").style.visibility = 'hidden'
-	tutStage = 0
 })
 
 var logValue = function(e){
@@ -439,66 +471,65 @@ var upOp = true
 function tutorial(){
 	switch(tutStage){
 		case 0:
-				
-		if(create){
-			document.getElementById("infoText").innerHTML = "<p id='infoText'><a href='http://www.ancient-astronomy.org/en/2013/05/03/antike-sonnenuhren/'>The Berlin Sundial Project </a>has 3D scanned and archived dozens of sundials from ancient Greece and Rome. The sundial presented here was found in the Villa Palombra Massimi in Rome and dates to the first century BCE. <br><br>Use the mouse to navigate the scene and use the time dial to change the time and date.<br><br></p>"
-			document.getElementById("next").addEventListener("click",function(){
-				tutStage++
-				create = true
-			})
-			create=false
-		}
+			if(create){
+				document.getElementById("infoText").innerHTML = "<p id='infoText'><a href='http://www.ancient-astronomy.org/en/2013/05/03/antike-sonnenuhren/'>The Berlin Sundial Project </a>has 3D scanned and archived dozens of sundials from ancient Greece and Rome. The sundial presented here was found in the Villa Palombra Massimi in Rome and dates to the first century BCE. <br><br>Use the mouse to navigate the scene and use the time dial to change the time and date.<br><br></p>"
+				document.getElementById("next").addEventListener("click",function(){
+					tutStage++
+					create = true
+				})
+				create=false
+			}
 		break
 
 		case 1:
-		if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
-		if(create){
-			controls.autoRotate = true
-			document.getElementById("infoText").innerHTML = "This sundial was made by cutting a spherical shape out of stone."
-			document.getElementById("next").innerHTML = "Next"
-			var sphereCutGeo = new THREE.SphereGeometry(2.2,24,24)
-			var sphereCutMat = new THREE.MeshBasicMaterial( { depthTest: false,color: 0xffffff, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide, transparent: true, opacity:.25} );
-			sphereCut = new THREE.Mesh(sphereCutGeo,sphereCutMat)
-			sphereCut.position.y=3
-			scene.add(sphereCut)
-			create=false
-		}
+			if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
+			if(create){
+				controls.autoRotate = true
+				document.getElementById("infoText").innerHTML = "This sundial was made by cutting a spherical shape out of stone."
+				document.getElementById("next").innerHTML = "Next"
+				var sphereCutGeo = new THREE.SphereGeometry(2.2,24,24)
+				var sphereCutMat = new THREE.MeshBasicMaterial( { depthTest: false,color: 0xffffff, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide, transparent: true, opacity:.25} );
+				sphereCut = new THREE.Mesh(sphereCutGeo,sphereCutMat)
+				sphereCut.position.y=3
+				scene.add(sphereCut)
+				create=false
+			}
 		break
 
 		case 2:
-		if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
-		if(create){
-			document.getElementById("infoText").innerHTML = "The lines on the face of the dial are made by calculating earth's axis relative to the observer's latitude."
-			var earthPlaneGeo = new THREE.PlaneGeometry(10,10,1)
-			var earthPlaneMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0, side: THREE.DoubleSide})
-			earthPlaneMesh = new THREE.Mesh(earthPlaneGeo,earthPlaneMat)
-			earthPlaneMesh.rotateX(Math.PI/2)
-			var loader = new THREE.TextureLoader()
-			loader.load(
-			'../../../lib/data/images/Earth.jpg',
-			function ( texture ) {
-				var globeGeo = new THREE.SphereGeometry(2.2,24,24)
-				var globeMat = new THREE.MeshBasicMaterial({map:texture,transparent:true, opacity:0})
-				globeMesh = new THREE.Mesh(globeGeo,globeMat)
-				sphereCut.add(globeMesh)
-			})
-			
-			addLabel("Plane of Earth Equator", new THREE.Vector3(1,0,2.45), sphereCut, 5)
-			
-			sphereCut.add(earthPlaneMesh)
-			
-			
-			create=false
-		}
-		//if(sphereCut.material.opacity > 0){sphereCut.material.opacity-=.01}
-		if(typeof globeMesh != 'undefined' && globeMesh.material.opacity<1 && upOp){globeMesh.material.opacity+=.01}
-		if(typeof earthPlaneMesh != 'undefined' && earthPlaneMesh.material.opacity<.4 && upOp){earthPlaneMesh.material.opacity+=.01}
+			if((xpl.now+sumT+timeOffset+(timeZone/12))%1>.02){timeOffset+=.01}
 
-		if(sphereCut.rotation.x>((90-obsPos.latitude)*xpl.DEG2RAD)*-1){
-			sphereCut.rotateX(-.01*(sphereCut.rotation.x-((90-obsPos.latitude)*xpl.DEG2RAD)*-1))
-			sphereCut.children[1].rotation.x=(Math.PI/4)	
-		}
-		sphereCut.children[1].rotation.y = controls.getAzimuthalAngle()
+			if(create){
+				document.getElementById("infoText").innerHTML = "The lines on the face of the dial are made by calculating earth's axis relative to the observer's latitude."
+				var earthPlaneGeo = new THREE.PlaneGeometry(10,10,1)
+				var earthPlaneMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0, side: THREE.DoubleSide})
+				earthPlaneMesh = new THREE.Mesh(earthPlaneGeo,earthPlaneMat)
+				earthPlaneMesh.rotateX(Math.PI/2)
+				var loader = new THREE.TextureLoader()
+				loader.load(
+				'../../../lib/data/images/Earth.jpg',
+				function ( texture ) {
+					var globeGeo = new THREE.SphereGeometry(2.2,24,24)
+					var globeMat = new THREE.MeshBasicMaterial({map:texture,transparent:true, opacity:0})
+					globeMesh = new THREE.Mesh(globeGeo,globeMat)
+					sphereCut.add(globeMesh)
+				})
+				
+				addLabel("Plane of Earth Equator", new THREE.Vector3(1,0,2.45), sphereCut, 5)
+				
+				sphereCut.add(earthPlaneMesh)			
+				create=false
+			}
+			//if(sphereCut.material.opacity > 0){sphereCut.material.opacity-=.01}
+			if(typeof globeMesh != 'undefined' && globeMesh.material.opacity<1 && upOp){globeMesh.material.opacity+=.01}
+			if(typeof earthPlaneMesh != 'undefined' && earthPlaneMesh.material.opacity<.4 && upOp){earthPlaneMesh.material.opacity+=.01}
+
+			if(sphereCut.rotation.x>((90-obsPos.latitude)*xpl.DEG2RAD)*-1){
+				sphereCut.rotateX(-.01*(sphereCut.rotation.x-((90-obsPos.latitude)*xpl.DEG2RAD)*-1))
+				sphereCut.children[1].rotation.x=(Math.PI/4)	
+			}
+
+			sphereCut.children[1].rotation.y = controls.getAzimuthalAngle()
 
 		break
 
@@ -507,11 +538,16 @@ function tutorial(){
 				sphereCut.rotateX(-.01*(sphereCut.rotation.x-((90-obsPos.latitude)*xpl.DEG2RAD)*-1))
 				sphereCut.children[1].rotation.x=(Math.PI/4)	
 			}
+
 			sphereCut.children[1].rotation.y = controls.getAzimuthalAngle()
 			if(typeof globeMesh != 'undefined' && globeMesh.material.opacity>0 && upOp){globeMesh.material.opacity-=.01}
 			if(typeof sphereCut != 'undefined' && sphereCut.material.opacity>0 && upOp){sphereCut.material.opacity-=.01}
-			if(Math.abs(controls.getAzimuthalAngle())>.1){controls.rotateLeft(.1*(Math.abs(controls.getAzimuthalAngle())-.1))}
-			if(camera.position.distanceTo(new THREE.Vector3(0,0,0))>3.5){controls.dollyIn(1+(.001*camera.position.distanceTo(new THREE.Vector3(0,0,0))))}
+
+			if(Math.abs(controls.getAzimuthalAngle())>.5){controls.rotateLeft(.1*(Math.abs(controls.getAzimuthalAngle())-.1))}
+			if(Math.abs(controls.getPolarAngle())>.1){controls.rotateUp(.1*(Math.abs(controls.getPolarAngle())))}
+			
+			if(camera.position.distanceTo(new THREE.Vector3(0,0,0))>4){controls.dollyIn(1+(.001*camera.position.distanceTo(new THREE.Vector3(0,0,0))))}
+			
 			if(create){
 				controls.autoRotate = false
 				document.getElementById("infoText").innerHTML = "This makes the direction of sunlight directly perpendicular to the middle marking line of the dial on the equinoxes."
@@ -520,6 +556,8 @@ function tutorial(){
 						scene.children[p].add(line)
 					}
 				}
+				addEquinoxes = true
+				showEquinoxes = true
 				create = false
 			}
 			
@@ -527,6 +565,7 @@ function tutorial(){
 
 		case 4:
 			if(camera.position.distanceTo(new THREE.Vector3(0,0,0))<8){controls.dollyOut(1+(.1/camera.position.distanceTo(new THREE.Vector3(0,0,0))))}
+			if(controls.getPolarAngle()<1){controls.rotateUp(.1*(controls.getPolarAngle()-1))}
 
 			if(create){
 				document.getElementById("infoText").innerHTML = "The solstice lines can then be made at 23.4 degrees above and below the equator line – the angle that Earth tilts between seasons."
@@ -552,6 +591,12 @@ function tutorial(){
 		break
 	}
 }
+
+document.body.addEventListener("keypress",function(){
+	console.log("keypress")
+	updateAllLabels = !updateAllLabels
+	showAllLabels = !showAllLabels
+})
 
 YUI().use('dial', function(Y) {
         dial = new Y.Dial({

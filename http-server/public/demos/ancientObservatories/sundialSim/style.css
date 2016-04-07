@@ -33,6 +33,7 @@
 
 #moreInfo{
   z-index: 999;
+  font-size: 30px;
   background:rgba(64,64,64,.5);
   /*border: .5px solid grey;*/
   text-align: center;
@@ -43,7 +44,7 @@
   padding: 5px;
   padding-left: 50px;
   padding-right: 50px;
-  left:12.5%;
+  left:0%;
 }
 
 #nightTime{
@@ -51,7 +52,7 @@
   position: absolute;
   width:80%;
   left:50%;
-  top:100px;
+  top:120px;
   text-align: center;
   font-weight: lighter;
   font-size: 28px;
@@ -210,10 +211,11 @@ canvas{
 #date{
   display: inline;
   position: absolute;
-  margin-top:0px;
   left: 0px;
+  bottom:10px;
   background-color: rgba(0, 0, 0, .5);
   padding:5px;
+  font-size: 36px;
 }
 
 #controls{
@@ -263,7 +265,7 @@ canvas{
 .time{
   position: absolute;
   width:100%;
-  bottom:-20px;
+  bottom:-25px;
   text-align: center;
 }
 
