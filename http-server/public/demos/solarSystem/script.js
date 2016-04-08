@@ -295,7 +295,11 @@ var ISSPropMat = new THREE.LineBasicMaterial({
 	color: 0x00ff00});
 
 var render = function () {
-
+	/* UPDATE CLIPPING PLANES!
+	camera.near = 
+	camera.far = 
+	camera.updateProjectionMatrix()
+	*/
 	if(typeof dial != 'undefined'){
 		dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
 	}
@@ -340,7 +344,7 @@ var render = function () {
 		//var curObj = clone(tlObj)
 		var curObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
 		//console.log(curObj)
-		for(var propT = 0;propT<0.0625;propT+=.0025){
+		for(var propT = 0;propT<0.0625;propT+=.0015){
 			curObj.update(t+sumT+propT)
 			curxyz = curObj.position_ecf
 			var curPosition = [xpl.kmtoau(curxyz.x)*solScale,xpl.kmtoau(curxyz.z)*solScale,xpl.kmtoau(-curxyz.y)*solScale]

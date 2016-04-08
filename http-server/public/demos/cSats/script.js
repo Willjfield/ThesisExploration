@@ -54,17 +54,6 @@ var mwTexture
 var initDate
 var timeZone
 
-// var tweenStart = new TWEEN.Tween(tourPositions[0])
-//     .to(tourPositions[1], 5000)
-//     .easing(TWEEN.Easing.Sinusoidal.InOut)
-    
-
-// var tweenEnd = new TWEEN.Tween(tourPositions[1])
-//     .to(tourPositions[2], 5000)
-//     .easing(TWEEN.Easing.Sinusoidal.InOut)
-
-// tweenStart.chain(tweenEnd)
-
 xpl.getTLE('classified', satellites, function(){
     
     for(var sat in satellites){
@@ -78,7 +67,8 @@ xpl.getTLE('classified', satellites, function(){
         obs.longitude = location.coords.longitude
         obs.height = 0
         
-
+        // obs.latitude = -6.1745
+        // obs.longitude = 106.8227
         var manager = new THREE.LoadingManager();
                 manager.onProgress = function ( item, loaded, total ) {
                     document.getElementById("loading").remove()
@@ -650,11 +640,15 @@ function tour(){
                 viewerNormalizedLat.normalize()
                 cameraNormalizedLat.normalize()
 
-                controls.rotateLeft(.1*(1-viewerNormalizedLong.dot(cameraNormalizedLong)))
-
-                var distanceFromLatitude = controls.getPolarAngle()-((obs.latitude+11.7)*xpl.DEG2RAD)
+                controls.rotateLeft(.5*(1-viewerNormalizedLong.dot(cameraNormalizedLong)))
+                //console.log((1-viewerNormalizedLong.dot(cameraNormalizedLong)))
+                var mappedLatitude = (180-(obs.latitude+90))*xpl.DEG2RAD
+                var distanceFromLatitude = controls.getPolarAngle()-mappedLatitude
+                
                 if(Math.abs(distanceFromLatitude)>.01){
-                   controls.rotateUp(.05*distanceFromLatitude)
+                    // console.log("pa "+controls.getPolarAngle())
+                    // console.log("lat "+mappedLatitude)
+                    controls.rotateUp(.1*distanceFromLatitude)
                 }
 
                 if( controls.target.distanceTo(myViewPosition)>.1){
@@ -670,7 +664,7 @@ function tour(){
                 if( camera.position.length()>125){
                     camera.position.multiplyScalar(.98)
                 }
-                if(camera.position.length()<115){
+                if(camera.position.length()<100){
                     camera.position.multiplyScalar(1.02)
                 }
         break
