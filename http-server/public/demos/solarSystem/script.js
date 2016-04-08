@@ -113,17 +113,11 @@ var sunTexture = new THREE.Texture();
 	scene.add( sphere );
 })
 
-var wireFrameMeshes=[]
 function makePlanets(){
 	for(var p in xpl.planets){	
 			var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.planets[p].radius)*solScale,48,48 );
 			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,/*wireframe: true*/} );
 			var sphere = new THREE.Mesh( geometry, material );
-			
-			var materialW = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, wireframeLinewidth: 1 } );
-			var geometryW = new THREE.SphereGeometry( xpl.planets[p].radius/planScale,6,6);
-			var sphereW = new THREE.Mesh( geometryW, materialW );
-			wireFrameMeshes.push(sphereW)
 
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
 			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
@@ -397,15 +391,18 @@ var render = function () {
 		var dist
 		focusedPlanet>3 ? dist = .002 : dist = .0001
 		document.getElementById("movewcam").style.color = "white"
+		document.getElementById("movewcam").style.fontWeight='normal'
 		if(focusedPlanet!=9){
 			if(camera.position.distanceTo(drawPlanets[focusedPlanet].position)>dist){
 				document.getElementById("movewcam").style.color = "#ff0000"
+				document.getElementById("movewcam").style.fontWeight='900'
 				controls.dollyIn(1.1)
 			}
 		}else{
 			dist = .01
 			if(camera.position.distanceTo(new THREE.Vector3())>dist){
 				document.getElementById("movewcam").style.color = "#ff0000"
+				document.getElementById("movewcam").style.fontWeight='900'
 				controls.dollyIn(1.1)
 			}
 		}
@@ -413,9 +410,6 @@ var render = function () {
 	}
 	renderer.render(scene, camera);
 	drawPlanets[2].remove(ISSPropLine)
-	// for(var p in wireFrameMeshes){
-	// 	scene.remove(scene.add(wireFrameMeshes[p]))
-	// }
 };
 
 var voyager1Positions = []

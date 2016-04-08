@@ -1,3 +1,6 @@
+*{
+  overflow: hidden;
+}
 .label{
   display: none;
 }
@@ -30,6 +33,7 @@
 body{
   margin: 0 auto;
   font-size: 28px;
+  overflow: hidden;
 }
 
 #speedSlider{

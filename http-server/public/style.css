@@ -138,19 +138,21 @@ li a:hover {
 
 .tutBody{
 	font-size: 16px;
-	background:rgba(0,0,0,.8);
+	background:rgba(255,255,255,.75);
 }
 
 code, pre{
 	width:100%;
 	position: relative;
 	padding: 0;
-    color: #eceef4;
+    color: black;
+    background: white;
     direction: ltr;
     text-align: left;
     white-space: pre;
     display: inline-block;
     word-spacing: normal;
+
     word-break: normal;
     -moz-tab-size: 4;
     -o-tab-size: 4;
@@ -159,7 +161,12 @@ code, pre{
     -moz-hyphens: none;
     -ms-hyphens: none;
     hyphens: none;
+}
 
+.tutExplanation{
+	display:inline-block;
+	padding:10px;
+	background:rgba(0,0,0,.5);
 }
 
 /*pre { 
@@ -220,6 +227,7 @@ code, pre{
 
 .demoPresentDiv{
 	position:absolute;
+	overflow: hidden;
 	width:100%;
 	height:100%;
 	left:50%;
@@ -255,6 +263,7 @@ iframe{
 	z-index: 999;
 	border:none;
 	background: black;
+	overflow: hidden;
 }
 
 .overflowNotHidden{
@@ -269,6 +278,7 @@ iframe{
 	left:50%;
 	top:50%;
 	transform:translate(-50%,-50%);
+	overflow: hidden;
 }
 
 .demobox:hover .openNew {
