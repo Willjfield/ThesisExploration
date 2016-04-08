@@ -1,6 +1,3 @@
-// var tleLine1 = "1 25544U 98067A   16072.60311259  .00012306  00000-0  19343-3 0  9998"
-// var tleLine2 = "2 25544  51.6438 179.7093 0001431 279.1916 222.9068 15.54042739989958"
-// var tlObj = new xpl.tle(tleLine1,tleLine2);
 var tlObj
 var satellites = []
 var xyz = new THREE.Vector3()
@@ -17,7 +14,6 @@ xmlhttp.onreadystatechange = function() {
 	    			line1 : tleresponse[s].TLE_LINE1,
 	    			line2 : tleresponse[s].TLE_LINE2
 	    		})
-
 	        }
 	        //console.log(satellites[0])
 	        tlObj = new xpl.tle(satellites[0].line1,satellites[0].line2)
@@ -36,7 +32,6 @@ camera.position.set(0,0,100)
 var focusedPlanet = 2
 
 var renderer = new THREE.WebGLRenderer();
-
 
 renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -91,6 +86,20 @@ var manager = new THREE.LoadingManager();
 
 var loader = new THREE.ImageLoader( manager );
 
+var mwGeo = new THREE.SphereGeometry(.01,48,48)
+var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide, depthTest: false})
+var mwMesh = new THREE.Mesh(mwGeo,mwMat)
+
+loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
+    var texture = new THREE.Texture()
+    texture.image = image
+    texture.needsUpdate = true
+    mwMesh.material.map = texture
+    //how to get tilt of galactic plane?
+    mwMesh.rotation.set(0,0,60*Math.PI/180)
+    scene.add(mwMesh)
+})
+
 //SUN
 var sunTexture = new THREE.Texture();
 	loader.load( '../../lib/data/images/Sun.jpg', function ( image ) {
@@ -126,20 +135,6 @@ function makePlanets(){
 
 makePlanets()
     
-var mwGeo = new THREE.SphereGeometry(900,48,48)
-var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide})
-var mwMesh = new THREE.Mesh(mwGeo,mwMat)
-
-loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
-    var texture = new THREE.Texture()
-    texture.image = image
-    texture.needsUpdate = true
-    mwMesh.material.map = texture
-    //how to get tilt of galactic plane?
-    mwMesh.rotation.set(0,0,60*Math.PI/180)
-    scene.add(mwMesh)
-})
-
 function addLabel(planet){
 	//var size = 256;
 	var canvas = document.createElement('canvas')
@@ -209,7 +204,6 @@ var earthCenter = new THREE.Object3D()
 earthCenter.position.copy(drawPlanets[2].position)
 scene.add(earthCenter)
 
-
 var obs = {latitude:0,longitude:0,elevation:0}
 var moonPosition = xpl.MoonPos(xpl.now+t+sumT, obs)
 moonMesh.position.x = xpl.kmtoau(moonPosition[9])
@@ -254,15 +248,11 @@ mtlLoader.load( modelPath+'.mtl', function( materials ) {
 		} );
 
 		object.scale.set(.00001,.00001,.00001)
-		// object.rotateX(-Math.PI/2)
-		// object.position.y=3
 		drawPlanets[2].add(object)
 
 	});
 
 }, onProgress, onError );
-
-
 
 	///TEST EARTH AXES
 	/*
@@ -295,11 +285,13 @@ var ISSPropMat = new THREE.LineBasicMaterial({
 	color: 0x00ff00});
 
 var render = function () {
-	/* UPDATE CLIPPING PLANES!
-	camera.near = 
-	camera.far = 
+	// UPDATE CLIPPING PLANES!
+	camera.far = camera.position.distanceTo(controls.target)*10000
+	if(camera.far>100){
+		camera.far = 100
+	}
 	camera.updateProjectionMatrix()
-	*/
+	
 	if(typeof dial != 'undefined'){
 		dial._stepsPerRevolution = parseFloat(document.getElementById('timeSelector').value)
 	}
@@ -360,7 +352,6 @@ var render = function () {
 		drawPlanets[2].children[0].position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 	}
 
-
 	// var iss_helio = xpl.ecf_to_heliocentric(ISS_ecf.position,xpl.now+t)
 	// ISS_eci.position.set(iss_helio.x,iss_helio.z,iss_helio.y)
 
@@ -418,9 +409,7 @@ var render = function () {
 				controls.dollyIn(1.1)
 			}
 		}
-
 		// camera.position.copy(drawPlanets[focusedPlanet].position)
-
 	}
 	renderer.render(scene, camera);
 	drawPlanets[2].remove(ISSPropLine)
@@ -525,9 +514,5 @@ YUI().use('dial', function(Y) {
 			dial.set('value',0)
 		}, false)
 });
-
-
-
-
 
 render();

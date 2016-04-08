@@ -58,7 +58,7 @@ li a:hover {
 	top: 11%;
 	left: 25%;
 	margin: 0 auto;
-	width:50%;
+	width:60%;
 	height: 100%;
 	background: rgba(0,0,0,.4);
 	font-family: "futura-pt",sans-serif;
@@ -115,7 +115,7 @@ li a:hover {
 	font-family: "futura-pt",sans-serif;
 	font-size: 24px;
 }
-.demos{
+.demos, .tuts{
 	position: absolute;
 	width: 500px;
 	height: 360px;
@@ -123,9 +123,59 @@ li a:hover {
 	transform:translate(-50%,0%);
 	top:10%;
     font-family: "futura-pt",sans-serif;
+    background: rgba(0,0,0,.8);
 }
 
-.demobox{
+.tuts{
+	width:;
+}
+
+.tutdemo{
+	width:100%;
+	height:600px;
+	border: 1px solid white;
+}
+
+.tutBody{
+	font-size: 16px;
+	background:rgba(0,0,0,.8);
+}
+
+code, pre{
+	width:100%;
+	position: relative;
+	padding: 0;
+    color: #eceef4;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    display: inline-block;
+    word-spacing: normal;
+    word-break: normal;
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+
+}
+
+/*pre { 
+	position: relative;
+	font: 100% courier,monospace; 
+	border: 1px solid #ccc; 
+	overflow: auto; 
+	overflow-x: scroll; 
+	width: 50%; 
+	padding: 0 1em 1em 1em; 
+	margin: 1em auto 2em auto; 
+	background: #fff7f0; 
+	color: #000 
+}*/
+
+.demobox, .tutbox{
 	border: 1px solid white;
 	width:300px;
 	height:150px;
@@ -135,16 +185,21 @@ li a:hover {
     text-align: center;
 }
 
-.demobox a {
+.demobox a,.tutbox a {
 	text-decoration: none;
 	color:white;
 }
 
-.demobox:hover {
+.demobox:hover, .tutbox:hover {
 	box-sizing: border-box;
    border: 1px solid;
    border-color: rgba(255,255,255,.5);
    background:rgba(64,64,64,.5);
+}
+
+.tutbox{
+	width: 200px;
+	height:200px;
 }
 
 .openBelow {

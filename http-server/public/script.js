@@ -3,6 +3,7 @@ var camera = new THREE.PerspectiveCamera( 55, window.innerWidth/window.innerHeig
 
 var renderer = new THREE.WebGLRenderer({ /*alpha: true*/ });
 renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.domElement.style.position = 'fixed'
 document.body.appendChild( renderer.domElement );
 
 var light = new THREE.AmbientLight( 0x343434 ); // soft white light
