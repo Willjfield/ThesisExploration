@@ -509,4 +509,77 @@ YUI().use('dial', function(Y) {
 		}, false)
 });
 
+var label = function(parameters){
+	this.height = typeof parameters.size=='undefined' ? 128 : parameters.height
+	this.width = typeof parameters.width=='undefined' ? 256 : parameters.width
+	this.labelText = typeof parameters.labelText=='undefined' ? "label" : parameters.labelText
+	this.parent = typeof parameters.scene=='undefined' ? scene : parameters.scene
+	this.position = typeof parameters.position=='undefined' ? new THREE.Vector3(0,0,0) : parameters.position
+	this.parentScale = typeof parameters.parentScale=='undefined' ? 1 : parameters.parentScale
+	this.labelScale = typeof parameters.labelScale=='undefined' ? 1 : parameters.labelScale
+
+	
+	var lineheight = 2
+
+	var canvas = document.createElement('canvas')
+
+	canvas.className='label'
+	document.body.appendChild(canvas)
+	var ctx = canvas.getContext('2d');
+	canvas.width = this.width
+	canvas.height = this.height
+	ctx.font = '48pt Arial';
+	ctx.fontWeight = 'bolder'
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle="rgba(0, 0, 200, 1)";
+    ctx.fill();
+	ctx.fillStyle = 'white';
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(this.labelText, canvas.width / 2, canvas.height / 2);
+
+	var stexture = new THREE.Texture(canvas);
+	stexture.needsUpdate = true;
+
+	this.parentObj = new THREE.Object3D()
+
+	var smaterial = new THREE.MeshBasicMaterial({map: stexture, alphaMap:stexture, transparent: true});
+	var sgeometry = new THREE.PlaneGeometry( 1, .5 );
+	this.smesh = new THREE.Mesh( sgeometry, smaterial );
+	this.smesh.scale.set(this.labelScale,this.labelScale,this.labelScale)
+	this.smesh.position.y+=lineheight+.25
+
+	var pointerLineGeo = new THREE.Geometry()
+	pointerLineGeo.vertices.push(new THREE.Vector3(0,0,0),new THREE.Vector3(0,lineheight,0))
+	var pointerLineMat = new THREE.LineBasicMaterial({
+		color: 0xffffff});
+	var pointerLine = new THREE.Line(pointerLineGeo,pointerLineMat );
+	pointerLine.name=this.labelText+"_labelLine"
+	pointerLine.position.copy(this.position)
+	pointerLine.geometry.verticesNeedUpdate = true
+	
+	this.parentObj.add(pointerLine)
+	this.parentObj.add(this.smesh)
+	
+	this.parentObj.name=this.labelText+"_label"
+	this.parentObj.position.copy(this.position)
+	this.parentObj.scale.set(this.parentScale,this.parentScale,this.parentScale)
+
+	this.parent.add( this.parentObj );
+
+	console.log('made label')
+}
+
+label.prototype.update = function(){}
+
+label.prototype.hide = function(){
+	this.parent.remove(this.parentObj)
+}
+
+var testLabel = new label({labelText:"Hello, World!",labelScale:1,parentScale:.01})
+
+document.body.addEventListener("keypress",function(){
+	testLabel.hide()
+})
+
 render();
