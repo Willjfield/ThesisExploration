@@ -410,7 +410,7 @@ Add moons
 	planet.prototype.rotationAt = function(jday){	
 		// var _jday
 		// typeof "jday" == undefined ? _jday = xpl.now : _jday=jday
-		var currentPlanetRotation = ((jday)%(this.dayLength/23.9344))*2*Math.PI//+0.166667
+		var currentPlanetRotation = ((jday)%(this.dayLength/23.9344))*2*Math.PI+0.04363323127//+0.166667
 		return currentPlanetRotation
 	}
 	//http://nssdc.gsfc.nasa.gov/planetary/planetfact.html

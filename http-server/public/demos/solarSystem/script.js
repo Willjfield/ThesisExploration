@@ -87,7 +87,7 @@ var manager = new THREE.LoadingManager();
 var loader = new THREE.ImageLoader( manager );
 
 var mwGeo = new THREE.SphereGeometry(.01,48,48)
-var mwMat = new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide, depthTest: false})
+var mwMat = new THREE.MeshBasicMaterial({color:0x888888, side:THREE.DoubleSide, depthTest: false})
 var mwMesh = new THREE.Mesh(mwGeo,mwMat)
 
 loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
@@ -101,6 +101,7 @@ loader.load("../../lib/data/images/milkywaypan_brunier.jpg",function (image){
 })
 
 //SUN
+var SunLabel
 var sunTexture = new THREE.Texture();
 	loader.load( '../../lib/data/images/Sun.jpg', function ( image ) {
 	sunTexture.image = image;
@@ -111,71 +112,26 @@ var sunTexture = new THREE.Texture();
 	var material = new THREE.MeshLambertMaterial( { map:image } );
 	var sphere = new THREE.Mesh( sunGeometry, sunMaterial );
 	scene.add( sphere );
+	SunLabel = new ThreeLabel({labelText:"Sun",width:4,labelScale:1,parentScale:.01})
 })
-
+var planetLabels=new Array(xpl.planets.length)
 function makePlanets(){
 	for(var p in xpl.planets){	
 			var geometry = new THREE.SphereGeometry( xpl.kmtoau(xpl.planets[p].radius)*solScale,48,48 );
 			var material = new THREE.MeshLambertMaterial( { color:0xffffff ,/*wireframe: true*/} );
 			var sphere = new THREE.Mesh( geometry, material );
-
+			sphere.rotateX(xpl.planets[p].oblique*Math.PI/180)
 			var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now);
-			sphere.position.set(curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
-			sphere.rotateX(-xpl.planets[p].oblique*Math.PI/180)
+			sphere.position.set(-curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale);
 			sphere.name = xpl.planets[p].name
+			planetLabels[p] = new ThreeLabel({labelText:xpl.planets[p].name,width:4,labelScale:1,parentScale:.01, parent:sphere})
+
 			drawPlanets.push(sphere);
+
 		}
 }
 
 makePlanets()
-    
-function addLabel(planet){
-	//var size = 256;
-	var canvas = document.createElement('canvas')
-
-	canvas.className='label'
-	//console.log(canvas)
-	document.body.appendChild(canvas)
-	var ctx = canvas.getContext('2d');
-	canvas.width = 256
-	canvas.height = 128
-	ctx.font = '48pt Arial';
-	ctx.fontWeight = 'bolder'
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle="rgba(0, 0, 200, 0)";
-    ctx.fill();
-	ctx.fillStyle = 'white';
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-	ctx.fillText(planet.name, canvas.width / 2, canvas.height / 2);
-
-	var stexture = new THREE.Texture(canvas);
-	stexture.needsUpdate = true;
-
-	var parentObj = new THREE.Object3D()
-
-	var smaterial = new THREE.MeshBasicMaterial({ map: stexture, alphaMap:stexture, transparent: true});
-	var sgeometry = new THREE.PlaneGeometry( .05, .025 );
-	var smesh = new THREE.Mesh( sgeometry, smaterial );
-
-	var pointer = new THREE.Geometry()
-	pointer.vertices.push(new THREE.Vector3(0,0,0),new THREE.Vector3(0,.06,0))
-	var pointerLine = new THREE.LineBasicMaterial({
-		color: 0xffffff});
-	var line = new THREE.Line(pointer,pointerLine );
-	line.name=planet.name+"_labelLine"
-	line.position.copy(planet.position)
-	line.geometry.verticesNeedUpdate = true
-	
-	scene.add(line)
-	parentObj.add(smesh)
-
-	parentObj.name=planet.name+"_label"
-	parentObj.position.copy(planet.position)
-	parentObj.position.y+=.075
-
-	scene.add( parentObj );
-}
 
 drawPlanets.forEach(function(planet, index){
 	var texturePath = "../../lib/data/images/"
@@ -187,21 +143,24 @@ drawPlanets.forEach(function(planet, index){
 				ptexture.needsUpdate = true;
 				drawPlanets[index].material.map = ptexture
 				scene.add(drawPlanets[index])
-				addLabel(drawPlanets[index])
+				//addLabel(drawPlanets[index])
 				})		
 });
 
 var moonGeo = new THREE.SphereGeometry(xpl.kmtoau(1736.482)*solScale,32,32)
 var moonMat = new THREE.MeshLambertMaterial({color:0xffffff})
 var moonMesh = new THREE.Mesh(moonGeo,moonMat)
+moonMesh.name = "moonMesh"
 var earthCenter = new THREE.Object3D()
 earthCenter.position.copy(drawPlanets[2].position)
 scene.add(earthCenter)
 
 var obs = {latitude:0,longitude:0,elevation:0}
 var moonPosition = xpl.MoonPos(xpl.now+t+sumT, obs)
+console.log(moonPosition)
 moonMesh.position.x = xpl.kmtoau(moonPosition[9])
 
+var moonLabel
 loader.load( "../../lib/data/images/Moon.jpg", function (image) {
 				ptexture = new THREE.Texture();
 				ptexture.image = image;
@@ -209,7 +168,12 @@ loader.load( "../../lib/data/images/Moon.jpg", function (image) {
 				moonMesh.material.map = ptexture
 				moonMesh.rotateY(Math.PI)
 				earthCenter.add(moonMesh)
-				earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
+				moonLabel = new ThreeLabel({labelText:"Moon",width:4,labelScale:.1,parent:scene, parentScale:.005})
+				moonMesh.add(scene.getObjectByName("Moon_parent_label",true))
+				scene.getObjectByName("moonMesh",true).rotateY(Math.PI/2)
+
+				scene.remove(scene.getObjectByName("Moon_parent_label",true))
+				earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)+Math.PI
 				earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
 				})	
 
@@ -230,7 +194,7 @@ mtlLoader.load( modelPath+'.mtl', function( materials ) {
 	loader.load( modelPath+'.obj', function ( object ) {
 		var objLoader = new THREE.OBJLoader();
 		//loader.setMaterials( materials );
-
+		object.name = "ISSObj"
 		object.traverse( function ( child ) {
 		if ( child instanceof THREE.Mesh ) {
 			//console.log(materials.materials)
@@ -266,7 +230,7 @@ mtlLoader.load( modelPath+'.mtl', function( materials ) {
 	*/
 	///TEST EARTH AXES
 
-camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,-drawPlanets[2].position.z-.0001)
+camera.position.set(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z-.0001)
 controls.target = new THREE.Vector3(drawPlanets[2].position.x,drawPlanets[2].position.y,drawPlanets[2].position.z)
 
 var planetSelector = document.getElementById("planetSelector")
@@ -279,6 +243,7 @@ var ISSPropMat = new THREE.LineBasicMaterial({
 	color: 0x00ff00});
 
 var render = function () {
+	typeof SunLabel != 'undefined' ? SunLabel.update():{}
 	// UPDATE CLIPPING PLANES!
 	camera.far = camera.position.distanceTo(controls.target)*10000
 	if(camera.far>100){
@@ -305,7 +270,7 @@ var render = function () {
 								"<br>Time: "+dspHour+":"+dmin +"(UTC "+timeZone+")";
 
 	earthCenter.position.copy(drawPlanets[2].position)
-	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)
+	earthCenter.rotation.y = moonPosition[3]*(Math.PI/180)+Math.PI
 	earthCenter.rotation.x = drawPlanets[2].rotation.x+(moonPosition[4]*(Math.PI/180))
 
 	moonPosition = xpl.MoonPos(xpl.now+t+sumT, obs)
@@ -342,9 +307,11 @@ var render = function () {
 	}
     
 	var ISSPosition = [xpl.kmtoau(xyz.x)*solScale,xpl.kmtoau(xyz.z)*solScale,xpl.kmtoau(-xyz.y)*solScale]
-	if(drawPlanets[2].children.length>0){
-		drawPlanets[2].children[0].position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
+	
+	if(typeof scene.getObjectByName("ISSObj",true)!='undefined'){
+		scene.getObjectByName("ISSObj",true).position.set(ISSPosition[0],ISSPosition[1],ISSPosition[2]);
 	}
+
 
 	// var iss_helio = xpl.ecf_to_heliocentric(ISS_ecf.position,xpl.now+t)
 	// ISS_eci.position.set(iss_helio.x,iss_helio.z,iss_helio.y)
@@ -366,30 +333,16 @@ var render = function () {
 		var curPosition = xpl.SolarSystem(xpl.planets[p],xpl.now+t+sumT);
 		//launch of voyager 1
         //var curPosition = xpl.SolarSystem(xpl.planets[p],2443391.500000+t);
-		var curRotation = xpl.planets[p].rotationAt(xpl.now+t+sumT)
+		var curRotation = xpl.planets[p].rotationAt(xpl.now+t+sumT)+Math.PI
 		var oblique = 0
 		drawPlanets[p].rotation.y = curRotation
-		drawPlanets[p].position.set(curPosition[0]*solScale,curPosition[2]*solScale,-curPosition[1]*solScale)
-
-		for(var child in scene.children){
-			if(scene.children[child].name==drawPlanets[p].name+"_labelLine"){
-				scene.children[child].position.copy(drawPlanets[p].position)
-				//console.log(scene.children[child].position)
-				//scene.children[child].position.z*=-1
-			}
-			if(scene.children[child].name==drawPlanets[p].name+"_label"){
-				scene.children[child].lookAt(camera.position)
-				var labelScale = scene.children[child].position.distanceTo(camera.position)*2
-				scene.children[child].scale.set(labelScale,labelScale,labelScale)
-				scene.children[child].position.copy(drawPlanets[p].position)
-				scene.children[child].position.y+=.075
-			}
-		}
+		drawPlanets[p].position.set(-curPosition[0]*solScale,curPosition[2]*solScale,curPosition[1]*solScale)
+		planetLabels[p].update()
 	}
 
 	if(document.getElementById("moveWithPlanet").checked){
 		var dist
-		focusedPlanet>3 ? dist = .002 : dist = .0001
+		focusedPlanet>3 ? dist = .004 : dist = .0005
 		document.getElementById("movewcam").style.color = "white"
 		document.getElementById("movewcam").style.fontWeight='normal'
 		if(focusedPlanet!=9){
@@ -418,7 +371,7 @@ xpl.probePositions('voyager1',voyager1Positions,function(){
 		probeGeometry.verticesNeedUpdate = true
 	for(var v in voyager1Positions){
 		probeGeometry.vertices.push(
-			new THREE.Vector3( voyager1Positions[v].x, voyager1Positions[v].y, -voyager1Positions[v].z )
+			new THREE.Vector3( -voyager1Positions[v].x, voyager1Positions[v].y, voyager1Positions[v].z )
 		);
 	}
 	var probeMaterial = new THREE.LineBasicMaterial({
@@ -434,7 +387,7 @@ xpl.probePositions('voyager2',voyager2Positions,function(){
 		probeGeometry.verticesNeedUpdate = true
 	for(var v in voyager2Positions){
 		probeGeometry.vertices.push(
-			new THREE.Vector3( voyager2Positions[v].x, voyager2Positions[v].y, -voyager2Positions[v].z )
+			new THREE.Vector3( -voyager2Positions[v].x, voyager2Positions[v].y, voyager2Positions[v].z )
 		);
 	}
 	var probeMaterial = new THREE.LineBasicMaterial({
@@ -450,7 +403,7 @@ xpl.probePositions('dawn',dawnPositions,function(){
 		probeGeometry.verticesNeedUpdate = true
 	for(var v in dawnPositions){
 		probeGeometry.vertices.push(
-			new THREE.Vector3( dawnPositions[v].x, dawnPositions[v].y, -dawnPositions[v].z )
+			new THREE.Vector3( -dawnPositions[v].x, dawnPositions[v].y, dawnPositions[v].z )
 		);
 	}
 	var probeMaterial = new THREE.LineBasicMaterial({
@@ -508,78 +461,5 @@ YUI().use('dial', function(Y) {
 			dial.set('value',0)
 		}, false)
 });
-
-var label = function(parameters){
-	this.height = typeof parameters.size=='undefined' ? 128 : parameters.height
-	this.width = typeof parameters.width=='undefined' ? 256 : parameters.width
-	this.labelText = typeof parameters.labelText=='undefined' ? "label" : parameters.labelText
-	this.parent = typeof parameters.scene=='undefined' ? scene : parameters.scene
-	this.position = typeof parameters.position=='undefined' ? new THREE.Vector3(0,0,0) : parameters.position
-	this.parentScale = typeof parameters.parentScale=='undefined' ? 1 : parameters.parentScale
-	this.labelScale = typeof parameters.labelScale=='undefined' ? 1 : parameters.labelScale
-
-	
-	var lineheight = 2
-
-	var canvas = document.createElement('canvas')
-
-	canvas.className='label'
-	document.body.appendChild(canvas)
-	var ctx = canvas.getContext('2d');
-	canvas.width = this.width
-	canvas.height = this.height
-	ctx.font = '48pt Arial';
-	ctx.fontWeight = 'bolder'
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle="rgba(0, 0, 200, 1)";
-    ctx.fill();
-	ctx.fillStyle = 'white';
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-	ctx.fillText(this.labelText, canvas.width / 2, canvas.height / 2);
-
-	var stexture = new THREE.Texture(canvas);
-	stexture.needsUpdate = true;
-
-	this.parentObj = new THREE.Object3D()
-
-	var smaterial = new THREE.MeshBasicMaterial({map: stexture, alphaMap:stexture, transparent: true});
-	var sgeometry = new THREE.PlaneGeometry( 1, .5 );
-	this.smesh = new THREE.Mesh( sgeometry, smaterial );
-	this.smesh.scale.set(this.labelScale,this.labelScale,this.labelScale)
-	this.smesh.position.y+=lineheight+.25
-
-	var pointerLineGeo = new THREE.Geometry()
-	pointerLineGeo.vertices.push(new THREE.Vector3(0,0,0),new THREE.Vector3(0,lineheight,0))
-	var pointerLineMat = new THREE.LineBasicMaterial({
-		color: 0xffffff});
-	var pointerLine = new THREE.Line(pointerLineGeo,pointerLineMat );
-	pointerLine.name=this.labelText+"_labelLine"
-	pointerLine.position.copy(this.position)
-	pointerLine.geometry.verticesNeedUpdate = true
-	
-	this.parentObj.add(pointerLine)
-	this.parentObj.add(this.smesh)
-	
-	this.parentObj.name=this.labelText+"_label"
-	this.parentObj.position.copy(this.position)
-	this.parentObj.scale.set(this.parentScale,this.parentScale,this.parentScale)
-
-	this.parent.add( this.parentObj );
-
-	console.log('made label')
-}
-
-label.prototype.update = function(){}
-
-label.prototype.hide = function(){
-	this.parent.remove(this.parentObj)
-}
-
-var testLabel = new label({labelText:"Hello, World!",labelScale:1,parentScale:.01})
-
-document.body.addEventListener("keypress",function(){
-	testLabel.hide()
-})
 
 render();
