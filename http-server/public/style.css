@@ -99,7 +99,7 @@ li a:hover {
 
 .topic{
 	margin: 0;
-	cursor:default;
+	cursor:pointer;
 	padding:10px;
 }
 

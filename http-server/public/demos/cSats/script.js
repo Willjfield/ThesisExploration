@@ -140,14 +140,12 @@ function init() {
                                 controls.maxPolarAngle = Infinity;
                                 controls.addEventListener( 'change',render);
 			
-
         scene = new THREE.Scene();
 
         // Grid
         var size = 500, step = 100;
 
        //Background
-        
         scene.add( skybox );
         
         //Earth
@@ -177,7 +175,9 @@ function init() {
         
         scene.add(earth);
         lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset)+.2)
-        
+        //Change Y-Axis of light depending on time of year
+        //lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset)+.2)
+
         // Lights
         scene.add( new THREE.AmbientLight( 1 * 0x202020 ) );
 
@@ -201,7 +201,6 @@ function init() {
         meshObs = new THREE.Mesh( geometryObs, materialObs);
         meshObs.position.set(myThreePosition.x,myThreePosition.y,myThreePosition.z)
         earth.add( meshObs );
-        //earth.rotateZ((xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180)
 
         renderer = new THREE.WebGLRenderer({ antialias: true, autoClear: true });
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -209,13 +208,6 @@ function init() {
 
         createSats()
 
-        // tweenStart.onUpdate(function() {
-        //  camera.position.x = this.x
-        // })
-        // tweenEnd.onUpdate(function() {
-        //  camera.position.x = this.x
-        // })
-        //tweenStart.start()
         camera.position.set( 0, 0, 300 );
         window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -236,25 +228,23 @@ function loadImage( path ) {
 
 function animate(time) {
     if(tourStage>100){
-        // ? showNRO = true : showNRO = false
         document.getElementById('nroHighlight').checked ? showNRO = true : showNRO = false
         document.getElementById('milHighlight').checked ? showMilitary = true : showMilitary = false
         document.getElementById('unHighlight').checked ? showUnknown = true : showUnknown = false
     }
+
     myLong = map(obs.longitude,-180,180,0,360)
     tour()
     xpl.updateTime()
     myposition = xpl.satellite.geodetic_to_ecf(my_geodetic)
-        //myposition = xpl.ecf_to_eci(myposition, xpl.now)
+
     myThreePosition = new THREE.Vector3(myposition.x*.0156,myposition.z*.0156,myposition.y*-.0156)
-   //var rotateGeo = (xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
-        myViewPosition=new THREE.Vector3()
-        myViewPosition.copy(myThreePosition)
-        //myViewPosition.applyAxisAngle( new THREE.Vector3(0,0,1),rotateGeo)
-        myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))       
+    myViewPosition=new THREE.Vector3()
+    myViewPosition.copy(myThreePosition)
+    myViewPosition.applyAxisAngle( new THREE.Vector3(0,1,0),xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT))       
 
     xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
-    longRotation = ((xpl.now+timeOffset+sumT)%(xpl.planets[2].dayLength/23.9344))*2*Math.PI
+    longRotation = ((xpl.now+timeOffset+sumT)%(xpl.planets[2].dayLength/23.9344))*2*Math.PI+0.04363323127
     earth.rotation.y = longRotation
     skybox.rotation.z = ((xpl.now+timeOffset+sumT)%1)*2*Math.PI
 
@@ -271,7 +261,7 @@ function animate(time) {
     var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
     lightDir.applyAxisAngle(earthAxis,(Math.PI)-xpl.planets[2].rotationAt(xpl.now+timeOffset+sumT)+.2)
     requestAnimationFrame( animate );
-    // TWEEN.update(time);
+    
     xpl.batchTLEUpdate(tle_data, timeOffset+sumT)
    earthMaterial.uniforms.sunDirection.value = lightDir 
  	earthMaterial.uniforms.texOffset.value = (timeOffset+sumT)/-10;	
@@ -291,7 +281,7 @@ function animate(time) {
     render();
     
    if(particleHeadArr.length>0){
-   	scene.remove(particleHeadArr[0]);
+    scene.remove(particleHeadArr[0]);
 	particleHeadArr.shift();	
    }
     
@@ -301,9 +291,10 @@ function animate(time) {
     }
 
     if(collisionArr.length>20){
-    	scene.remove(collisionArr[0]);
-	collisionArr.shift();
+        scene.remove(collisionArr[0]);
+        collisionArr.shift();
     }
+
     scene.remove( viewLine );
 
     for(var mesh in scene.children){
@@ -311,7 +302,6 @@ function animate(time) {
             scene.remove(scene.children[mesh])
         }
     }
-    // TWEEN.update()
 }
 
 function render() { 
