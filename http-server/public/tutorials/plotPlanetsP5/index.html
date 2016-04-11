@@ -73,7 +73,7 @@ function draw(){
 		<br><br>
 		Now, while still inside of the draw() loop, we will create a for loop that looks at every planet inside xpl.planets. xpl.planets is an array of planet objects in the explore.js library. First, we'll call the current planet we're looking at "planet". Then we can store that planet's position, radius and color.
 		<br><br>
-		The position of planets we get with the function xpl.SolarSystem(). This function takes two arguments. The first is which planet we want to return the position of and the second argument is the time at which we want to find out the position. The time, in this case, is the current time, xpl.now, plus the tOffset which can be set by the user.
+		The position of planets we get with the function xpl.SolarSystem(). This function takes two arguments. The first is which planet we want to return the position of and the second argument is the time at which we want to find out the position. The time, in this case, is the current time, xpl.now, plus the tOffset which can be set by the user. The position of the planets is returned as an array in heliocentric coordinates. This can cause a lot of confusion because heliocentric coordinates are described with the Z-axis as up. This can be confusing because most graphics programs use a Y-axis up system. <b>Be sure to keep this in mind when dealing with coordinates</b> 
 		<br><br>
 		The radius is also store in the planet object but we need to multiply it by our planet scale. Each planet also has a rough surface color associated with it that is stored in the planet object.
 		<br><br>

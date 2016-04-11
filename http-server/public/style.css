@@ -99,7 +99,29 @@ li a:hover {
 
 .topic{
 	margin: 0;
+	cursor:default;
+	padding:10px;
 }
+
+.topic:hover .topicDescription{
+	display:block;
+	border:1px solid white;
+	padding:10px;
+	max-height: 500px;
+	-webkit-transition: max-height 0.5s;
+	-moz-transition: max-height 0.5s;
+	transition: max-height 0.5s;
+}
+
+.topicDescription{
+	display:block;
+	max-height: 0;
+	overflow: hidden;
+	-webkit-transition: max-height 0.5s;
+	-moz-transition: max-height 0.5s;
+	transition: max-height 0.5s;
+}
+
 .credits{
 	position: absolute;
 	padding: 50px;
