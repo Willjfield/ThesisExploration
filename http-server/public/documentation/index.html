@@ -4,7 +4,7 @@
 		<script src="https://use.typekit.net/pwk6ibv.js"></script>
 		<script>try{Typekit.load({ async: true });}catch(e){}</script>
 	</head>
-	<body>
+	<body style="overflow-y:visible">
 		<ul>
 			<h1 class="top-title">explore.js</h1>
 			<li><a href="../">Home</a></li>
@@ -18,7 +18,7 @@
 		<ul class="documentationTop">
 			<ul class="category">
 				<h1>Planets</h1>
-				<p class="topic">xpl.SolarSystem(<i>Planet,Time</i>)
+				<p class="topic" tabindex="0">xpl.SolarSystem(<i>Planet,Time</i>)
 					<br>
 					<span class="topicDescription">This function returns the position of a planet at a specified time. The planet objects can be accessed from the xpl.planets planets array. The time is entered as a Julian Day. The returned position is described in an XYZ coordinate system with the Z-axis as up and the Sun's barrycenter at the origin. For a demonstration of this function, look at <a href="../tutorials/plotPlanetsP5">Drawing Planets in P5</a>
 					<code class="tutBody">
@@ -33,7 +33,7 @@ for(var p=0;p< xpl.planets.length;p++){
 </code>
 </span>
 				</p>
-				<p class="topic">xpl.planets(<i>Planet,Time</i>)
+				<p class="topic" tabindex="0">xpl.planets(<i>Planet,Time</i>)
 					<br>
 					<span class="topicDescription">xpl.planets is an array of Planet Javascript objects. Planet objects contain all of the data needed to derive the position, rotation and obliqueness of each planet in our Solar System given a certain time.
 <code class="tutBody">
@@ -50,7 +50,7 @@ for(var p=0;p< xpl.planets.length;p++){
 			</ul>
 			<ul class="category">
 				<h1>Time</h1>
-				<p class="topic">xpl.now
+				<p class="topic" tabindex="0">xpl.now
 					<br>
 					<span class="topicDescription">xpl.now holds the current time as a Julian Date <i>as of when the script is loaded</i>. Julian dates (abbreviated JD or Jday) are the number of days since noon Universal Time on January 1, 4713 BCE (on the Julian calendar). For a detailed explanation of Julian Dates and an online converter tool, look at <a href="http://aa.usno.navy.mil/data/docs/JulianDate.php">The US Naval Obsrvatory's Julian Date Converter</a>
 <code class="tutBody">
@@ -64,7 +64,7 @@ console.log(position)
 </code>
 					</span>
 				</p>
-				<p class="topic">xpl.updateTime()
+				<p class="topic" tabindex="0">xpl.updateTime()
 					<br>
 					<span class="topicDescription">Since xpl.now is created when the script loads, you will need to update the time if you need a continous measurement. For instance, an animation can track planets and satellites in real time if xpl.updateTime() is called on each frame.
 <code class="tutBody">	

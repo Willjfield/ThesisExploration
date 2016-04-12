@@ -102,8 +102,10 @@ li a:hover {
 	cursor:pointer;
 	padding:10px;
 }
-
-.topic:hover .topicDescription{
+.topic:focus{
+	outline:none;
+}
+.topic:focus .topicDescription{
 	display:block;
 	border:1px solid white;
 	padding:10px;
