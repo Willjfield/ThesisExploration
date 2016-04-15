@@ -162,3 +162,15 @@ canvas{
   border:1px solid white;
   cursor: pointer;
 }
+
+.madewith{
+  z-index: 999;
+  color:white;
+  position:absolute;
+  width:100px;
+  font-size: 12px;
+  text-align: center;
+  right:50%;
+  transform: translate(50px,0px);
+  background:black;
+}

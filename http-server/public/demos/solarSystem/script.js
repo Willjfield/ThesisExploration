@@ -242,8 +242,15 @@ var makeLabels=true
 var ISSPropMat = new THREE.LineBasicMaterial({
 	color: 0x00ff00});
 
+var v2Label, dLabel, v1Label
+var curV1Position = new THREE.Vector3()
+var curV2Position = new THREE.Vector3()
+var curDawnPosition = new THREE.Vector3()
 var render = function () {
 	typeof SunLabel != 'undefined' ? SunLabel.update():{}
+	typeof v2Label != 'undefined' ? v2Label.update():{}
+	typeof v1Label != 'undefined' ? v1Label.update():{}
+	typeof dLabel != 'undefined' ? dLabel.update():{}
 	// UPDATE CLIPPING PLANES!
 	camera.far = camera.position.distanceTo(controls.target)*10000
 	if(camera.far>100){
@@ -277,8 +284,20 @@ var render = function () {
 	moonMesh.position.x = xpl.kmtoau(moonPosition[9])
 	if(focusedPlanet<9){
 		controls.target = new THREE.Vector3(drawPlanets[focusedPlanet].position.x,drawPlanets[focusedPlanet].position.y,drawPlanets[focusedPlanet].position.z)
-	}else{
+	}else if(focusedPlanet==9){
 		controls.target = new THREE.Vector3(0,0,0)
+	}else{
+		switch(focusedPlanet){
+				case 10:
+				controls.target = curV1Position
+				break
+				case 11:
+				controls.target = curV2Position
+				break
+				case 12:
+				controls.target = curDawnPosition
+				break
+			}
 	}
     mwMesh.position.set(camera.position.x,camera.position.y,camera.position.z)
     controls.update()
@@ -345,18 +364,42 @@ var render = function () {
 		focusedPlanet>3 ? dist = .004 : dist = .0005
 		document.getElementById("movewcam").style.color = "white"
 		document.getElementById("movewcam").style.fontWeight='normal'
-		if(focusedPlanet!=9){
+		if(focusedPlanet<9){
 			if(camera.position.distanceTo(drawPlanets[focusedPlanet].position)>dist){
 				document.getElementById("movewcam").style.color = "#ff0000"
 				document.getElementById("movewcam").style.fontWeight='900'
 				controls.dollyIn(1.1)
 			}
-		}else{
+		}else if(focusedPlanet==9){
 			dist = .01
 			if(camera.position.distanceTo(new THREE.Vector3())>dist){
 				document.getElementById("movewcam").style.color = "#ff0000"
 				document.getElementById("movewcam").style.fontWeight='900'
 				controls.dollyIn(1.1)
+			}
+		}else{
+			switch(focusedPlanet){
+				case 10:
+				 if(camera.position.distanceTo(curV1Position)>dist){
+				 	document.getElementById("movewcam").style.color = "#ff0000"
+					document.getElementById("movewcam").style.fontWeight='900'
+					controls.dollyIn(1.1)
+				 }	
+				break
+				case 11:
+				if(camera.position.distanceTo(curV2Position)>dist){
+				 	document.getElementById("movewcam").style.color = "#ff0000"
+					document.getElementById("movewcam").style.fontWeight='900'
+					controls.dollyIn(1.1)
+				 }	
+				break
+				case 12:
+				if(camera.position.distanceTo(curDawnPosition)>dist){
+				 	document.getElementById("movewcam").style.color = "#ff0000"
+					document.getElementById("movewcam").style.fontWeight='900'
+					controls.dollyIn(1.1)
+				 }	
+				break
 			}
 		}
 		// camera.position.copy(drawPlanets[focusedPlanet].position)
@@ -379,9 +422,14 @@ xpl.probePositions('voyager1',voyager1Positions,function(){
 	var line = new THREE.Line(probeGeometry,probeMaterial );
 	line.geometry.verticesNeedUpdate = true
 	scene.add(line)
+
+	var v = voyager1Positions.length-1
+	curV1Position = new THREE.Vector3( -voyager1Positions[v].x, voyager1Positions[v].y, voyager1Positions[v].z )
+	v1Label = new ThreeLabel({labelText:"Voyager 1", labelPosition:curV1Position, width:4,labelScale:1,parentScale:.005})
 },"../../lib/data/probes/")
 
 var voyager2Positions = []
+
 xpl.probePositions('voyager2',voyager2Positions,function(){
 	var probeGeometry = new THREE.Geometry();
 		probeGeometry.verticesNeedUpdate = true
@@ -395,6 +443,10 @@ xpl.probePositions('voyager2',voyager2Positions,function(){
 	var line = new THREE.Line(probeGeometry,probeMaterial );
 	line.geometry.verticesNeedUpdate = true
 	scene.add(line)
+	var v = voyager2Positions.length-1
+	curV2Position = new THREE.Vector3( -voyager2Positions[v].x, voyager2Positions[v].y, voyager2Positions[v].z )
+	v2Label = new ThreeLabel({labelText:"Voyager 2", labelPosition:curV2Position, width:4,labelScale:1,parentScale:.005})
+
 },"../../lib/data/probes/")
 
 var dawnPositions = []
@@ -411,6 +463,11 @@ xpl.probePositions('dawn',dawnPositions,function(){
 	var line = new THREE.Line(probeGeometry,probeMaterial );
 	line.geometry.verticesNeedUpdate = true
 	scene.add(line)
+
+	var v = dawnPositions.length-1
+	curDawnPosition = new THREE.Vector3( -dawnPositions[v].x, dawnPositions[v].y, dawnPositions[v].z )
+	dLabel = new ThreeLabel({labelText:"Dawn", labelPosition:curDawnPosition, width:4,labelScale:1,parentScale:.005})
+
 },"../../lib/data/probes/")
 
 window.addEventListener( 'resize', onWindowResize, false );
@@ -461,5 +518,35 @@ YUI().use('dial', function(Y) {
 			dial.set('value',0)
 		}, false)
 });
+
+document.getElementById("showLabels").addEventListener("change",function(){
+	if(document.getElementById("showLabels").checked){
+		scene.getObjectByName("Sun_parent_label",true).visible = true
+
+		scene.getObjectByName("Voyager 2_parent_label",true).visible = true
+		scene.getObjectByName("Voyager 1_parent_label",true).visible = true
+		scene.getObjectByName("Dawn_parent_label",true).visible = true	
+
+		scene.getObjectByName("Moon_parent_label",true).visible = true	
+		
+		for(var p in xpl.planets){
+			var label = scene.getObjectByName(xpl.planets[p].name+"_parent_label",true)
+			typeof label != 'undefined' ? label.visible = true : {}
+			//console.log(drawPlanets[p])
+			//label.visible = true
+		}
+	}else{
+		scene.getObjectByName("Sun_parent_label",true).visible = false
+		scene.getObjectByName("Voyager 2_parent_label",true).visible = false
+		scene.getObjectByName("Voyager 1_parent_label",true).visible = false
+		scene.getObjectByName("Dawn_parent_label",true).visible = false	
+		scene.getObjectByName("Moon_parent_label",true).visible = false
+		for(var p in drawPlanets){
+			var label = scene.getObjectByName(xpl.planets[p].name+"_parent_label",true)
+			typeof label != 'undefined' ? label.visible = false : {}
+			//label.visible = false
+		}
+	}
+})
 
 render();

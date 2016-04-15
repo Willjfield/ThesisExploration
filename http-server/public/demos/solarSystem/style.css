@@ -169,3 +169,27 @@ input[type="checkbox"]{
     background:white;
     cursor:pointer;
 }
+
+#shwlabels{
+  position: absolute;
+  right:10px;
+  bottom:38px;
+}
+
+#movewcam{
+  position: absolute;
+  right:10px;
+  bottom:10px;
+}
+
+.madewith{
+  z-index: 999;
+  color:white;
+  position:absolute;
+  width:100px;
+  font-size: 12px;
+  text-align: center;
+  right:50%;
+  transform: translate(50px,0px);
+  background:black;
+}

@@ -11,6 +11,18 @@
   background-color:transparent;
 }
 
+.madewith{
+  z-index: 999;
+  color:white;
+  position:absolute;
+  width:140px;
+  font-size: 12px;
+  text-align: center;
+  right:50%;
+  transform: translate(70px,0px);
+  background:black;
+}
+
 #intro{
   z-index: 999;
   position: absolute;
@@ -44,7 +56,9 @@
   padding: 5px;
   padding-left: 50px;
   padding-right: 50px;
-  left:0%;
+  right:0%;
+  top:0px;
+  height:40px;
 }
 
 #nightTime{
@@ -168,8 +182,8 @@ a{
 #latlong{
   display: inline-block;
   position: absolute;
-  right: 5px;
-  top:-15px;
+  right: 0px;
+  top:-25px;
   text-align: right;
   background-color: rgba(0, 0, 0, .5);
   padding:5px;
@@ -212,10 +226,11 @@ canvas{
   display: inline;
   position: absolute;
   left: 0px;
-  bottom:10px;
+  bottom:-30px;
   background-color: rgba(0, 0, 0, .5);
   padding:5px;
-  font-size: 36px;
+  font-size: 30px;
+  height:130px;
 }
 
 #controls{

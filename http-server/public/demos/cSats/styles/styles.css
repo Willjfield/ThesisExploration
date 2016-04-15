@@ -213,3 +213,15 @@ a{
   bottom:-20px;
   text-align: center;
 }
+
+.madewith{
+  z-index: 999;
+  color:white;
+  position:absolute;
+  width:120px;
+  font-size: 12px;
+  text-align: center;
+  right:50%;
+  transform: translate(60px,0px);
+  background:black;
+}

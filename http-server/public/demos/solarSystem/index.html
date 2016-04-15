@@ -5,7 +5,9 @@
 		<script src="../../lib/three_labels.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
-	<body class="yui3-skin-sam">	
+	<body class="yui3-skin-sam">
+		<a href="http://explorejs.space" class="madewith">Made with explorejs</a>
+	
 		<script src="../../lib/explore.js"></script>
 		<script src="OBJLoader.js"></script>
 		<script src="OrbitControls.js"></script>
@@ -23,9 +25,13 @@
 			      <option value="5">Saturn</option>
 			      <option value="6">Uranus</option>
 			      <option value="7">Neptune</option>
+			      <option value="10">Voyager 1</option>
+			      <option value="11">Voyager 2</option>
+			      <option value="12">Dawn</option>
 			    </select>
 			    <br>
-			    <span id="movewcam">Move camera with planet </span><input id="moveWithPlanet" type="checkbox"> 
+			    <span id="movewcam"><input id="moveWithPlanet" type="checkbox"> Move camera with target </span>
+			    <span id="shwlabels"><input id="showLabels" type="checkbox" checked="true"> Show labels </span>
 			    <br>
 			    	<img src="Arrows.png" class="arrows">
 					<div id="demo"></div>
