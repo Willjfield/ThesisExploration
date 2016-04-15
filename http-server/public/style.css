@@ -1,7 +1,7 @@
 body{
 	background:black;
 	margin: 0 auto;
-	overflow: hidden;
+	overflow-x: hidden;
 }
 
 ul {
@@ -394,4 +394,8 @@ iframe{
 .downloadBtn:hover{
 	background-color: #555;
     color: white;
+}
+.videoScreen{
+	z-index: 999;
+	width:100%;
 }
