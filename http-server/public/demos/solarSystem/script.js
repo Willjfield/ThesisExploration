@@ -134,7 +134,7 @@ function makePlanets(){
 		var ptexture
 		loader.load( texturePath, function (image) {
 				var ringGeo = new THREE.PlaneGeometry(.0025,.0025,1)
-				var ringMat = new THREE.MeshLambertMaterial( {color:0xffffff, transparent:true,needsUpdate: true, side:THREE.DoubleSide} );
+				var ringMat = new THREE.MeshLambertMaterial( {color:0xffffff, transparent:true, needsUpdate: true, side:THREE.DoubleSide} );
 				var ringMesh = new THREE.Mesh(ringGeo,ringMat)
 				ringMesh.rotateX(Math.PI/2)
 				ptexture = new THREE.Texture();
@@ -142,9 +142,7 @@ function makePlanets(){
 				ptexture.needsUpdate = true;
 				ringMesh.material.map = ptexture
 				drawPlanets[5].add(ringMesh)
-				//addLabel(drawPlanets[index])
 				})		
-	
 }
 
 makePlanets()
@@ -378,47 +376,40 @@ var render = function () {
 	if(document.getElementById("moveWithPlanet").checked){
 		var dist
 		focusedPlanet>3 ? dist = .004 : dist = .0005
-		document.getElementById("movewcam").style.color = "white"
-		document.getElementById("movewcam").style.fontWeight='normal'
+		document.getElementById("movewcam").style.color = "red"
+		document.getElementById("movewcam").style.fontWeight='900'
 		if(focusedPlanet<9){
 			if(camera.position.distanceTo(drawPlanets[focusedPlanet].position)>dist){
-				document.getElementById("movewcam").style.color = "#ff0000"
-				document.getElementById("movewcam").style.fontWeight='900'
 				controls.dollyIn(1.1)
 			}
 		}else if(focusedPlanet==9){
 			dist = .01
 			if(camera.position.distanceTo(new THREE.Vector3())>dist){
-				document.getElementById("movewcam").style.color = "#ff0000"
-				document.getElementById("movewcam").style.fontWeight='900'
 				controls.dollyIn(1.1)
 			}
 		}else{
 			switch(focusedPlanet){
 				case 10:
 				 if(camera.position.distanceTo(curV1Position)>dist){
-				 	document.getElementById("movewcam").style.color = "#ff0000"
-					document.getElementById("movewcam").style.fontWeight='900'
 					controls.dollyIn(1.1)
 				 }	
 				break
 				case 11:
 				if(camera.position.distanceTo(curV2Position)>dist){
-				 	document.getElementById("movewcam").style.color = "#ff0000"
-					document.getElementById("movewcam").style.fontWeight='900'
 					controls.dollyIn(1.1)
 				 }	
 				break
 				case 12:
 				if(camera.position.distanceTo(curDawnPosition)>dist){
-				 	document.getElementById("movewcam").style.color = "#ff0000"
-					document.getElementById("movewcam").style.fontWeight='900'
 					controls.dollyIn(1.1)
 				 }	
 				break
 			}
 		}
 		// camera.position.copy(drawPlanets[focusedPlanet].position)
+	}else{
+		document.getElementById("movewcam").style.color = "white"
+		document.getElementById("movewcam").style.fontWeight='normal'
 	}
 	renderer.render(scene, camera);
 	drawPlanets[2].remove(ISSPropLine)
@@ -641,5 +632,31 @@ document.getElementById("showLabels").addEventListener("change",function(){
 		}
 	}
 })
+var accuracySelected = false
+document.getElementById("accuracy").addEventListener("click",function(){
+	accuracySelected = !accuracySelected
+	if(accuracySelected){
+		document.getElementById("accuracy").style.bottom = "50%"
+		document.getElementById("accuracy").style.background = "black"
+		//document.getElementById("accuracy").style.left = "50%"
+		document.getElementById("accuracy").style.right = "50%"
+		document.getElementById("accuracy").style.transform = "translate(50%,50%)"
+		document.getElementById("accuracy").style.fontSize = "16px"
+		document.getElementById("accuracy").innerHTML = "This Solar System is not complete. The following are various inaccuracies that are being addressed:"+
+		"<br><br>– The ISS, Voyager probes and Dawn probe are dramatically scaled up"+
+		"<br>– The tilt of the Milky Way background is roughly approximated"+
+		"<br>– The obliqueness of planets other than Earth are not necessarily on the correct axis"+
+		"<br>– There are of course many dwarf planets, comets, asteroids and moons that have not been included yet"
+	}else{
+		document.getElementById("accuracy").style.background = "black"
+		document.getElementById("accuracy").style.bottom = ""
+		document.getElementById("accuracy").style.right = ""
+		document.getElementById("accuracy").style.transform = ""
+		document.getElementById("accuracy").style.fontSize = ""
+		document.getElementById("accuracy").innerHTML = "A note on accuracy"
+	}
+})
+
+
 
 render();

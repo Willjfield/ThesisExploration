@@ -1,5 +1,6 @@
 *{
   overflow: hidden;
+  font-family: "futura-pt",sans-serif;
 }
 .label{
   display: none;
@@ -50,8 +51,8 @@ body{
 
 #planetSelector{
   position: absolute;
-  left:0px;
-  top:10px;
+  left:90px;
+  top:25px;
 }
 
 #planetSelect{
@@ -170,16 +171,33 @@ input[type="checkbox"]{
     cursor:pointer;
 }
 
+#curDate{
+  position: absolute;
+  bottom:0px;
+}
+
+#accuracy{
+  cursor:pointer;
+  color:white;
+  z-index: 999;
+  font-size: 12px;
+  position: absolute;
+  bottom:0px;
+  right:0px;
+  padding:5px;
+  border: 1px solid white;
+}
+
 #shwlabels{
   position: absolute;
   right:10px;
-  bottom:38px;
+  top:38px;
 }
 
 #movewcam{
   position: absolute;
   right:10px;
-  bottom:10px;
+  top:10px;
 }
 
 .madewith{

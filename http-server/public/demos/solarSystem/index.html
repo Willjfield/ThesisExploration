@@ -3,6 +3,8 @@
 		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>-->
 		<script src="../../lib/three.min.js"></script>
 		<script src="../../lib/three_labels.js"></script>
+		<script src="https://use.typekit.net/pwk6ibv.js"></script>
+        <script>try{Typekit.load({ async: true });}catch(e){}</script>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body class="yui3-skin-sam">
@@ -14,8 +16,11 @@
 		<script src="MTLLoader.js"></script>
 		<script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
 		<!-- <canvas id="earth" class="label"></canvas> -->
+		 	
 		  <aside id="controls">
-			    <select id="planetSelector">
+		  
+		  		<span>Target:</span>
+			    <select id="planetSelector">	    
 			      <option value="9">Sun</option>
 			      <option value="0">Mercury</option>
 			      <option value="1">Venus</option>
@@ -29,8 +34,9 @@
 			      <option value="11">Voyager 2</option>
 			      <option value="12">Dawn</option>
 			    </select>
+
 			    <br>
-			    <span id="movewcam"><input id="moveWithPlanet" type="checkbox"> Move camera with target </span>
+			    <span id="movewcam"><input id="moveWithPlanet" type="checkbox"> Keep camera close to target </span>
 			    <span id="shwlabels"><input id="showLabels" type="checkbox" checked="true"> Show labels </span>
 			    <br>
 			    	<img src="Arrows.png" class="arrows">
@@ -50,7 +56,7 @@
 					</h4>
 					<div id="curDate">Current Date and Time:</div>
 		   </aside>
-
+		   <div id="accuracy">A note on accuracy</div>
 		   <script src="script.js"></script>
 	</body>
 </html>
