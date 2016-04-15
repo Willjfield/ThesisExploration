@@ -129,6 +129,22 @@ function makePlanets(){
 			drawPlanets.push(sphere);
 
 		}
+		var texturePath = "../../lib/data/images/"
+		texturePath += "Saturn_Ring.png"
+		var ptexture
+		loader.load( texturePath, function (image) {
+				var ringGeo = new THREE.PlaneGeometry(.0025,.0025,1)
+				var ringMat = new THREE.MeshLambertMaterial( {color:0xffffff, transparent:true,needsUpdate: true, side:THREE.DoubleSide} );
+				var ringMesh = new THREE.Mesh(ringGeo,ringMat)
+				ringMesh.rotateX(Math.PI/2)
+				ptexture = new THREE.Texture();
+				ptexture.image = image;
+				ptexture.needsUpdate = true;
+				ringMesh.material.map = ptexture
+				drawPlanets[5].add(ringMesh)
+				//addLabel(drawPlanets[index])
+				})		
+	
 }
 
 makePlanets()
@@ -252,7 +268,7 @@ var render = function () {
 	typeof v1Label != 'undefined' ? v1Label.update():{}
 	typeof dLabel != 'undefined' ? dLabel.update():{}
 	// UPDATE CLIPPING PLANES!
-	camera.far = camera.position.distanceTo(controls.target)*10000
+	camera.far = camera.position.distanceTo(controls.target)*20000
 	if(camera.far>100){
 		camera.far = 100
 	}
@@ -426,6 +442,33 @@ xpl.probePositions('voyager1',voyager1Positions,function(){
 	var v = voyager1Positions.length-1
 	curV1Position = new THREE.Vector3( -voyager1Positions[v].x, voyager1Positions[v].y, voyager1Positions[v].z )
 	v1Label = new ThreeLabel({labelText:"Voyager 1", labelPosition:curV1Position, width:4,labelScale:1,parentScale:.005})
+
+	var modelPath = '../../lib/data/3D/Voyager'
+
+	//var mtlLoader = new THREE.MTLLoader();
+	//mtlLoader.load( modelPath+'.mtl', function( materials ) {
+		//materials.preload();
+		loader.load( modelPath+'.obj', function ( object ) {
+			var objLoader = new THREE.OBJLoader();
+			//loader.setMaterials( materials );
+			object.name = "VoyagerObj"
+			object.traverse( function ( child ) {
+			if ( child instanceof THREE.Mesh ) {
+				child.materials = new THREE.MeshLambertMaterial( {/*map: texture*/color:0x888888, needsUpdate: true, side:THREE.DoubleSide} );
+				child.geometry.computeVertexNormals();
+				child.castShadow = true
+				child.receiveShadow = true
+			}
+			} );
+			object.position.copy(curV1Position)
+			object.scale.set(.0005,.0005,.0005)
+			object.lookAt(new THREE.Vector3())
+			object.rotateX(Math.PI/2)
+			scene.add(object)
+		});
+
+	//}, onProgress, onError );
+
 },"../../lib/data/probes/")
 
 var voyager2Positions = []
@@ -447,6 +490,31 @@ xpl.probePositions('voyager2',voyager2Positions,function(){
 	curV2Position = new THREE.Vector3( -voyager2Positions[v].x, voyager2Positions[v].y, voyager2Positions[v].z )
 	v2Label = new ThreeLabel({labelText:"Voyager 2", labelPosition:curV2Position, width:4,labelScale:1,parentScale:.005})
 
+	var modelPath = '../../lib/data/3D/Voyager'
+
+	//var mtlLoader = new THREE.MTLLoader();
+	//mtlLoader.load( modelPath+'.mtl', function( materials ) {
+		//materials.preload();
+		loader.load( modelPath+'.obj', function ( object ) {
+			var objLoader = new THREE.OBJLoader();
+			//loader.setMaterials( materials );
+			object.name = "VoyagerObj"
+			object.traverse( function ( child ) {
+			if ( child instanceof THREE.Mesh ) {
+				child.materials = new THREE.MeshLambertMaterial( {/*map: texture*/color:0x888888, needsUpdate: true, side:THREE.DoubleSide} );
+				child.geometry.computeVertexNormals();
+				child.castShadow = true
+				child.receiveShadow = true
+			}
+			} );
+			object.position.copy(curV2Position)
+			object.scale.set(.0005,.0005,.0005)
+			object.lookAt(new THREE.Vector3())
+			object.rotateX(Math.PI/2)
+			scene.add(object)
+		});
+
+	//}, onProgress, onError );
 },"../../lib/data/probes/")
 
 var dawnPositions = []
@@ -468,6 +536,31 @@ xpl.probePositions('dawn',dawnPositions,function(){
 	curDawnPosition = new THREE.Vector3( -dawnPositions[v].x, dawnPositions[v].y, dawnPositions[v].z )
 	dLabel = new ThreeLabel({labelText:"Dawn", labelPosition:curDawnPosition, width:4,labelScale:1,parentScale:.005})
 
+	var modelPath = '../../lib/data/3D/Dawn'
+
+	//var mtlLoader = new THREE.MTLLoader();
+	//mtlLoader.load( modelPath+'.mtl', function( materials ) {
+		//materials.preload();
+		loader.load( modelPath+'.obj', function ( object ) {
+			var objLoader = new THREE.OBJLoader();
+			//loader.setMaterials( materials );
+			object.name = "DawnObj"
+			object.traverse( function ( child ) {
+			if ( child instanceof THREE.Mesh ) {
+				child.materials = new THREE.MeshLambertMaterial( {/*map: texture*/color:0x888888, needsUpdate: true, side:THREE.DoubleSide} );
+				child.geometry.computeVertexNormals();
+				child.castShadow = true
+				child.receiveShadow = true
+			}
+			} );
+			object.position.copy(curDawnPosition)
+			object.scale.set(.0005,.0005,.0005)
+			object.lookAt(new THREE.Vector3())
+			//object.rotateX(Math.PI/2)
+			scene.add(object)
+		});
+
+	//}, onProgress, onError );
 },"../../lib/data/probes/")
 
 window.addEventListener( 'resize', onWindowResize, false );

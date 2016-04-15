@@ -92,13 +92,13 @@ ThreeLabel.prototype.update = function(parameters){
 		}
 	this.parentObj.lookAt(camera.position)
 
-	//if(camera.position.distanceTo(this.parentObj.position)<10){
+	if(camera.position.distanceTo(this.parentObj.position)<50){
 		this.labelScale = this.parentObj.position.distanceTo(camera.position)*15
 		this.smesh.scale.set(this.labelScale,this.labelScale,this.labelScale)
-	//}else{
-		//this.labelScale = 150
+	}else{
+		this.labelScale = 1000
 		this.smesh.scale.set(this.labelScale,this.labelScale,this.labelScale)
-	//}
+	}
 	this.smesh.position.y=this.lineheight+(this.height*this.labelScale/2)
 }
 
