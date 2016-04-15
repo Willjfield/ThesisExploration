@@ -56,6 +56,7 @@ li a:hover {
 	position: absolute;
 	padding: 50px;
 	top: 11%;
+	bottom:0px;
 	left: 25%;
 	margin: 0 auto;
 	width:60%;
@@ -113,7 +114,7 @@ li a:hover {
 	margin: 0 auto;
 	width: 100%;
 	height: 100%;
-	background: rgba(0,0,0,.4);
+	/*background: rgba(0,0,0,.4);*/
 	font-family: "futura-pt",sans-serif;
 	color:white;
 	text-align: left;
@@ -142,7 +143,7 @@ li a:hover {
 	display:block;
 	border:1px solid white;
 	padding:10px;
-	max-height: 500px;
+	max-height:100%;
 	-webkit-transition: max-height 0.5s;
 	-moz-transition: max-height 0.5s;
 	transition: max-height 0.5s;

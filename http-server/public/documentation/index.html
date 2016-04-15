@@ -3,8 +3,10 @@
 		<link rel="stylesheet" type="text/css" href="../style.css">
 		<script src="https://use.typekit.net/pwk6ibv.js"></script>
 		<script>try{Typekit.load({ async: true });}catch(e){}</script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
 	</head>
 	<body style="overflow-y:visible">
+		<script type="text/javascript" src="../script.js"></script>
 		<ul>
 			<h1 class="top-title">explore.js</h1>
 			<li><a href="../">Home</a></li>
@@ -47,6 +49,32 @@ for(var p=0;p< xpl.planets.length;p++){
 </code>
 					</span>
 				</p>
+				<p class="topic" tabindex="0">xpl.planet(<i>name,number,[keplerian elements],radius,oblique,dayLength,yearLength,[color]</i>)
+					<br>
+					<span class="topicDescription">xpl.planet objects contain the information needed for tracking and drawing planets in our Solar System. They contain the name of the planet and its zero-indexed position in an array ordered by distance from the Sun. Next, it has the Keplerian elements or the numbers that can be used to derive its position at a given time. Finally, it contains information useful for drawing it including its radius, obliquity (how tilted it is), the day length, year length, and a rough approximation of its surface color.
+<code class="tutBody">	
+//Draw planets in p5
+
+function draw(){
+	xpl.updateTime()
+
+	for(var p in xpl.planets){
+		var planet = xpl.planets[p]
+		var position = xpl.SolarSystem(planet,xpl.now)
+		var radius = planet.radius
+		var planetColor = rgbColor
+
+		fill(planetColor.r,planetColor.g,planetColor.b)
+		push()
+			translate(position[0],position[3])
+			ellipse(0,0,radius,radius)
+		pop()
+	}
+}
+	
+</code>
+					</span>
+				</p>
 			</ul>
 			<ul class="category">
 				<h1>Time</h1>
@@ -82,8 +110,10 @@ function draw(){
 </code>
 					</span>
 				</p>
+				
 			</ul>
-
+			<br><br>
+			<ul class="category" style="background:transparent;"><i>Further documentation in progress...</i></ul>
 <!-- 				<h1>Spatial Coordinates</h1>
 				<p class="topic">Earth Centered Inertial (ECI) – Geocentric, XYZ</p>
 				<p class="topic">Earth Centered Earth Fixed (ECF or ECEF) – Geocentric, XYZ</p>
