@@ -7,6 +7,11 @@
     box-sizing: border-box;
 }
 */
+
+.shareLocation{
+  font-size: 16px;
+}
+
 body { margin: 0 auto; font: 100%/1.375em 'Roboto', sans-serif; overflow:hidden;}
 
 a { text-decoration: none; }

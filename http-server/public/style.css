@@ -17,7 +17,9 @@ ul {
     font-weight: lighter;
     font-family: "futura-pt",sans-serif;
 }
-
+.shareLocation{
+	font-size: 12px;
+}
 li a {
     display: block;
     background-color: rgba(0,0,0,.3);
