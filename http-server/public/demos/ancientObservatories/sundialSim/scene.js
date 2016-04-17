@@ -3,7 +3,7 @@ var obsPos = {latitude:41.895556,longitude:12.496667, elevation: .038} //rome
 //var obsPos = {latitude:40.6928,longitude:-73.9903, elevation: 0}//brooklyn
 var modelPath = 'models/Sundials/Ascoli/ObjID73_r2.obj'
 var texturePath = 'models/Sundials/Ascoli/ss_tex.jpg'
-var timeZone = 1
+var timeZone = 2
 
 var groundTexPath = 'models/Sundials/Ascoli/groundtext.jpg'
 var container;
@@ -333,7 +333,8 @@ function animate() {
 	// var dspHour = (dhour+timeZone)
 	// if(dspHour>23){dspHour=0}
 	// if(dspHour<0){dspHour=24+dspHour}
-	var date = xpl.dateFromJday(xpl.now+timeOffset+sumT+(timeZone/12))
+
+	var date = xpl.dateFromJday(xpl.now+timeOffset+sumT+(timeZone/24))
 
 	var dmin = date.minute.toString()
 	if(dmin.length<2) dmin = "0"+dmin
