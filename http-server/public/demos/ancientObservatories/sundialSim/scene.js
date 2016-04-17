@@ -3,7 +3,7 @@ var obsPos = {latitude:41.895556,longitude:12.496667, elevation: .038} //rome
 //var obsPos = {latitude:40.6928,longitude:-73.9903, elevation: 0}//brooklyn
 var modelPath = 'models/Sundials/Ascoli/ObjID73_r2.obj'
 var texturePath = 'models/Sundials/Ascoli/ss_tex.jpg'
-var timeZone = 2
+var timeZone = 1
 
 var groundTexPath = 'models/Sundials/Ascoli/groundtext.jpg'
 var container;
