@@ -242,14 +242,51 @@ Add moons
 	}
 
 	function jday(year, mon, day, hr, minute, sec){
+		typeof year == 'undefined' ? year = 0 : {}
+		typeof mon == 'undefined' ? mon = 0 : {}
+		typeof day == 'undefined' ? day = 0 : {}
+		typeof hr == 'undefined' ? hr = 0 : {}
+		typeof minute == 'undefined' ? minute = 0 : {}
+		typeof sec == 'undefined' ? sec = 0 : {}
+
+		return computeTheForm(year, mon, day, hr, minute, sec)
+		/*
 	    return (367.0 * year -
 	          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
 	          Math.floor( 275 * mon / 9.0 ) +
 	          day + 1721013.5 +
 	          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0//-  //  ut in days
-	            //0.5*Math.sign(100.0*year+mon-190002.5)+0.5
-	            //-Math.floor((year-2000)/100)
+	            // -0.5*Math.sign(100.0*year+mon-190002.5)+0.5
+	            // -Math.floor((year-2000)/100)
 	          );
+*/
+	}
+	//Julian Date to Calendar Date conversion from
+	//http://quasar.as.utexas.edu/BillInfo/JulianDatesG.html
+	function computeTheForm(year, mon, day, hr, minute, sec)
+	{
+		var leap = (
+			(year%4 == 0)? 1:
+			(year%4 != 0? 0: 
+			(year%400 == 0? 1:
+			(year%100==0? 0:
+			1))));
+		var D = day
+		var M = mon
+		var Y = year
+		if(M<3)	{
+			Y--;
+			M += 12;
+		}
+
+			var A = Math.floor(Y/100);
+			var B = Math.floor(A/4);
+			var C = 2 - A + B;
+		var E = Math.floor(365.25*(Y + 4716));
+		var F = Math.floor(30.6001*(M + 1));
+		var julianday = C + eval(D) + E + F - 1524.5;
+	 	 var NewJD = julianday+((sec / 60.0 + minute) / 60.0 + hr) / 24.0;
+		return NewJD
 	}
 
 	xpl.dateFromJday = function(jday){

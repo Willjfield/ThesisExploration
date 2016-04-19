@@ -624,8 +624,20 @@ function tutorial(){
 	}
 }
 
-document.body.addEventListener("keypress",function(){
-	lineMaterial.opacity*=-1
+// document.body.addEventListener("keypress",function(){
+// 	lineMaterial.opacity*=-1
+// })
+
+document.getElementById("submitDate").addEventListener("click",function(){
+	var enteredDate = document.getElementById("setDate").value
+	var eDateComponents = enteredDate.split("/");
+	var curjday = xpl.now+timeOffset+sumT
+	var ejday = xpl.jday(parseInt(eDateComponents[2]),parseInt(eDateComponents[0]),parseInt(eDateComponents[1]))
+	ejday+=((curjday-.5)%1)
+	//console.log(ejday)
+	
+	var tDiff = ejday-curjday
+	timeOffset+=tDiff
 })
 
 YUI().use('dial', function(Y) {

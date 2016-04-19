@@ -5,6 +5,7 @@
   text-align: right;
   font-size: 10px;
 }
+
 #speedSlider{
   width:100%;
   height:30px;
@@ -12,9 +13,31 @@
 }
 
 .noDST{
+  z-index: 999;
   position: absolute;
-  bottom:50px;
+  bottom:5px;
+  left:5px;
   font-size: 14px;
+}
+
+.noDST:hover{
+  cursor:pointer;
+}
+
+.timeExplanation{
+  z-index: 999;
+  position: absolute;
+  width:80%;
+  left:50%;
+  bottom:150px;
+  text-align: center;
+  font-weight: lighter;
+  font-size: 24px;
+  font-family: "kepler-std-semicondensed",sans-serif;
+  transform:translate(-50%,0%);
+  background: rgba(0,0,0,.75);
+  padding: 10px;
+  visibility: hidden;
 }
 
 .madewith{
@@ -52,8 +75,8 @@
 #moreInfo{
   z-index: 999;
   font-size: 30px;
-  background:rgba(64,64,64,.5);
-  /*border: .5px solid grey;*/
+  background:rgba(0,0,0,.2);
+  border: .5px solid white;
   text-align: center;
   visibility: hidden;
   cursor: pointer;
@@ -65,6 +88,11 @@
   right:0%;
   top:0px;
   height:40px;
+}
+
+#moreInfo:hover{
+  background:rgba(0,0,0,.5);
+  border:2px solid white;
 }
 
 #nightTime{
@@ -195,6 +223,26 @@ a{
   padding:5px;
 }
 
+#setDate{
+  z-index: 999;
+  position: absolute;
+  bottom: 25px;
+  left:5px;
+  height:30px;
+  font-size: 20px;
+  width:120px;
+}
+
+#submitDate{
+  z-index: 999;
+  position: absolute;
+  bottom: 27.5px;
+  left:140px;
+  height:30px;
+  font-size: 20px;
+  width:140px;
+}
+
 #sliderTitle{
   margin: 0 auto;
   text-align: center;
@@ -210,6 +258,7 @@ a{
   font-family:sans-serif;
   font-size: 12px;
 }
+
 h1{font-size: 40px}
 
 body{
@@ -237,7 +286,9 @@ canvas{
   padding:5px;
   font-size: 30px;
   height:130px;
+  border:1px white solid;
 }
+#date:hover{}
 
 #controls{
   font-weight: lighter;
