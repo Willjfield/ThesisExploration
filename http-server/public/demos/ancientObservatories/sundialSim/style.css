@@ -24,7 +24,7 @@
   cursor:pointer;
 }
 
-.timeExplanation{
+.timeExplanationCl{
   z-index: 999;
   position: absolute;
   width:80%;

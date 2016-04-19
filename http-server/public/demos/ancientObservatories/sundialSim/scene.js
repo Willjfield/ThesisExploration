@@ -625,9 +625,15 @@ function tutorial(){
 }
 
 // document.body.addEventListener("keypress",function(){
-// 	lineMaterial.opacity*=-1
+// 	lineMaterial.opacity*=-1time
 // })
+document.getElementById("timeRight").addEventListener("click",function(){
+	document.getElementById("timeExplanation").style.visibility = "visible"	
+})
 
+document.getElementById("timeExplanation").addEventListener("click",function(){
+	document.getElementById("timeExplanation").style.visibility = "hidden"
+})
 document.getElementById("submitDate").addEventListener("click",function(){
 	var enteredDate = document.getElementById("setDate").value
 	var eDateComponents = enteredDate.split("/");
