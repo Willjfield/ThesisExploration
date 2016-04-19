@@ -1,9 +1,10 @@
 #credit{
-  position: absolute;
+/*  position: absolute;
   bottom: 0px;
   right:2px;
   text-align: right;
-  font-size: 10px;
+  font-size: 10px;*/
+  visibility: hidden;
 }
 
 #speedSlider{
@@ -12,19 +13,33 @@
   background-color:transparent;
 }
 
-.noDST{
+.questions{
   z-index: 999;
-  position: absolute;
-  bottom:5px;
-  left:5px;
   font-size: 14px;
 }
 
-.noDST:hover{
+.questions:hover{
   cursor:pointer;
 }
 
-.timeExplanation{
+.timeExplanationCl{
+  z-index: 999;
+  position: absolute;
+  width:70%;
+  left:50%;
+  bottom:50%;
+  text-align: center;
+  font-weight: lighter;
+  font-size: 24px;
+  font-family: "kepler-std-semicondensed",sans-serif;
+  transform:translate(-50%,0%);
+  background: rgba(0,0,0,.75);
+  padding: 25px;
+  visibility: hidden;
+  cursor:pointer;
+}
+
+.centeredInfo{
   z-index: 999;
   position: absolute;
   width:80%;
@@ -57,7 +72,7 @@
   position: absolute;
   width:80%;
   left:50%;
-  bottom:150px;
+  bottom:250px;
   text-align: center;
   font-weight: lighter;
   font-size: 24px;
@@ -74,25 +89,35 @@
 
 #moreInfo{
   z-index: 999;
-  font-size: 30px;
-  background:rgba(0,0,0,.2);
+  font-size: 20px;
+  background:rgba(0,0,0,.4);
   border: .5px solid white;
   text-align: center;
   visibility: hidden;
   cursor: pointer;
   position: absolute;
-  bottom:0px;
+  top:-35px;
   padding: 5px;
   padding-left: 50px;
   padding-right: 50px;
-  right:0%;
-  top:0px;
-  height:40px;
+  left:0px;
+  height:20px;
+  width:150px;
+  transition: all .5s ease-in-out;
+ 
+  white-space: nowrap;
+  overflow: hidden;
+   text-overflow: clip;
 }
 
 #moreInfo:hover{
-  background:rgba(0,0,0,.5);
+  
+  background:rgba(0,0,0,.8);
   border:2px solid white;
+  height:150px;
+  width:200px;
+  top:-168px;
+  transition: all .5s ease-in-out;
 }
 
 #nightTime{
@@ -136,11 +161,9 @@ a{
 }
 
 #info{
-  position: absolute;
+  text-align: center;
   z-index: 999;
-  width: 100%;
-  top:5px;
-  height:100px;
+  visibility: hidden;
 }
 
 #timeline{
@@ -215,10 +238,7 @@ a{
 }
 #latlong{
   display: inline-block;
-  position: absolute;
-  right: 0px;
-  top:-25px;
-  text-align: right;
+  text-align: center;
   background-color: rgba(0, 0, 0, .5);
   padding:5px;
 }
@@ -299,7 +319,7 @@ canvas{
   padding-top:15px;
   width:100%;
   height:125px;
-  background:rgba(0,0,0,.2);
+  background:rgba(0,0,0,0);
   color:white;
   font-family: Helvetica;
 }

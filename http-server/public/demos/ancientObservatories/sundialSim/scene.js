@@ -34,6 +34,8 @@ var showAllLabels = false
 var updateAllLabels = false
 var showLines = false
 
+var nightWarning = false
+
 function init() {
 	//console.log('sunrise '+xpl.sunrise(obsPos,-0.833))
 	speed = 0
@@ -350,10 +352,9 @@ function animate() {
 
 	// document.getElementById('date').innerHTML = "Date: " + dMo + "/" + dDay + "/" +date.year+ " (at meridian)"+
 	// 											"<br>Time: "+dspHour+":"+dmin +"(UTC"+dtz+timeZone+")";
-	document.getElementById('latlong').innerHTML ="Latitude: "+obsPos.latitude+
-																				"<br> Longitude: "+obsPos.longitude+
-																				"<br> Elevation(m): "+obsPos.elevation*1000+
-																				"<br>Villa Palombara Massimi, Rome"
+	document.getElementById('latlong').innerHTML ="Latitude: "+obsPos.latitude.toFixed(3)+
+																				"<br> Longitude: "+obsPos.longitude.toFixed(3)+
+																				"<br> Elevation(m): "+obsPos.elevation*1000
 
 	for(var p =0;p<planetArray.length;p++){
 			var pAltAz = xpl.PlanetAlt(p,xpl.now+timeOffset+sumT,obsPos)
@@ -368,7 +369,7 @@ function animate() {
 		document.body.style.backgroundColor = dayColor
 		document.getElementById('nightTime').style.visibility = 'hidden'
 	}else{
-		if(document.getElementById("intro").style.visibility == 'hidden'){
+		if(nightWarning){
 			document.getElementById('nightTime').style.visibility = 'visible'
 		}else{
 			document.getElementById('nightTime').style.visibility = 'hidden'
@@ -475,8 +476,19 @@ document.getElementById('timeSelector').addEventListener("change", function() {
     dial.set('value',0)
 });
 
+document.getElementById("creditButton").addEventListener("click",function(){
+	document.getElementById("credit").style.visibility = "visible"
+	nightWarning = false
+})
+
+document.getElementById("credit").addEventListener("click",function(){
+	document.getElementById("credit").style.visibility = "hidden"
+	nightWarning = true
+})
+
 document.getElementById("close").addEventListener("click",function(){
 	document.getElementById("intro").style.visibility = 'hidden'
+	nightWarning = true
 	document.getElementById("moreInfo").style.visibility = 'visible'
 	if(sphereCut){scene.remove(sphereCut)}
 	controls.autoRotate = false
@@ -484,11 +496,11 @@ document.getElementById("close").addEventListener("click",function(){
 	tutStage = 0
 })
 
-document.getElementById("moreInfo").addEventListener("click",function(){
+document.getElementById("takeTour").addEventListener("click",function(){
 	create = true
 	tutStage = 0
 	document.getElementById("intro").style.visibility = 'visible'
-	document.getElementById("moreInfo").style.visibility = 'hidden'
+	nightWarning = false
 })
 
 var logValue = function(e){
@@ -625,9 +637,28 @@ function tutorial(){
 }
 
 // document.body.addEventListener("keypress",function(){
-// 	lineMaterial.opacity*=-1
+// 	lineMaterial.opacity*=-1time
 // })
+document.getElementById("timeRight").addEventListener("click",function(){
+	document.getElementById("timeExplanation").style.visibility = "visible"	
+	nightWarning = false
+})
 
+document.getElementById("info").addEventListener("click",function(){
+	document.getElementById("info").style.visibility = "hidden"	
+	nightWarning = true
+})
+
+document.getElementById("location").addEventListener("click",function(){
+	document.getElementById("info").style.visibility = "visible"	
+	nightWarning = false
+	//document.getElementById("nightTime").style.visibility = "hidden"
+})
+
+document.getElementById("timeExplanation").addEventListener("click",function(){
+	document.getElementById("timeExplanation").style.visibility = "hidden"
+	nightWarning = true
+})
 document.getElementById("submitDate").addEventListener("click",function(){
 	var enteredDate = document.getElementById("setDate").value
 	var eDateComponents = enteredDate.split("/");
@@ -637,7 +668,7 @@ document.getElementById("submitDate").addEventListener("click",function(){
 	//console.log(ejday)
 	
 	var tDiff = ejday-curjday
-	timeOffset+=tDiff
+	sumT+=tDiff
 })
 
 YUI().use('dial', function(Y) {
