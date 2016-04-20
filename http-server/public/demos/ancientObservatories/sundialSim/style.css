@@ -299,6 +299,7 @@ canvas{
 }
 
 #date{
+  z-index: 999;
   display: inline;
   position: absolute;
   left: 0px;
@@ -310,7 +311,10 @@ canvas{
   border:1px white solid;
 }
 #date:hover{}
-
+#timeSelector{
+  position: relative;
+  top:-2px;
+}
 #controls{
   font-weight: lighter;
   z-index: 998;
@@ -356,6 +360,7 @@ canvas{
 }
 
 .time{
+  z-index: 999;
   position: absolute;
   width:100%;
   bottom:-25px;
