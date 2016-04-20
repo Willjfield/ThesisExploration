@@ -25,7 +25,7 @@
 .timeExplanationCl{
   z-index: 999;
   position: absolute;
-  width:70%;
+  width:50%;
   left:50%;
   bottom:50%;
   text-align: center;
@@ -70,7 +70,7 @@
 #intro{
   z-index: 999;
   position: absolute;
-  width:80%;
+  width:50%;
   left:50%;
   bottom:250px;
   text-align: center;
@@ -259,8 +259,9 @@ a{
   bottom: 27.5px;
   left:140px;
   height:30px;
-  font-size: 20px;
+  font-size: 18px;
   width:140px;
+  font-family: monospace;
 }
 
 #sliderTitle{
@@ -359,6 +360,9 @@ canvas{
   width:100%;
   bottom:-25px;
   text-align: center;
+  font-family: monospace;
+  font-weight: lighter;
+  letter-spacing: -1px;
 }
 
 #fastForward{

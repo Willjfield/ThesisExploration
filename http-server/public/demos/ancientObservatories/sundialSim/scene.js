@@ -478,11 +478,17 @@ document.getElementById('timeSelector').addEventListener("change", function() {
 
 document.getElementById("creditButton").addEventListener("click",function(){
 	document.getElementById("credit").style.visibility = "visible"
+	document.getElementById("intro").style.visibility = "hidden"
+	document.getElementById("timeExplanation").style.visibility = "hidden"
+	document.getElementById("info").style.visibility = "hidden"	
 	nightWarning = false
 })
 
 document.getElementById("credit").addEventListener("click",function(){
 	document.getElementById("credit").style.visibility = "hidden"
+	document.getElementById("intro").style.visibility = "hidden"
+	document.getElementById("timeExplanation").style.visibility = "hidden"
+	document.getElementById("info").style.visibility = "hidden"	
 	nightWarning = true
 })
 
@@ -500,7 +506,17 @@ document.getElementById("takeTour").addEventListener("click",function(){
 	create = true
 	tutStage = 0
 	document.getElementById("intro").style.visibility = 'visible'
+	document.getElementById("credit").style.visibility = "hidden"
+	document.getElementById("timeExplanation").style.visibility = "hidden"
+	document.getElementById("info").style.visibility = "hidden"	
 	nightWarning = false
+})
+
+document.getElementsByTagName('canvas')[0].addEventListener("click",function(){
+	document.getElementById("intro").style.visibility = 'hidden'
+	document.getElementById("credit").style.visibility = "hidden"
+	document.getElementById("timeExplanation").style.visibility = "hidden"
+	document.getElementById("info").style.visibility = "hidden"	
 })
 
 var logValue = function(e){
@@ -520,7 +536,7 @@ function tutorial(){
 	switch(tutStage){
 		case 0:
 			if(create){
-				document.getElementById("infoText").innerHTML = "<p id='infoText'><a href='http://www.ancient-astronomy.org/en/2013/05/03/antike-sonnenuhren/'>The Berlin Sundial Project </a>has 3D scanned and archived dozens of sundials from ancient Greece and Rome. The sundial presented here was found in the Villa Palombra Massimi in Rome and dates to the first century BCE. <br><br>Use the mouse to navigate the scene and use the time dial to change the time and date.<br><br></p>"
+				document.getElementById("infoText").innerHTML = "<p id='infoText'><a href='http://www.ancient-astronomy.org/en/2013/05/03/antike-sonnenuhren/'>The Berlin Sundial Project </a>has 3D scanned and archived dozens of sundials from ancient Greece and Rome. The sundial presented here was found in the Villa Palombra in Rome and dates to the first century BCE. <br><br>Use the mouse to navigate through the scene.<br><br>Spin the time dial to change the time and date or enter a date in the text box.<br><br></p>"
 				create=false
 			}
 		break
@@ -640,17 +656,25 @@ function tutorial(){
 // 	lineMaterial.opacity*=-1time
 // })
 document.getElementById("timeRight").addEventListener("click",function(){
-	document.getElementById("timeExplanation").style.visibility = "visible"	
+	document.getElementById("timeExplanation").style.visibility = "visible"
+	document.getElementById("intro").style.visibility = "hidden"
+	document.getElementById("credit").style.visibility = "hidden"
+	document.getElementById("info").style.visibility = "hidden"	
 	nightWarning = false
 })
 
 document.getElementById("info").addEventListener("click",function(){
-	document.getElementById("info").style.visibility = "hidden"	
+	document.getElementById("info").style.visibility = "hidden"
+
 	nightWarning = true
 })
 
 document.getElementById("location").addEventListener("click",function(){
-	document.getElementById("info").style.visibility = "visible"	
+	document.getElementById("info").style.visibility = "visible"
+	document.getElementById("intro").style.visibility = "hidden"
+	document.getElementById("timeExplanation").style.visibility = "hidden"
+	document.getElementById("credit").style.visibility = "hidden"
+
 	nightWarning = false
 	//document.getElementById("nightTime").style.visibility = "hidden"
 })
