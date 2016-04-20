@@ -89,8 +89,8 @@
 
 #moreInfo{
   z-index: 999;
-  font-size: 20px;
-  background:rgba(0,0,0,.4);
+  font-size: 18px;
+  background:rgba(0,0,0,.6);
   border: .5px solid white;
   text-align: center;
   visibility: hidden;
@@ -103,6 +103,8 @@
   left:0px;
   height:20px;
   width:150px;
+  font-family: monospace;
+  letter-spacing: -.5px;
   transition: all .5s ease-in-out;
  
   white-space: nowrap;
@@ -111,7 +113,7 @@
 }
 
 #moreInfo:hover{
-  
+  font-size: 22px;
   background:rgba(0,0,0,.8);
   border:2px solid white;
   height:150px;
