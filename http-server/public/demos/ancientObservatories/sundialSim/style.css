@@ -106,7 +106,6 @@
   font-family: monospace;
   letter-spacing: -.5px;
   transition: all .5s ease-in-out;
- 
   white-space: nowrap;
   overflow: hidden;
    text-overflow: clip;
