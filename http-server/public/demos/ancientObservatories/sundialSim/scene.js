@@ -513,10 +513,12 @@ document.getElementById("takeTour").addEventListener("click",function(){
 })
 
 document.getElementsByTagName('canvas')[0].addEventListener("click",function(){
-	document.getElementById("intro").style.visibility = 'hidden'
-	document.getElementById("credit").style.visibility = "hidden"
-	document.getElementById("timeExplanation").style.visibility = "hidden"
-	document.getElementById("info").style.visibility = "hidden"	
+	if(tutStage>0){
+		document.getElementById("intro").style.visibility = 'hidden'
+		document.getElementById("credit").style.visibility = "hidden"
+		document.getElementById("timeExplanation").style.visibility = "hidden"
+		document.getElementById("info").style.visibility = "hidden"	
+	}	
 })
 
 var logValue = function(e){

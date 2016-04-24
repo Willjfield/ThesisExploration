@@ -425,8 +425,8 @@ function tour(){
                 tour1Text.style.position = 'absolute'
                 tour1Text.style.right = '10px'
                 tour1Text.style.bottom = '150px'
-                tour1Text.style.width = '350px'
-                tour1Text.style.height = '150px'
+                tour1Text.style.width = '400px'
+                tour1Text.style.height = '200px'
                 tour1Text.innerHTML = "<p id='textp'>We know who launched many of the satellites, and we can track them,<br>but we do not really know what they are doing.</p>"
                 element = document.createElement("next1");
                 element.className = "btn"
@@ -445,7 +445,8 @@ function tour(){
 
                 elementBack.appendChild(document.createTextNode('back'));
                 tour1Text.appendChild(elementBack);
-                elementBack.addEventListener('click',function(){           
+                elementBack.addEventListener('click',function(){
+                    tour1Text.style.visibility = 'hidden'       
                     createDiv = true
                     document.body.removeChild(document.getElementById('tourStart'))
                     tourStage--
@@ -774,5 +775,5 @@ YUI().use('dial', function(Y) {
             dial.set('value',0)
         }, false)
 });
-document.getElementById("takeTour").addEventListener("click",function(){tourStage=0})
+document.getElementById("takeTour").addEventListener("click",function(){tourStage > 100 ? tourStage=0 : {}})
 

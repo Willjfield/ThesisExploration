@@ -85,8 +85,9 @@
 			frame.src = pathToiFrame
 
 			var closeBox = document.createElement('div')
+			frame.appendChild(closeBox)
 			closeBox.id = 'closeBox'
-			closeBox.appendChild(document.createTextNode('x'))
+			//closeBox.appendChild(document.createTextNode('x'))
 			closeBox.addEventListener("click",function(){
 				document.getElementById("showPresentation").removeChild(presentation)
 				console.log("close")

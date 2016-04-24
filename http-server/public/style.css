@@ -298,19 +298,25 @@ tr{
 	height:300px;
 }
 #closeBox{
-	width:30px;
-	height:30px;
-	font-size: 23px;
+	z-index: 999;
+	width:40px;
+	height:40px;
+	font-size: 30px;
 	border: 1px solid white;
 	border-radius: 50%;
 	position: absolute;
-	top:30px;
-	left:30px;
+	top:3%;
+	left:3%;
 	color:white;
 	font-weight: lighter;
 	font-family: sans-serif;
 	text-align: center;
 	cursor: pointer;
+	background:black;
+}
+
+#closeBox:after {
+    content: '\d7';
 }
 
 #closeBox:hover{
