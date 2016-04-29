@@ -1,4 +1,4 @@
-var obs={}
+var obs={};
 var container, stats;
 var camera, scene, controls, renderer, objects;
 var pointLight;
@@ -7,7 +7,7 @@ var sphere,earth, skybox;
 var earthMaterial;
 var materialP,particles, particleCount, geoP, geoC, particlesP, particlesC;
 
-var meshObs
+var meshObs;
 
 var particleTrail = [];
 var particleHeadArr = [];
@@ -17,82 +17,99 @@ var particleHead;
 
 var lightDir= new THREE.Vector3(-1.0,0.0,-0.3);
 
-var tlObj
-var tle_data = []
-var xyz = new THREE.Vector3()
-var satellites = []
+var tlObj;
+var tle_data = [];
+var xyz = new THREE.Vector3();
+var satellites = [];
 
-var timeOffset = 0
-var sumT = 0
-var earthAxis = new THREE.Vector3(0,1,0)
+var timeOffset = 0;
+var sumT = 0;
+var earthAxis = new THREE.Vector3(0,1,0);
 
-var viewLine
-var myThreePosition, myViewPosition
-var my_geodetic, myposition 
-var linesArray = []
-var viewGeometry, viewMaterial
-var rotateGeo = 0//(xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
-var longRotation
-var myLong
-var camRot
+var viewLine;
+var myThreePosition, myViewPosition;
+var my_geodetic, myposition;
+var linesArray = [];
+var viewGeometry, viewMaterial;
+var rotateGeo = 0;//(xpl.curEarthOblique(xpl.now+timeOffset+sumT))*Math.PI/180
+var longRotation;
+var myLong;
+var camRot;
 
-var tourStage = 0
+var tourStage = 0;
 var tourPositions = [{ x: 0, y: 0 },{ x: 100, y: 100 },{ x: -100, y: 100 }];
-var tourDollies = []
-var tourRotations = []
+var tourDollies = [];
+var tourRotations = [];
 
-var showNRO = false
-var showMilitary = false
-var showUnknown = false
+var showNRO = false;
+var showMilitary = false;
+var showUnknown = false;
 
-var nro = []
-var military = []
-var unknown = []
+var nro = [];
+var military = [];
+var unknown = [];
 
-var mwTexture
+var mwTexture;
 
-var initDate
-var timeZone
+var initDate;
+var timeZone;
 
 xpl.getTLE('classified', satellites, function(){
-    
+   
     for(var sat in satellites){
        tle_data.push(new xpl.tle(satellites[sat].line1,satellites[sat].line2,satellites[sat].id))
        tle_data[sat].update()
        tle_data[sat].mission=tle_data[sat].name.replace(/[0-9]/g, '')
     }
+    
+    $.ajax({
+        url: "http://freegeoip.net/json/",
+     
+        // The name of the callback parameter, as specified by the YQL service
+        jsonp: "callback",
+     
+        // Tell jQuery we're expecting JSONP
+        dataType: "jsonp",
+     
+        // Tell YQL what we want and that we want JSON
+        data: {
+            format: "json"
+        },
+     
+        // Work with the response
+        success: function(location){
+            console.log(location)
+            obs.latitude = location.latitude
+            obs.longitude = location.longitude
+            obs.height = 0
+            
+            // obs.latitude = -6.1745
+            // obs.longitude = 106.8227
+            var manager = new THREE.LoadingManager();
+                    manager.onProgress = function ( item, loaded, total ) {
+                        document.getElementById("loading").remove()
+                        // document.getElementById("loadAmount").remove()
+                        //console.log( item, loaded, total );
+                    };
 
-    navigator.geolocation.getCurrentPosition(function(location){
-        obs.latitude = location.coords.latitude
-        obs.longitude = location.coords.longitude
-        obs.height = 0
-        
-        // obs.latitude = -6.1745
-        // obs.longitude = 106.8227
-        var manager = new THREE.LoadingManager();
-                manager.onProgress = function ( item, loaded, total ) {
-                    document.getElementById("loading").remove()
-                    // document.getElementById("loadAmount").remove()
-                    //console.log( item, loaded, total );
-                };
+            var loader = new THREE.ImageLoader( manager );
+            mwTexture = new THREE.Texture();
+            loader.load( '../../lib/data/images/milkywaypan_brunier.jpg', function ( image ) {
+                mwTexture.image = image;
+                mwTexture.needsUpdate = true
+                var geometryBG = new THREE.SphereGeometry( 5000, 24, 24 );
+            
+                var materialBG = new THREE.MeshLambertMaterial( { map:mwTexture } );
+                skybox = new THREE.Mesh( geometryBG, materialBG);
+                skybox.material.side = THREE.DoubleSide;
+                skybox.rotateX(60*(Math.PI/180))
 
-        var loader = new THREE.ImageLoader( manager );
-        mwTexture = new THREE.Texture();
-        loader.load( '../../lib/data/images/milkywaypan_brunier.jpg', function ( image ) {
-            mwTexture.image = image;
-            mwTexture.needsUpdate = true
-            var geometryBG = new THREE.SphereGeometry( 5000, 24, 24 );
-        
-            var materialBG = new THREE.MeshLambertMaterial( { map:mwTexture } );
-            skybox = new THREE.Mesh( geometryBG, materialBG);
-            skybox.material.side = THREE.DoubleSide;
-            skybox.rotateX(60*(Math.PI/180))
-
-            init()
-            animate()
-         })
-        
-    }) 
+                init()
+                animate()
+             })
+            
+        }
+    });
 })
 
 function map (val, in_min, in_max, out_min, out_max) {
